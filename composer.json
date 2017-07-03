@@ -1,0 +1,19 @@
+{
+    "name": "studiomado/query-bundle",
+    "type": "symfony-bundle",
+    "authors": [
+        {
+            "name": "Simone Gentili",
+            "email": "sensorario@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "": ["src", "tests"]
+        }
+    },
+    "config": {
+        "bin-dir": "bin"
+    },
+    "require": {}
+}
