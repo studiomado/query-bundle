@@ -483,5 +483,10 @@ class BaseRepository extends EntityRepository implements ContainerAwareInterface
 
         $stmt = $this->getEntityManager()->getConnection()->prepare($sql);
         $stmt->execute();
-    }     
+    }
+
+    public function getQueryBuilderFactoryWithoutInitialization()
+    {
+        return $this->queryBuilderFactory;
+    }
 }

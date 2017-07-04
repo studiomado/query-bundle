@@ -204,10 +204,10 @@ class QueryBuilderFactory extends AbstractQuery
                         ->join($entityAlias . "." . $fieldName, $relationEntityAlias);
 
                     $this->storeJoin($relationEntityAlias, $relation);
-
-                    $entityName = $association['targetEntity'];
-                    $entityAlias = $relationEntityAlias;
                 }
+
+                $entityName = $association['targetEntity'];
+                $entityAlias = $relationEntityAlias;
             }
 
             $this->setRelationEntityAlias($relationEntityAlias);
@@ -237,8 +237,10 @@ class QueryBuilderFactory extends AbstractQuery
             $this->applyFilter('andWhere', $filter, $parser, $value);
         }
 
-        foreach ($this->orFiltering as $filter => $value) {
-            $this->applyFilter('orWhere', $filter, $parser, $value);
+        if ($this->orFiltering) {
+            foreach ($this->orFiltering as $filter => $value) {
+                $this->applyFilter('orWhere', $filter, $parser, $value);
+            }
         }
 
         return $this;
