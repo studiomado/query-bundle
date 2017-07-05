@@ -102,17 +102,25 @@ class BaseRepository extends EntityRepository implements ContainerAwareInterface
 
     public function setQueryOptionsFromRequest(Request $request = null)
     {
-        $filters = $request->query->get('filtering', []);
-        $orFilters = $request->query->get('filtering_or', []);
-        $sorting = $request->query->get('sorting', []);
-        $printing = $request->query->get('printing', []);
-        $rel = $request->query->get('rel', '');
-        $page = $request->query->get('page', '');
-        $select = $request->query->get('select', $this->entityAlias);
-        $pageLength = $request->query->get('limit', 666);
-        $filtering = $request->query->get('filtering', '');
-        $limit = $request->query->get('limit', '');
-        
+        $requestAttributes = [];
+        foreach ($request->attributes->all() as $attributeName => $attributeValue) {
+            $requestAttributes[$attributeName] = $request->attributes->get(
+                $attributeName,
+                $attributeValue
+            );
+        }
+
+        $filters     = $request->query->get('filtering', []);
+        $orFilters   = $request->query->get('filtering_or', []);
+        $sorting     = $request->query->get('sorting', []);
+        $printing    = $request->query->get('printing', []);
+        $rel         = $request->query->get('rel', '');
+        $page        = $request->query->get('page', '');
+        $select      = $request->query->get('select', $this->entityAlias);
+        $pageLength  = $request->query->get('limit', 666);
+        $filtering   = $request->query->get('filtering', '');
+        $limit       = $request->query->get('limit', '');
+
         $filterOrCorrected = [];
 
         $count = 0;
@@ -127,22 +135,25 @@ class BaseRepository extends EntityRepository implements ContainerAwareInterface
             }
         }
 
-        $this->queryOptions = QueryBuilderOptions::fromArray([
-            '_route' => $request->attributes->get('_route'),
-            'customer_id' => $request->attributes->get('customer_id'),
-            'sva_id' => $request->attributes->get('sva_id'),
-            'id' => $request->attributes->get('id'),
-            'filtering' => $filtering,
+        $requestProperties = [
+            'filtering'   => $filtering,
             'orFiltering' => $filterOrCorrected,
-            'limit' => $limit,
-            'page' => $page,
-            'filters' => $filters,
-            'orFilters' => $filterOrCorrected,
-            'sorting' => $sorting,
-            'rel' => $rel,
-            'printing' => $printing,
-            'select' => $select,
-        ]);
+            'limit'       => $limit,
+            'page'        => $page,
+            'filters'     => $filters,
+            'orFilters'   => $filterOrCorrected,
+            'sorting'     => $sorting,
+            'rel'         => $rel,
+            'printing'    => $printing,
+            'select'      => $select,
+        ];
+
+        $options = array_merge(
+            $requestAttributes,
+            $requestProperties
+        );
+
+        $this->queryOptions = QueryBuilderOptions::fromArray($options);
 
         return $this;
     }
