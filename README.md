@@ -1,5 +1,24 @@
 # `QueryBuilderFactory`
 
+## Installazione
+
+Per installare la libreria è necessario aggiungere nel composer
+
+```
+"repositories": [
+    {
+        "type": "vcs",
+        "url": "https://bitbucket.org/studiomado/query-bundle.git"
+    }
+]
+```
+
+```
+"require": {
+    "studiomado/query-bundle": "@dev"
+}
+```
+
 ## Utilizzo normale
 
 Queste sono le istruzioni per utilzzare il QueryBuilderFactory al posto dei normali repository. Questo QueryBuilderFactory ha la capacita' di leggere, ordinare, filtrare i dati. Puo' essere utilizzato all'interno di un normale repository ma anche standalone.
