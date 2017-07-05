@@ -15,7 +15,7 @@ Per installare la libreria è necessario aggiungere nel composer
 
 ```
 "require": {
-    "studiomado/query-bundle": "@dev"
+    "studiomado/query-bundle": "^1.0"
 }
 ```
 
