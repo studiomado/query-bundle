@@ -567,24 +567,6 @@ class QueryBuilderFactory extends AbstractQuery
         return $this->getSelect();
     }
 
-    public function createQuery()
-    {
-        if (null == $this->getEntityName()) {
-            throw new \RuntimeException(
-                'Oops! Entity name is missing'
-            );
-        }
-
-        $alias = $this->getEntityAlias(
-            $this->getEntityName()
-        );
-
-        $this->qBuilder->select('s')
-            ->from('SvaBundle\Entity\Sva', 's');
-
-        return $this->qBuilder->getQuery();
-    }
-
     private function setRelationEntityAlias(string $relationEntityAlias)
     {
         $this->relationEntityAlias = $relationEntityAlias;

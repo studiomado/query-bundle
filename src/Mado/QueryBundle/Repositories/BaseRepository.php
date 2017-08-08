@@ -266,7 +266,6 @@ class BaseRepository extends EntityRepository implements ContainerAwareInterface
             'limit',
             'page',
             'sorting',
-            'sva_id',
             /** @todo add missing ids */
         ];
 
