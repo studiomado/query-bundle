@@ -6,5 +6,3 @@ in 1.0 minor versions.
 
 * 1.0
 
- * bug #1 unchecked orFiltering
- * feature #4 QueryBuilderOptions get all request properties
