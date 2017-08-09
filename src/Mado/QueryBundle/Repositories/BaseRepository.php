@@ -306,20 +306,22 @@ class BaseRepository extends EntityRepository implements ContainerAwareInterface
         return $results;
     }
 
-    private function createRouter()
+    protected function customQueryStringValues()
+    {
+        return [];
+    }
+
+    protected function createRouter()
     {
         $request = $this->getRequest();
         $params = [];
 
-        $list = [
-            'customer_id',
+        $list = array_merge([
             'filtering',
-            'id',
             'limit',
             'page',
             'sorting',
-            /** @todo add missing ids */
-        ];
+        ], $this->customQueryStringValues());
 
         foreach ($list as $itemKey => $itemValue) {
             $params[$itemValue] = $this->queryOptions->get($itemValue);
