@@ -1,4 +1,6 @@
 services:
-#    mado_query.example:
-#        class: Mado\QueryBundle\Example
-#        arguments: ["@service_id", "plain_value", "%parameter%"]
+
+    mado.query_builder_factory:
+        class: Mado\QueryBundle\Queries\QueryBuilderFactory
+        arguments:
+            - "@doctrine.orm.entity_manager"

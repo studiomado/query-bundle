@@ -2,7 +2,6 @@
 
 namespace Mado\QueryBundle\Queries;
 
-use Mado\Strings\CamelCaseParser;
 use Doctrine\ORM\QueryBuilder;
 
 class QueryBuilderFactory extends AbstractQuery
@@ -168,14 +167,12 @@ class QueryBuilderFactory extends AbstractQuery
      */
     public function join(String $relation)
     {
-        $parser = new CamelCaseParser();
         $relation = explode('|', $relation)[0];
         $relations = [$relation];
 
         if (strstr($relation, '_embedded.')) {
             $embeddedFields = explode('.', $relation);
-            $parser = new CamelCaseParser();
-            $relation = $parser->trans($embeddedFields[1]);
+            $relation = $this->parser->camelize($embeddedFields[1]);
 
             // elimino l'ultimo elemento che dovrebbe essere il nome del campo
             unset($embeddedFields[count($embeddedFields) - 1]);
@@ -191,7 +188,7 @@ class QueryBuilderFactory extends AbstractQuery
 
         foreach ($relations as $relation) {
 
-            $relation = $parser->trans($relation);
+            $relation = $this->parser->camelize($relation);
             $relationEntityAlias = 'table_' . $relation;
 
             $metadata = $this->manager->getClassMetadata($entityName);
@@ -200,7 +197,7 @@ class QueryBuilderFactory extends AbstractQuery
 
                 $association = $metadata->getAssociationMapping($relation);
 
-                $fieldName = $parser->trans($association['fieldName']);
+                $fieldName = $this->parser->camelize($association['fieldName']);
 
                 if ($this->noExistsJoin($relationEntityAlias, $relation)) {
 
@@ -260,13 +257,11 @@ class QueryBuilderFactory extends AbstractQuery
 
     private function applyFilterAnd($filter, $value)
     {
-        $parser = new CamelCaseParser();
-
         $whereCondition = null;
         $filterAndOperator = explode('|',$filter);
 
         $fieldName = $filterAndOperator[0];
-        $fieldName = $parser->trans($fieldName);
+        $fieldName = $this->parser->camelize($fieldName);
 
         $operator = self::$operatorMap[self::DEFAULT_OPERATOR];
         if(isset($filterAndOperator[1])){
@@ -338,7 +333,7 @@ class QueryBuilderFactory extends AbstractQuery
             $relationEntityAlias = $this->getRelationEntityAlias();
 
             $embeddedFields = explode('.', $fieldName);
-            $fieldName = $parser->trans($embeddedFields[count($embeddedFields)-1]);
+            $fieldName = $this->parser->camelize($embeddedFields[count($embeddedFields)-1]);
 
             $salt = '';
             foreach ($this->qBuilder->getParameters() as $parameter) {
@@ -372,13 +367,11 @@ class QueryBuilderFactory extends AbstractQuery
 
     private function applyFilterOr($filter, $value, $orCondition)
     {
-        $parser = new CamelCaseParser();
-
         $whereCondition = null;
         $filterAndOperator = explode('|',$filter);
 
         $fieldName = $filterAndOperator[0];
-        $fieldName = $parser->trans($fieldName);
+        $fieldName = $this->parser->camelize($fieldName);
 
         $operator = self::$operatorMap[self::DEFAULT_OPERATOR];
         if(isset($filterAndOperator[1])){
@@ -461,7 +454,7 @@ class QueryBuilderFactory extends AbstractQuery
             $relationEntityAlias = $this->getRelationEntityAlias();
 
             $embeddedFields = explode('.', $fieldName);
-            $fieldName = $parser->trans($embeddedFields[count($embeddedFields)-1]);
+            $fieldName = $this->parser->camelize($embeddedFields[count($embeddedFields)-1]);
 
             $salt = '';
             foreach ($this->qBuilder->getParameters() as $parameter) {
@@ -517,12 +510,10 @@ class QueryBuilderFactory extends AbstractQuery
             );
         }
 
-        $parser = new CamelCaseParser();
-
         foreach ($this->sorting as $sort => $val) {
             $val = strtolower($val);
 
-            $fieldName = $parser->trans($sort);
+            $fieldName = $this->parser->camelize($sort);
 
             if (in_array($fieldName, $this->fields)) {
                 $direction = ($val === self::DIRECTION_AZ) ? self::DIRECTION_AZ : self::DIRECTION_ZA;
@@ -534,7 +525,7 @@ class QueryBuilderFactory extends AbstractQuery
                 $relationEntityAlias = $this->getRelationEntityAlias();
 
                 $embeddedFields = explode('.', $sort);
-                $fieldName = $parser->trans($embeddedFields[2]);
+                $fieldName = $this->parser->camelize($embeddedFields[2]);
                 $direction = ($val === self::DIRECTION_AZ) ? self::DIRECTION_AZ : self::DIRECTION_ZA;
 
                 $this->qBuilder->addOrderBy($relationEntityAlias.'.'.$fieldName, $direction);

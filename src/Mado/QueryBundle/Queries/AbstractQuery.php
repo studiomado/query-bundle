@@ -3,6 +3,7 @@
 namespace Mado\QueryBundle\Queries;
 
 use Doctrine\ORM\EntityManager;
+use Mado\QueryBundle\Services\StringParser;
 
 class AbstractQuery
 {
@@ -12,9 +13,12 @@ class AbstractQuery
 
     protected $entityAlias;
 
+    protected $parser;
+
     public function __construct(EntityManager $manager)
     {
         $this->manager = $manager;
+        $this->parser  = new StringParser();
     }
 
     public function createSelectAndGroupBy($entityName, $alias, $groupByField)
