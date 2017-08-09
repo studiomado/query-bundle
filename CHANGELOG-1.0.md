@@ -6,3 +6,4 @@ in 1.0 minor versions.
 
 * 1.0
 
+ - bug #3 - missing query string variables (sensorario)
