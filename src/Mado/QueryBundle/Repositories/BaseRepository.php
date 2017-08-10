@@ -334,21 +334,21 @@ class BaseRepository extends EntityRepository implements ContainerAwareInterface
         return new Route($this->route_name, $params);
     }
 
-    /** @deprecate use QueryBuilderFatory instead */
+    /** @deprecate use QueryBuilderFactory instead */
     public function noExistsJoin($prevEntityAlias, $currentEntityAlias)
     {
         $needle = $prevEntityAlias . "_" . $currentEntityAlias;
         return ! in_array($needle, $this->joins);
     }
 
-    /** @deprecate use QueryBuilderFatory instead */
+    /** @deprecate use QueryBuilderFactory instead */
     public function storeJoin($prevEntityAlias, $currentEntityAlias)
     {
         $needle = $prevEntityAlias . "_" . $currentEntityAlias;
         $this->joins[$needle] = $needle;
     }
 
-    /** @deprecate use QueryBuilderFatory instead */
+    /** @deprecate use QueryBuilderFactory instead */
     public function join($queryBuilder, $key, $val) 
     {
         if (strstr($key, '_embedded.')) {
@@ -412,98 +412,12 @@ class BaseRepository extends EntityRepository implements ContainerAwareInterface
         $this->embeddedFields = $embeddedFields;
     }    
 
-    /** @deprecate use QueryBuilderFatory component instead */
-    //protected function sort($queryBuilder)
-    //{
-        //$request = $this->getRequest();
-        //$sorting = $request->query->get('sorting', array());
-
-        //foreach ($this->fields as $field) {
-            //if (isset($sorting[$field])) {
-                //$direction = ($sorting[$field] === 'asc') ? 'asc' : 'desc';
-                //$queryBuilder->addOrderBy($this->entityAlias.'.'.$field, $direction);
-            //}
-        //}
-
-        //// &sorting[_embedded.{{relazione}}.{{campo}}={{val}}
-        //foreach ($sorting as $sort => $val) {
-            //if (strstr($sort, '_embedded.')) {
-
-                //$queryBuilder = $this->join($queryBuilder, $sort, $val);
-
-                //$currentEntityAlias = $this->getCurrentEntityAlias();
-                //$embeddedFields = $this->getEmbeddedFields();
-                //$numFields = count($embeddedFields);
-
-                //$fieldName = $embeddedFields[$numFields - 1];
-                //$direction = ($val === 'asc') ? 'asc' : 'desc';
-                //$queryBuilder->addOrderBy("$currentEntityAlias." . $fieldName, $direction);
-            //}
-        //}
-
-        //return $queryBuilder;
-    //}
-
     public function getEntityAlias(string $entityName) : string
     {
         $arrayEntityName = explode('\\', strtolower($entityName) );
         $entityAlias = $arrayEntityName[count($arrayEntityName)-1];
         return $entityAlias;
     }
-
-    /** @deprecate use QueryBuilderFatory component instead */
-    //protected function filter($queryBuilder)
-    //{
-        //$request = $this->getRequest();
-        //$filtering = $request->query->get('filtering', array());
-
-        //foreach ($this->fields as $field) {
-            //if (isset($filtering[$field])) {
-                //switch ($field) {
-                //case 'id':
-                //case 'year':
-                //case 'week':                        
-                    //$queryBuilder->andWhere($this->entityAlias.'.'.$field.' = :filter_'.$field)
-                        //->setParameter('filter_'.$field, $filtering[$field]);                        
-                    //break;
-                //default:
-                    //$queryBuilder->andWhere($this->entityAlias.'.'.$field.' LIKE :filter_'.$field)
-                        //->setParameter('filter_'.$field, '%'.$filtering[$field].'%');
-                //}
-            //}
-        //}
-
-        //// &filtering[_embedded.{{relazione}}.{{campo}}]={{val}}
-        //foreach ($filtering as $filter => $val) {
-            //if (strstr($filter, '_embedded.')) {
-
-                //$queryBuilder = $this->join($queryBuilder, $filter, $val);
-
-                //$currentEntityAlias = $this->getCurrentEntityAlias();
-                //$embeddedFields = $this->getEmbeddedFields();
-                //$numFields = count($embeddedFields);
-                //$fieldName = $embeddedFields[$numFields - 1];
-
-                //$paramName = str_replace(".", "_", $filter);
-
-                //switch ($fieldName) {
-                //case 'id':
-                //case 'codiceClienteFornitore':
-                //case 'codiceFamily':
-                //case 'year':
-                //case 'week':
-                    //$queryBuilder->andWhere("$currentEntityAlias." . $fieldName . ' = :filter_' . $paramName)
-                        //->setParameter('filter_' . $paramName, $val);
-                    //break;
-                //default :
-                    //$queryBuilder->andWhere("$currentEntityAlias." . $fieldName . ' LIKE :filter_' . $paramName)
-                        //->setParameter('filter_' . $paramName, '%' . $val . '%');                        
-                //}
-            //}
-        //}
-
-        //return $queryBuilder;
-    //}
 
     protected function relationship($queryBuilder)
     {
