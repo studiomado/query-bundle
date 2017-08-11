@@ -7,6 +7,7 @@ in 1.0 minor versions.
 
  - bug #4 - fix phpunit configuration
  - feature #5 - add contributing file
+ - feature #7 - add Operators to Vocabulary
 
 ## 1.0.6 (2017-08-09)
 

@@ -3,14 +3,13 @@
 namespace Mado\QueryBundle\Queries;
 
 use Doctrine\ORM\QueryBuilder;
+use Mado\QueryBundle\Vocabulary\Operators;
 
 class QueryBuilderFactory extends AbstractQuery
 {
     const DIRECTION_AZ = 'asc';
 
     const DIRECTION_ZA = 'desc';
-
-    const DEFAULT_OPERATOR = 'eq';
 
     /**
      * @var QueryBuilder
@@ -39,60 +38,9 @@ class QueryBuilderFactory extends AbstractQuery
 
     protected $select;
 
-    /** @todo move this file in configuration */
-    /** @todo type number|text */
-    private static $operatorMap = [
-        //'eq' => [
-            //'filtro' => '=',
-            //'tipo' => 'data|numero|stringa',
-            //'meta' => '%{foo}%'
-        //],
-        'eq' => [
-            'meta' => '=',
-        ],
-        'neq' => [
-            'meta' => '!=',
-        ],
-        'gt' => [
-            'meta' => '>',
-        ],
-        'gte' => [
-            'meta' => '>=',
-        ],
-        'lt' => [
-            'meta' => '<',
-        ],
-        'lte' => [
-            'meta' => '<=',
-        ],
-        'startswith' => [
-            'meta' => 'LIKE',
-            'substitution_pattern' => '{string}%'
-        ],
-        'contains' => [
-            'meta' => 'LIKE',
-            'substitution_pattern' => '%{string}%'
-        ],
-        'notcontains' => [
-            'meta' => 'NOT LIKE',
-            'substitution_pattern' => '%{string}%'
-        ],
-        'endswith' => [
-            'meta' => 'LIKE',
-            'substitution_pattern' => '%{string}'
-        ],
-        'list' => [
-            'meta' => 'IN',
-            'substitution_pattern' => '({string})',
-        ],
-        'field_eq' => [
-            'meta' => '=',
-        ],
-    ];
-
     public function getAvailableFilters()
     {
-        return array_keys(static::$operatorMap);
+        return array_keys(Operators::getAll());
     }
 
     public function setFields(array $fields = [])
@@ -263,9 +211,9 @@ class QueryBuilderFactory extends AbstractQuery
         $fieldName = $filterAndOperator[0];
         $fieldName = $this->parser->camelize($fieldName);
 
-        $operator = self::$operatorMap[self::DEFAULT_OPERATOR];
+        $operator = Operators::getDefaultOperator();
         if(isset($filterAndOperator[1])){
-            $operator = self::$operatorMap[$filterAndOperator[1]];
+            $operator = Operators::get($filterAndOperator[1]);
         }
 
         // controllo se il filtro che mi arriva dalla richiesta è una proprietà di questa entità
@@ -373,9 +321,9 @@ class QueryBuilderFactory extends AbstractQuery
         $fieldName = $filterAndOperator[0];
         $fieldName = $this->parser->camelize($fieldName);
 
-        $operator = self::$operatorMap[self::DEFAULT_OPERATOR];
+        $operator = Operators::getDefaultOperator();
         if(isset($filterAndOperator[1])){
-            $operator = self::$operatorMap[$filterAndOperator[1]];
+            $operator = Operators::get($filterAndOperator[1]);
         }
 
         // controllo se il filtro che mi arriva dalla richiesta è una proprietà di questa entità
