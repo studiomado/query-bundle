@@ -105,13 +105,7 @@ class BaseRepository extends EntityRepository
 
     public function setQueryOptionsFromRequest(Request $request = null)
     {
-        $requestAttributes = [];
-        foreach ($request->attributes->all() as $attributeName => $attributeValue) {
-            $requestAttributes[$attributeName] = $request->attributes->get(
-                $attributeName,
-                $attributeValue
-            );
-        }
+        $requestAttributes = self::getRequestAttributes($request);
 
         $filters     = $request->query->get('filtering', []);
         $orFilters   = $request->query->get('filtering_or', []);
@@ -161,8 +155,24 @@ class BaseRepository extends EntityRepository
         return $this;
     }
 
+    public static function getRequestAttributes(Request $request)
+    {
+        $requestAttributes = [];
+
+        foreach ($request->attributes->all() as $attributeName => $attributeValue) {
+            $requestAttributes[$attributeName] = $request->attributes->get(
+                $attributeName,
+                $attributeValue
+            );
+        }
+
+        return $requestAttributes;
+    }
+
     public function setQueryOptionsFromRequestWithCustomFilter(Request $request = null, $filter)
     {
+        $requestAttributes = self::getRequestAttributes($request);
+
         $filters = $request->query->get('filtering', []);
         $orFilters = $request->query->get('filtering_or', []);
         $sorting = $request->query->get('sorting', []);
@@ -190,7 +200,7 @@ class BaseRepository extends EntityRepository
             }
         }
 
-        $this->queryOptions = QueryBuilderOptions::fromArray([
+        $requestProperties = [
             '_route' => $request->attributes->get('_route'),
             'customer_id' => $request->attributes->get('customer_id'),
             'id' => $request->attributes->get('id'),
@@ -203,13 +213,22 @@ class BaseRepository extends EntityRepository
             'rel' => $rel,
             'printing' => $printing,
             'select' => $select,
-        ]);
+        ];
+
+        $options = array_merge(
+            $requestAttributes,
+            $requestProperties
+        );
+
+        $this->queryOptions = QueryBuilderOptions::fromArray($options);
 
         return $this;
     }
 
     public function setQueryOptionsFromRequestWithCustomOrFilter(Request $request = null, $orFilter)
     {
+        $requestAttributes = self::getRequestAttributes($request);
+
         $filters = $request->query->get('filtering', []);
         $orFilters = $request->query->get('filtering_or', []);
         $sorting = $request->query->get('sorting', []);
@@ -237,7 +256,7 @@ class BaseRepository extends EntityRepository
             }
         }
 
-        $this->queryOptions = QueryBuilderOptions::fromArray([
+        $requestProperties = [
             '_route' => $request->attributes->get('_route'),
             'customer_id' => $request->attributes->get('customer_id'),
             'id' => $request->attributes->get('id'),
@@ -250,9 +269,21 @@ class BaseRepository extends EntityRepository
             'rel' => $rel,
             'printing' => $printing,
             'select' => $select,
-        ]);
+        ];
+
+        $options = array_merge(
+            $requestAttributes,
+            $requestProperties
+        );
+
+        $this->queryOptions = QueryBuilderOptions::fromArray($options);
 
         return $this;
+    }
+
+    public function getQueryBuilderOptions()
+    {
+        return $this->queryOptions;
     }
 
     public function getRequest()
