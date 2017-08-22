@@ -10,6 +10,7 @@ in 1.0 minor versions.
  - feature #7 - add Operators to Vocabulary
  - feature #8 - add new FilteringObject value
  - bug #11 - remove ContainerAwareInterface from BaseRepository
+ - bug #9 - fix missing attributes
 
 ## 1.0.6 (2017-08-09)
 
