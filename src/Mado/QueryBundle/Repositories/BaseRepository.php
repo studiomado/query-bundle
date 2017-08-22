@@ -13,10 +13,8 @@ use Mado\QueryBundle\Queries\QueryBuilderFactory;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
-class BaseRepository extends EntityRepository implements ContainerAwareInterface
+class BaseRepository extends EntityRepository
 {
-    use ContainerAwareTrait;
-
     protected $fields;
 
     protected $request;
