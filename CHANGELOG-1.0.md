@@ -3,7 +3,11 @@
 This changelog references the relevant changes (bug and security fixes) done
 in 1.0 minor versions.
 
-## 1.0.7
+## 1.0.8 (2017-08-25)
+
+ - feature #13 - add installation in readme file
+
+## 1.0.7 (2017-08-22)
 
  - bug #4 - fix phpunit configuration
  - feature #5 - add contributing file
