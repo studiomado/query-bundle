@@ -4,27 +4,27 @@ namespace Mado\QueryBundle\Services;
 
 class StringParser
 {
-    public function numberOfTokens(string $string)
+    public static function numberOfTokens(string $string)
     {
-        return count($this->exploded($string));
+        return count(self::exploded($string));
     }
 
-    private function exploded(string $string)
+    private static function exploded(string $string)
     {
         return explode('_', $string);
     }
 
-    public function tokenize(string $string, int $position)
+    public static function tokenize(string $string, int $position)
     {
-        return $this->exploded($string)[$position];
+        return self::exploded($string)[$position];
     }
 
-    public function camelize($string)
+    public static function camelize($string)
     {
-        $camelized = $this->tokenize($string, 0);
+        $camelized = self::tokenize($string, 0);
 
-        for ($i = 1; $i < $this->numberOfTokens($string); $i++) {
-            $camelized .= ucfirst($this->tokenize($string, $i));
+        for ($i = 1; $i < self::numberOfTokens($string); $i++) {
+            $camelized .= ucfirst(self::tokenize($string, $i));
         }
 
         return $camelized;
