@@ -3,6 +3,10 @@
 This changelog references the relevant changes (bug and security fixes) done
 in 1.0 minor versions.
 
+## 1.0.9
+
+ - feature #19 - scrutinizer integration
+
 ## 1.0.8 (2017-08-25)
 
  - feature #13 - add installation in readme file
