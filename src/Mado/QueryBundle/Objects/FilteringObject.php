@@ -26,6 +26,7 @@ final class FilteringObject
     {
         $filterAsArray = explode('|', $filter);
 
+        $properties = [];
         $properties[FilteringObject::KEY_FIELD_NAME] = $filterAsArray[FilteringObject::INDEX_FIELD_NAME];
 
         if (isset($filterAsArray[FilteringObject::INDEX_OPERATOR_NAME])) {
