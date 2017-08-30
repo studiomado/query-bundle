@@ -1,3 +1,4 @@
+[![Build Status](https://scrutinizer-ci.com/g/studiomado/query-bundle/badges/build.png?b=master)](https://scrutinizer-ci.com/g/studiomado/query-bundle/build-status/master) [![Code Coverage](https://scrutinizer-ci.com/g/studiomado/query-bundle/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/studiomado/query-bundle/?branch=master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/studiomado/query-bundle/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/studiomado/query-bundle/?branch=master)
 # Plain symfony project for query-bundle
 
 The purpose of this project is to see how studiomado/query-bundle works and can be installed in a plain symfony project.
