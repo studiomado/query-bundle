@@ -10,8 +10,6 @@ use Pagerfanta\Pagerfanta;
 use Symfony\Component\HttpFoundation\Request;
 use Mado\QueryBundle\Queries\QueryBuilderOptions;
 use Mado\QueryBundle\Queries\QueryBuilderFactory;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 class BaseRepository extends EntityRepository
 {
@@ -31,14 +29,8 @@ class BaseRepository extends EntityRepository
 
     protected $joins = [];
 
-    /**
-     * @var QueryBuilderFactory
-     */
     protected $queryBuilderFactory;
 
-    /**
-     * @var QueryBuilderOptions
-     */
     protected $queryOptions;
 
     public function __construct($manager, $class)
@@ -114,7 +106,6 @@ class BaseRepository extends EntityRepository
         $rel         = $request->query->get('rel', '');
         $page        = $request->query->get('page', '');
         $select      = $request->query->get('select', $this->entityAlias);
-        $pageLength  = $request->query->get('limit', 666);
         $filtering   = $request->query->get('filtering', '');
         $limit       = $request->query->get('limit', '');
 
@@ -180,7 +171,6 @@ class BaseRepository extends EntityRepository
         $rel = $request->query->get('rel', '');
         $page = $request->query->get('page', '');
         $select = $request->query->get('select', $this->entityAlias);
-        $pageLength = $request->query->get('limit', 666);
         $filtering = $request->query->get('filtering', '');
         $limit = $request->query->get('limit', '');
 
@@ -236,7 +226,6 @@ class BaseRepository extends EntityRepository
         $rel = $request->query->get('rel', '');
         $page = $request->query->get('page', '');
         $select = $request->query->get('select', $this->entityAlias);
-        $pageLength = $request->query->get('limit', 666);
         $filtering = $request->query->get('filtering', '');
         $limit = $request->query->get('limit', '');
 
@@ -342,7 +331,6 @@ class BaseRepository extends EntityRepository
 
     protected function createRouter()
     {
-        $request = $this->getRequest();
         $params = [];
 
         $list = array_merge([
@@ -384,8 +372,8 @@ class BaseRepository extends EntityRepository
             $embeddedFields = explode('.', $key);
             $numFields = count($embeddedFields);
 
-            $prevEntityAlias = $this->entityAlias; // Stocksellouts
-            $prevEntityName = $this->getEntityName(); // Stocksellouts
+            $prevEntityAlias = $this->entityAlias;
+            $prevEntityName = $this->getEntityName();
 
             for ($i = 1; $i < $numFields - 1; $i++) {
                 $metadata = $this->getEntityManager()->getClassMetadata($prevEntityName);
@@ -466,24 +454,24 @@ class BaseRepository extends EntityRepository
      */
     public function onDuplicateUpdate($insertFields, $updateFields)
     {
-        //---CHIAVI
         $array_keys = array_keys($insertFields);
         $list_keys = '`' . implode('`,`', $array_keys) . '`';
 
-        //---VALORI
         $list_values = "'" . implode("', '", $insertFields) . "'";
 
         $table = $this->getEntityManager()->getClassMetadata($this->getEntityName())->getTableName();
 
         $sql = 'INSERT INTO '.$table;
         $sql .= '('. $list_keys . ') ';
-        //$sql .= 'VALUES("'.implode('","', $insertFields).'") ';
         $sql .= "VALUES(". $list_values.") ";
         $sql .= 'ON DUPLICATE KEY UPDATE ';
 
         $c = 0;
         foreach($updateFields as $column => $value) {
-            if($c>0)$sql .= ", ";
+            if ($c > 0) {
+                $sql .= ", ";
+            }
+
             $sql .= '`'.$column . "` = '". $value."'";
             $c++;
         }
