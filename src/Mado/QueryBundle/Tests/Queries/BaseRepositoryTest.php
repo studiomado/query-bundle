@@ -6,6 +6,9 @@ use Mado\QueryBundle\Queries\QueryBuilderOptions;
 use Mado\QueryBundle\Repositories\BaseRepository;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @coversDefaultClass \Mado\QueryBundle\Repositories\BaseRepository
+ */
 class BaseRepositoryTest extends TestCase
 {
     public function setUp()
@@ -32,6 +35,11 @@ class BaseRepositoryTest extends TestCase
         );
     }
 
+    /**
+     * @covers Mado\QueryBundle\Queries\AbstractQuery::__construct
+     * @covers Mado\QueryBundle\Repositories\BaseRepository::__construct
+     * @covers Mado\QueryBundle\Repositories\BaseRepository::getEntityAlias
+     */
     public function testProvideEntityAliasByFQCN()
     {
         $this->assertEquals(
@@ -40,6 +48,16 @@ class BaseRepositoryTest extends TestCase
         );
     }
 
+    /**
+     * @covers Mado\QueryBundle\Queries\AbstractQuery::__construct
+     * @covers Mado\QueryBundle\Queries\QueryBuilderOptions::__construct
+     * @covers Mado\QueryBundle\Queries\QueryBuilderOptions::fromArray
+     * @covers Mado\QueryBundle\Repositories\BaseRepository::__construct
+     * @covers Mado\QueryBundle\Repositories\BaseRepository::getQueryBuilderOptions
+     * @covers Mado\QueryBundle\Repositories\BaseRepository::getRequestAttributes
+     * @covers Mado\QueryBundle\Repositories\BaseRepository::setQueryOptionsFromRequest
+     * @covers Mado\QueryBundle\Repositories\BaseRepository::setRequest
+     */
     public function testBuildOptionsViaRequest()
     {
         $this->attributeParameterBag = $this
@@ -89,6 +107,15 @@ class BaseRepositoryTest extends TestCase
         );
     }
 
+    /**
+     * @covers Mado\QueryBundle\Queries\AbstractQuery::__construct
+     * @covers Mado\QueryBundle\Queries\QueryBuilderOptions::__construct
+     * @covers Mado\QueryBundle\Queries\QueryBuilderOptions::fromArray
+     * @covers Mado\QueryBundle\Repositories\BaseRepository::__construct
+     * @covers Mado\QueryBundle\Repositories\BaseRepository::getRequestAttributes
+     * @covers Mado\QueryBundle\Repositories\BaseRepository::setQueryOptionsFromRequest
+     * @covers Mado\QueryBundle\Repositories\BaseRepository::getQueryBuilderOptions
+     */
     public function testBuildQueryOptionsFromRequest()
     {
         $this->attributeParameterBag = $this
@@ -139,6 +166,16 @@ class BaseRepositoryTest extends TestCase
             $this->repository->getQueryBuilderOptions()
         );
     }
+
+    /**
+     * @covers Mado\QueryBundle\Queries\AbstractQuery::__construct
+     * @covers Mado\QueryBundle\Queries\QueryBuilderOptions::__construct
+     * @covers Mado\QueryBundle\Queries\QueryBuilderOptions::fromArray
+     * @covers Mado\QueryBundle\Repositories\BaseRepository::__construct
+     * @covers Mado\QueryBundle\Repositories\BaseRepository::getRequestAttributes
+     * @covers Mado\QueryBundle\Repositories\BaseRepository::setQueryOptionsFromRequest
+     * @covers Mado\QueryBundle\Repositories\BaseRepository::getQueryBuilderOptions
+     */
     public function testBuildQueryOptionsFromRequestWithCustomFilter()
     {
         $this->attributeParameterBag = $this
@@ -190,6 +227,15 @@ class BaseRepositoryTest extends TestCase
         );
     }
 
+    /**
+     * @covers Mado\QueryBundle\Queries\AbstractQuery::__construct
+     * @covers Mado\QueryBundle\Queries\QueryBuilderOptions::__construct
+     * @covers Mado\QueryBundle\Queries\QueryBuilderOptions::fromArray
+     * @covers Mado\QueryBundle\Repositories\BaseRepository::__construct
+     * @covers Mado\QueryBundle\Repositories\BaseRepository::getRequestAttributes
+     * @covers Mado\QueryBundle\Repositories\BaseRepository::setQueryOptionsFromRequestWithCustomOrFilter
+     * @covers Mado\QueryBundle\Repositories\BaseRepository::getQueryBuilderOptions
+     */
     public function testBuildQueryOptionsFromRequestWithCustomOrFilter()
     {
         $this->attributeParameterBag = $this
