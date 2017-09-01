@@ -38,6 +38,42 @@ class QueryBuilderFactory extends AbstractQuery
 
     protected $select;
 
+    private function ensureFieldsDefined()
+    {
+        if (!$this->fields) {
+            throw new \RuntimeException(
+                'Oops! Fields are not defined'
+            );
+        }
+    }
+
+    private function ensureSortingIsDefined()
+    {
+        if (null === $this->sorting) {
+            throw new \RuntimeException(
+                'Oops! Sorting is not defined'
+            );
+        }
+    }
+
+    private function ensureFilteringIsDefined()
+    {
+        if (null === $this->filtering) {
+            throw new \RuntimeException(
+                'Oops! Filtering is not defined'
+            );
+        }
+    }
+
+    private function ensureQueryBuilderIsDefined()
+    {
+        if (!$this->qBuilder) {
+            throw new \RuntimeException(
+                "Oops! Query builder was never initialized! call ::createQueryBuilder('entityName', 'alias') to start."
+            );
+        }
+    }
+
     public function getAvailableFilters()
     {
         return array_keys(Operators::getAll());
@@ -52,11 +88,7 @@ class QueryBuilderFactory extends AbstractQuery
 
     public function getFields()
     {
-        if (null === $this->fields) {
-            throw new \RuntimeException(
-                'Oops! Fields are not defined'
-            );
-        }
+        $this->ensureFieldsDefined();
 
         return $this->fields;
     }
@@ -165,17 +197,8 @@ class QueryBuilderFactory extends AbstractQuery
 
     public function filter()
     {
-        if (null === $this->filtering) {
-            throw new \RuntimeException(
-                'Oops! Filtering is not defined'
-            );
-        }
-
-        if (!$this->fields) {
-            throw new \RuntimeException(
-                'Oops! Fields are not defined'
-            );
-        }
+        $this->ensureFilteringIsDefined();
+        $this->ensureFieldsDefined();
 
         foreach ($this->filtering as $filter => $value) {
             $this->applyFilterAnd($filter, $value);
@@ -335,10 +358,6 @@ class QueryBuilderFactory extends AbstractQuery
                         $operator['meta'] . '' .
                         $this->entityAlias . '.' . $value
                     ;
-                    //} else {
-                    //throw new \RuntimeException(
-                    //'Oops! Eccezzione'
-                    //);
                 } else {
                     $whereCondition = $this->entityAlias.'.'.$fieldName.' '.$operator['meta'].' :field_'.$fieldName . $salt;
                 }
@@ -432,17 +451,8 @@ class QueryBuilderFactory extends AbstractQuery
 
     public function sort()
     {
-        if (!$this->fields) {
-            throw new \RuntimeException(
-                'Oops! Fields are not defined'
-            );
-        }
-
-        if (null === $this->sorting) {
-            throw new \RuntimeException(
-                'Oops! Sorting is not defined'
-            );
-        }
+        $this->ensureFieldsDefined();
+        $this->ensureSortingIsDefined();
 
         foreach ($this->sorting as $sort => $val) {
             $val = strtolower($val);
@@ -472,11 +482,7 @@ class QueryBuilderFactory extends AbstractQuery
 
     public function getQueryBuilder()
     {
-        if (!$this->qBuilder) {
-            throw new \RuntimeException(
-                "Oops! Query builder was never initialized! call ::createQueryBuilder('entityName', 'alias') to start."
-            );
-        }
+        $this->ensureQueryBuilderIsDefined();
 
         return $this->qBuilder;
     }
