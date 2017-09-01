@@ -98,7 +98,7 @@ class QueryBuilderFactory extends AbstractQuery
         return $this;
     }
 
-    public function setOrFilters(array $orFiltering = [])
+    public function setOrFiltering(array $orFiltering = [])
     {
         $this->orFiltering = $orFiltering;
 
@@ -117,7 +117,7 @@ class QueryBuilderFactory extends AbstractQuery
         return $this->filtering;
     }
 
-    public function getOrFilters()
+    public function getOrFiltering()
     {
         return $this->orFiltering;
     }

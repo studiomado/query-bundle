@@ -10,6 +10,7 @@ use Pagerfanta\Pagerfanta;
 use Symfony\Component\HttpFoundation\Request;
 use Mado\QueryBundle\Queries\QueryBuilderOptions;
 use Mado\QueryBundle\Queries\QueryBuilderFactory;
+use Mado\QueryBundle\Objects\RequestOptions;
 
 class BaseRepository extends EntityRepository
 {
@@ -56,7 +57,7 @@ class BaseRepository extends EntityRepository
 
         $this->queryBuilderFactory->setFields($this->fields ?? []);
         $this->queryBuilderFactory->setFilters($options->getFilters());
-        $this->queryBuilderFactory->setOrFilters($options->getOrFilters());
+        $this->queryBuilderFactory->setOrFiltering($options->getOrFiltering());
         $this->queryBuilderFactory->setSorting($options->getSorting());
         $this->queryBuilderFactory->setRel($options->getRel());
         $this->queryBuilderFactory->setPrinting($options->getPrinting());
@@ -99,20 +100,13 @@ class BaseRepository extends EntityRepository
     {
         $requestAttributes = self::getRequestAttributes($request);
 
-        $filters     = $request->query->get('filtering', []);
-        $orFilters   = $request->query->get('filtering_or', []);
-        $sorting     = $request->query->get('sorting', []);
-        $printing    = $request->query->get('printing', []);
-        $rel         = $request->query->get('rel', '');
-        $page        = $request->query->get('page', '');
-        $select      = $request->query->get('select', $this->entityAlias);
-        $filtering   = $request->query->get('filtering', '');
-        $limit       = $request->query->get('limit', '');
+        $requestOptionObject = RequestOptions::fromRequest($request, $this->entityAlias);
+        $requestOptions = $requestOptionObject->asArray();
 
         $filterOrCorrected = [];
 
         $count = 0;
-        foreach ($orFilters as $key => $filter) {
+        foreach ($requestOptions['orFiltering'] as $key => $filter) {
             if (is_array($filter)) {
                 foreach ($filter as $keyInternal => $internal) {
                     $filterOrCorrected[$keyInternal .'|' . $count] = $internal;
@@ -123,22 +117,11 @@ class BaseRepository extends EntityRepository
             }
         }
 
-        $requestProperties = [
-            'filtering'   => $filtering,
-            'orFiltering' => $filterOrCorrected,
-            'limit'       => $limit,
-            'page'        => $page,
-            'filters'     => $filters,
-            'orFilters'   => $filterOrCorrected,
-            'sorting'     => $sorting,
-            'rel'         => $rel,
-            'printing'    => $printing,
-            'select'      => $select,
-        ];
+        $requestOptions['orFiltering'] = $filterOrCorrected;
 
         $options = array_merge(
             $requestAttributes,
-            $requestProperties
+            $requestOptions
         );
 
         $this->queryOptions = QueryBuilderOptions::fromArray($options);
@@ -164,22 +147,15 @@ class BaseRepository extends EntityRepository
     {
         $requestAttributes = self::getRequestAttributes($request);
 
-        $filters = $request->query->get('filtering', []);
-        $orFilters = $request->query->get('filtering_or', []);
-        $sorting = $request->query->get('sorting', []);
-        $printing = $request->query->get('printing', []);
-        $rel = $request->query->get('rel', '');
-        $page = $request->query->get('page', '');
-        $select = $request->query->get('select', $this->entityAlias);
-        $filtering = $request->query->get('filtering', '');
-        $limit = $request->query->get('limit', '');
+        $requestOptionObject = RequestOptions::fromRequest($request, $this->entityAlias);
+        $requestOptions = $requestOptionObject->asArray();
 
-        $filters = array_merge($filters, $filter);
+        $filters = array_merge($requestOption['filters'], $filter);
 
         $filterOrCorrected = [];
 
         $count = 0;
-        foreach ($orFilters as $key => $filter) {
+        foreach ($requestOptions['orFiltering'] as $key => $filter) {
             if (is_array($filter)) {
                 foreach ($filter as $keyInternal => $internal) {
                     $filterOrCorrected[$keyInternal .'|' . $count] = $internal;
@@ -190,24 +166,11 @@ class BaseRepository extends EntityRepository
             }
         }
 
-        $requestProperties = [
-            '_route' => $request->attributes->get('_route'),
-            'customer_id' => $request->attributes->get('customer_id'),
-            'id' => $request->attributes->get('id'),
-            'filtering' => $filtering,
-            'limit' => $limit,
-            'page' => $page,
-            'filters' => $filters,
-            'orFilters' => $filterOrCorrected,
-            'sorting' => $sorting,
-            'rel' => $rel,
-            'printing' => $printing,
-            'select' => $select,
-        ];
+        $requestOptions['orFiltering'] = $filterOrCorrected;
 
         $options = array_merge(
             $requestAttributes,
-            $requestProperties
+            $requestOptions
         );
 
         $this->queryOptions = QueryBuilderOptions::fromArray($options);
@@ -219,22 +182,15 @@ class BaseRepository extends EntityRepository
     {
         $requestAttributes = self::getRequestAttributes($request);
 
-        $filters = $request->query->get('filtering', []);
-        $orFilters = $request->query->get('filtering_or', []);
-        $sorting = $request->query->get('sorting', []);
-        $printing = $request->query->get('printing', []);
-        $rel = $request->query->get('rel', '');
-        $page = $request->query->get('page', '');
-        $select = $request->query->get('select', $this->entityAlias);
-        $filtering = $request->query->get('filtering', '');
-        $limit = $request->query->get('limit', '');
+        $requestOptionObject = RequestOptions::fromRequest($request, $this->entityAlias);
+        $requestOptions = $requestOptionObject->asArray();
 
-        $orFilters = array_merge($orFilters, $orFilter);
+        $orFiltering = array_merge($requestOptions['orFiltering'], $orFilter);
 
         $filterOrCorrected = [];
 
         $count = 0;
-        foreach ($orFilters as $key => $filter) {
+        foreach ($orFiltering as $key => $filter) {
             if (is_array($filter)) {
                 foreach ($filter as $keyInternal => $internal) {
                     $filterOrCorrected[$keyInternal .'|' . $count] = $internal;
@@ -245,24 +201,11 @@ class BaseRepository extends EntityRepository
             }
         }
 
-        $requestProperties = [
-            '_route' => $request->attributes->get('_route'),
-            'customer_id' => $request->attributes->get('customer_id'),
-            'id' => $request->attributes->get('id'),
-            'filtering' => $filtering,
-            'limit' => $limit,
-            'page' => $page,
-            'filters' => $filters,
-            'orFilters' => $filterOrCorrected,
-            'sorting' => $sorting,
-            'rel' => $rel,
-            'printing' => $printing,
-            'select' => $select,
-        ];
+        $requestOptions['orFiltering'] = $filterOrCorrected;
 
         $options = array_merge(
             $requestAttributes,
-            $requestProperties
+            $requestOptions
         );
 
         $this->queryOptions = QueryBuilderOptions::fromArray($options);
@@ -301,7 +244,6 @@ class BaseRepository extends EntityRepository
     ) {
         $limit = $this->queryOptions->get('limit', 10);
         $page = $this->queryOptions->get('page', 1);
-
 
         $pagerAdapter = new DoctrineORMAdapter($queryBuilder);
 
