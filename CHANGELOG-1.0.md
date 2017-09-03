@@ -5,6 +5,7 @@ in 1.0 minor versions.
 
 ## 1.0.9
 
+ - feature #34 - ensure methods
  - feature #19 - scrutinizer integration
  - bug #28 - removed dead code
 
