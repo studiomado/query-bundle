@@ -5,7 +5,7 @@ namespace Mado\QueryBundle\Objects;
 use Mado\QueryBundle\Queries\QueryBuilderFactory;
 use Mado\QueryBundle\Vocabulary\Operators;
 
-final class FilteringObject
+class FilteringObject
 {
     const INDEX_FIELD_NAME = 0;
 

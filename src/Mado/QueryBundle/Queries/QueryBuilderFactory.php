@@ -3,6 +3,7 @@
 namespace Mado\QueryBundle\Queries;
 
 use Mado\QueryBundle\Objects\FilteringObject;
+use Mado\QueryBundle\Objects\Operator;
 use Mado\QueryBundle\Vocabulary\Operators;
 
 class QueryBuilderFactory extends AbstractQuery
@@ -11,9 +12,6 @@ class QueryBuilderFactory extends AbstractQuery
 
     const DIRECTION_ZA = 'desc';
 
-    /**
-     * @var QueryBuilder
-     */
     protected $qBuilder;
 
     protected $fields;
@@ -141,10 +139,6 @@ class QueryBuilderFactory extends AbstractQuery
         $this->joins[$needle] = $needle;
     }
 
-    /**
-     * @param String $relation Nome della relazione semplice (groups.name) o con embedded (_embedded.groups.name)
-     * @return $this
-     */
     public function join(String $relation)
     {
         $relation = explode('|', $relation)[0];
@@ -152,13 +146,8 @@ class QueryBuilderFactory extends AbstractQuery
 
         if (strstr($relation, '_embedded.')) {
             $embeddedFields = explode('.', $relation);
-
-            // elimino l'ultimo elemento che dovrebbe essere il nome del campo
             unset($embeddedFields[count($embeddedFields) - 1]);
-
-            // elimino il primo elemento _embedded
             unset($embeddedFields[0]);
-
             $relations = $embeddedFields;
         }
 
@@ -231,13 +220,8 @@ class QueryBuilderFactory extends AbstractQuery
         $filtering = FilteringObject::fromFilter($filter);
         $fieldName = $this->parser->camelize($filtering->getFieldName());
 
-        $operator = Operators::getDefaultOperator();
-        if($filtering->hasOperator()){
-            $operator = Operators::get($filtering->getOperator());
-        }
+        $op = Operator::fromFilteringObject($filtering);
 
-        // controllo se il filtro che mi arriva dalla richiesta è una proprietà di questa entità
-        // esempio per users: filtering[username|contains]=mado
         if (in_array($fieldName, $this->fields)) {
 
             $salt = '';
@@ -249,30 +233,38 @@ class QueryBuilderFactory extends AbstractQuery
 
             if ($filtering->hasOperator()) {
                 if ('list' == $filtering->getOperator()) {
-                    $whereCondition = $this->entityAlias.'.'.$fieldName.' '.$operator['meta'].' (:field_'.$fieldName . $salt . ')';
+                    $whereCondition =
+                        $this->entityAlias . '.' . $fieldName . ' ' .
+                        $op->getMeta() .' ' .
+                        '(:field_' . $fieldName . $salt . ')';
                 } else if ('field_eq' == $filtering->getOperator()) {
                     $whereCondition =
                         $this->entityAlias . '.' . $fieldName . ' '.
-                        $operator['meta'] . '' .
-                        $this->entityAlias . '.' . $value
-                        ;
+                        $op->getMeta() . ' ' .
+                        $this->entityAlias . '.' . $value;
                 } else {
-                    $whereCondition = $this->entityAlias.'.'.$fieldName.' '.$operator['meta'].' :field_'.$fieldName . $salt;
+                    $whereCondition =
+                        $this->entityAlias . '.' . $fieldName . ' ' .
+                        $op->getMeta() . ' ' .
+                        ':field_' . $fieldName . $salt;
                 }
             } else {
-                $whereCondition = $this->entityAlias.'.'.$fieldName.' = :field_'.$fieldName . $salt;
+                $whereCondition =
+                    $this->entityAlias . '.' . $fieldName .  ' ' .
+                    $op->getMeta() . ' ' .
+                    ':field_' . $fieldName . $salt;
             }
 
             $this->qBuilder->andWhere($whereCondition);
 
-            if (isset($operator['substitution_pattern'])) {
+            if ($op->haveSubstitutionPattern()) {
                 if ($filtering->hasOperator() && 'list' == $filtering->getOperator()) {
                     $value = explode(',', $value);
                 } else {
                     $value = str_replace(
                         '{string}',
                         $value,
-                        $operator['substitution_pattern']
+                        $op->getSubstitutionPattern()
                     );
                 }
             }
@@ -281,13 +273,14 @@ class QueryBuilderFactory extends AbstractQuery
         } else {
             $isNotARelation = 0 !== strpos($fieldName, 'Embedded.');
             if ($isNotARelation) {
-                $whereCondition = $this->entityAlias.'.'.$fieldName.' '.$operator['meta'].' ' . $this->entityAlias . '.' . $value;
+                $whereCondition =
+                    $this->entityAlias . '.' . $fieldName . ' ' .
+                    $op->getMeta() .' ' .
+                    $this->entityAlias . '.' . $value;
                 $this->qBuilder->andWhere($whereCondition);
             }
         }
 
-        // controllo se il filtro si riferisce ad una relazione dell'entità quindi devo fare dei join
-        // esempio per users: filtering[_embedded.groups.name|eq]=admin
         if (strstr($filter, '_embedded.')) {
 
             $this->join($filter);
@@ -304,20 +297,26 @@ class QueryBuilderFactory extends AbstractQuery
             }
 
             if ($filtering->hasOperator() && 'list' == $filtering->getOperator()) {
-                $whereCondition = $relationEntityAlias.'.'.$fieldName.' '.$operator['meta'].' (:field_'.$fieldName . $salt . ')';
+                $whereCondition =
+                    $relationEntityAlias . '.' . $fieldName . ' ' .
+                    $op->getMeta() . ' ' .
+                    '(:field_' . $fieldName . $salt . ')';
             } else {
-                $whereCondition = $relationEntityAlias.'.'.$fieldName.' '.$operator['meta'].' :field_'.$fieldName . $salt;
+                $whereCondition =
+                    $relationEntityAlias . '.' . $fieldName . ' ' .
+                    $op->getMeta() .
+                    ' :field_' . $fieldName . $salt;
             }
 
             $this->qBuilder->andWhere($whereCondition);
-            if (isset($operator['substitution_pattern'])) {
+            if ($op->haveSubstitutionPattern()) {
                 if ($filtering->hasOperator() && 'list' == $filtering->getOperator()) {
                     $value = explode(',', $value);
                 } else {
                     $value = str_replace(
                         '{string}',
                         $value,
-                        $operator['substitution_pattern']
+                        $op->getSubstitutionPattern()
                     );
                 }
             }
@@ -333,13 +332,8 @@ class QueryBuilderFactory extends AbstractQuery
 
         $fieldName = $this->parser->camelize($filtering->getFieldName());
 
-        $operator = Operators::getDefaultOperator();
-        if($filtering->hasOperator()) {
-            $operator = Operators::get($filtering->getOperator());
-        }
+        $op = Operator::fromFilteringObject($filtering);
 
-        // controllo se il filtro che mi arriva dalla richiesta è una proprietà di questa entità
-        // esempio per users: filtering[username|contains]=mado
         if (in_array($fieldName, $this->fields)) {
 
             $salt = '';
@@ -351,18 +345,27 @@ class QueryBuilderFactory extends AbstractQuery
 
             if ($filtering->hasOperator()) {
                 if ('list' == $filtering->getOperator()) {
-                    $whereCondition = $this->entityAlias.'.'.$fieldName.' '.$operator['meta'].' (:field_'.$fieldName . $salt . ')';
+                    $whereCondition =
+                        $this->entityAlias.'.'.$fieldName.' '.
+                        $op->getMeta()
+                        .' (:field_' . $fieldName . $salt . ')';
                 } else if ('field_eq' == $filtering->getOperator()) {
                     $whereCondition =
                         $this->entityAlias . '.' . $fieldName . ' '.
-                        $operator['meta'] . '' .
+                        $op->getMeta() . ' ' .
                         $this->entityAlias . '.' . $value
                     ;
                 } else {
-                    $whereCondition = $this->entityAlias.'.'.$fieldName.' '.$operator['meta'].' :field_'.$fieldName . $salt;
+                    $whereCondition =
+                        $this->entityAlias . '.' . $fieldName . ' ' .
+                        $op->getMeta() .' ' .
+                        ':field_' . $fieldName . $salt;
                 }
             } else {
-                $whereCondition = $this->entityAlias.'.'.$fieldName.' = :field_'.$fieldName . $salt;
+                $whereCondition =
+                    $this->entityAlias . '.' . $fieldName . ' ' .
+                    '=' . ' ' .
+                    ':field_' . $fieldName . $salt;
             }
 
             if ($orCondition['orCondition'] != null) {
@@ -371,14 +374,14 @@ class QueryBuilderFactory extends AbstractQuery
                 $orCondition['orCondition'] = $whereCondition;
             }
 
-            if (isset($operator['substitution_pattern'])) {
+            if ($op->haveSubstitutionPattern()) {
                 if ($filtering->hasOperator() && 'list' == $filtering->getOperator()) {
                     $value = explode(',', $value);
                 } else {
                     $value = str_replace(
                         '{string}',
                         $value,
-                        $operator['substitution_pattern']
+                        $op->getSubstitutionPattern()
                     );
                 }
             }
@@ -390,7 +393,10 @@ class QueryBuilderFactory extends AbstractQuery
         } else {
             $isNotARelation = 0 !== strpos($fieldName, 'Embedded.');
             if ($isNotARelation) {
-                $whereCondition = $this->entityAlias.'.'.$fieldName.' '.$operator['meta'].' ' . $this->entityAlias . '.' . $value;
+                $whereCondition =
+                    $this->entityAlias . '.' . $fieldName . ' ' .
+                    $op->getMeta() . ' ' .
+                    $this->entityAlias . '.' . $value;
                 if ($orCondition['orCondition'] != null) {
                     $orCondition['orCondition'] .= ' OR ' . $whereCondition;
                 } else {
@@ -399,8 +405,6 @@ class QueryBuilderFactory extends AbstractQuery
             }
         }
 
-        // controllo se il filtro si riferisce ad una relazione dell'entità quindi devo fare dei join
-        // esempio per users: filtering[_embedded.groups.name|eq]=admin
         if (strstr($filter, '_embedded.')) {
 
             $this->join($filter);
@@ -417,9 +421,15 @@ class QueryBuilderFactory extends AbstractQuery
             }
 
             if ($filtering->hasOperator() && 'list' == $filtering->getOperator()) {
-                $whereCondition = $relationEntityAlias.'.'.$fieldName.' '.$operator['meta'].' (:field_'.$fieldName . $salt . ')';
+                $whereCondition =
+                    $relationEntityAlias . '.' . $fieldName . ' ' .
+                    $op->getMeta() .' ' .
+                    '(:field_' . $fieldName . $salt . ')';
             } else {
-                $whereCondition = $relationEntityAlias.'.'.$fieldName.' '.$operator['meta'].' :field_'.$fieldName . $salt;
+                $whereCondition =
+                    $relationEntityAlias . '.' . $fieldName . ' '.
+                    $op->getMeta() .' ' .
+                    ':field_' . $fieldName . $salt;
             }
 
             if ($orCondition['orCondition'] != null) {
@@ -428,14 +438,14 @@ class QueryBuilderFactory extends AbstractQuery
                 $orCondition['orCondition'] = $whereCondition;
             }
 
-            if (isset($operator['substitution_pattern'])) {
+            if ($op->haveSubstitutionPattern()) {
                 if ($filtering->hasOperator() && 'list' == $filtering->getOperator()) {
                     $value = explode(',', $value);
                 } else {
                     $value = str_replace(
                         '{string}',
                         $value,
-                        $operator['substitution_pattern']
+                        $op->getSubstitutionPattern()
                     );
                 }
             }
@@ -461,7 +471,7 @@ class QueryBuilderFactory extends AbstractQuery
 
             if (in_array($fieldName, $this->fields)) {
                 $direction = ($val === self::DIRECTION_AZ) ? self::DIRECTION_AZ : self::DIRECTION_ZA;
-                $this->qBuilder->addOrderBy($this->entityAlias .'.'. $fieldName, $direction);
+                $this->qBuilder->addOrderBy($this->entityAlias . '.' . $fieldName, $direction);
             }
 
             if (strstr($sort, '_embedded.')) {
@@ -472,7 +482,7 @@ class QueryBuilderFactory extends AbstractQuery
                 $fieldName = $this->parser->camelize($embeddedFields[2]);
                 $direction = ($val === self::DIRECTION_AZ) ? self::DIRECTION_AZ : self::DIRECTION_ZA;
 
-                $this->qBuilder->addOrderBy($relationEntityAlias.'.'.$fieldName, $direction);
+                $this->qBuilder->addOrderBy($relationEntityAlias . '.' . $fieldName, $direction);
             }
 
         }

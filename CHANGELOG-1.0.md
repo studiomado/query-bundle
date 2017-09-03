@@ -6,8 +6,9 @@ in 1.0 minor versions.
 ## 1.0.9
 
  - feature #34 - ensure methods
+ - feature #36 - add Objects/Operator object
  - feature #19 - scrutinizer integration
- - bug #28 - removed dead code
+ - bug #28     - removed dead code
 
 ## 1.0.8 (2017-08-25)
 
