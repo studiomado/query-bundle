@@ -59,4 +59,20 @@ class FilteringObject
     {
         return $this->getOperator()['meta'];
     }
+
+    public function isListOperator() : bool
+    {
+        return $this->is('list');
+    }
+
+    public function isFieldEqualsOperator() : bool
+    {
+        return $this->is('field_eq');
+    }
+
+    private function is(string $operator) : bool
+    {
+        return $this->hasOperator() &&
+            $operator == $this->getOperator();
+    }
 }
