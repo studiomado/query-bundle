@@ -57,7 +57,6 @@ Just take a look of the database content (that now is simply empty).
 
 The query will return an empty array of result
 
-     /Users/sensorario/Development/local/prova-query-bundle/vendor/doctrine/common/lib/Doctrine/Common/Util/Debug.php:71:
      array (size=0)
        empty
 
@@ -67,10 +66,8 @@ Just add first task ...
 
 and take a look of the content
 
-    /Users/sensorario/Development/local/prova-query-bundle/vendor/doctrine/common/lib/Doctrine/Common/Util/Debug.php:71:int 1
-    sensorario@gmail.com prova-query-bundle (feature/create-simple-database) $ ./bin/console doctrine:query:dql "select t from AppBundle:Task t"
+    prompt> ./bin/console doctrine:query:dql "select t from AppBundle:Task t"
 
-    /Users/sensorario/Development/local/prova-query-bundle/vendor/doctrine/common/lib/Doctrine/Common/Util/Debug.php:71:
     array (size=1)
       0 =>
         object(stdClass)[507]
