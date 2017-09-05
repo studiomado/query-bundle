@@ -9,3 +9,7 @@ build:
                 coverage:
                     file: 'some-file'
                     format: 'clover'
+filter:
+    excluded_paths:
+        - "src/Mado/QueryBundle/Tests"
+
