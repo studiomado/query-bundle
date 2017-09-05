@@ -7,7 +7,7 @@ The purpose of this project is to see how studiomado/query-bundle works and can 
  - install query-bundle
  - create at least one entity
 
-# database configuration
+# Database configuration
 
 Remember to update parameter.yml file, parameter.yml.dist and config.yml file. In config.yml file also remember that the drive MUST be changed in pdo_sqlite to enable doctrine to work with this database.
 
