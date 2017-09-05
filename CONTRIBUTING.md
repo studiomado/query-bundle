@@ -15,4 +15,6 @@ Just copy this template in your PR's description.
     - [ ] test code
     - [ ] document the code
     - [ ] update changelog
+    - [ ] wait 
+    - [ ] squash everything
     - [ ] release new tag
