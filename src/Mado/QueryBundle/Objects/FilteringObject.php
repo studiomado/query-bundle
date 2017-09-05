@@ -38,7 +38,7 @@ class FilteringObject
 
     public function getFieldName()
     {
-       return $this->properties[FilteringObject::KEY_FIELD_NAME];
+        return $this->properties[FilteringObject::KEY_FIELD_NAME];
     }
 
     public function getOperator()

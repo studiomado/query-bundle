@@ -130,7 +130,7 @@ class QueryBuilderFactory extends AbstractQuery
 
         $needle = $prevEntityAlias . "_" . $currentEntityAlias;
 
-        return ! in_array($needle, $this->joins);
+        return !in_array($needle, $this->joins);
     }
 
     private function storeJoin($prevEntityAlias, $currentEntityAlias)
@@ -235,11 +235,11 @@ class QueryBuilderFactory extends AbstractQuery
                 if ('list' == $filtering->getOperator()) {
                     $whereCondition =
                         $this->entityAlias . '.' . $fieldName . ' ' .
-                        $op->getMeta() .' ' .
+                        $op->getMeta() . ' ' .
                         '(:field_' . $fieldName . $salt . ')';
                 } else if ('field_eq' == $filtering->getOperator()) {
                     $whereCondition =
-                        $this->entityAlias . '.' . $fieldName . ' '.
+                        $this->entityAlias . '.' . $fieldName . ' ' .
                         $op->getMeta() . ' ' .
                         $this->entityAlias . '.' . $value;
                 } else {
@@ -250,7 +250,7 @@ class QueryBuilderFactory extends AbstractQuery
                 }
             } else {
                 $whereCondition =
-                    $this->entityAlias . '.' . $fieldName .  ' ' .
+                    $this->entityAlias . '.' . $fieldName . ' ' .
                     $op->getMeta() . ' ' .
                     ':field_' . $fieldName . $salt;
             }
@@ -275,7 +275,7 @@ class QueryBuilderFactory extends AbstractQuery
             if ($isNotARelation) {
                 $whereCondition =
                     $this->entityAlias . '.' . $fieldName . ' ' .
-                    $op->getMeta() .' ' .
+                    $op->getMeta() . ' ' .
                     $this->entityAlias . '.' . $value;
                 $this->qBuilder->andWhere($whereCondition);
             }
@@ -287,7 +287,7 @@ class QueryBuilderFactory extends AbstractQuery
             $relationEntityAlias = $this->getRelationEntityAlias();
 
             $embeddedFields = explode('.', $fieldName);
-            $fieldName = $this->parser->camelize($embeddedFields[count($embeddedFields)-1]);
+            $fieldName = $this->parser->camelize($embeddedFields[count($embeddedFields) - 1]);
 
             $salt = '';
             foreach ($this->qBuilder->getParameters() as $parameter) {
@@ -346,19 +346,19 @@ class QueryBuilderFactory extends AbstractQuery
             if ($filtering->hasOperator()) {
                 if ('list' == $filtering->getOperator()) {
                     $whereCondition =
-                        $this->entityAlias.'.'.$fieldName.' '.
+                        $this->entityAlias . '.' . $fieldName . ' ' .
                         $op->getMeta()
                         .' (:field_' . $fieldName . $salt . ')';
                 } else if ('field_eq' == $filtering->getOperator()) {
                     $whereCondition =
-                        $this->entityAlias . '.' . $fieldName . ' '.
+                        $this->entityAlias . '.' . $fieldName . ' ' .
                         $op->getMeta() . ' ' .
                         $this->entityAlias . '.' . $value
                     ;
                 } else {
                     $whereCondition =
                         $this->entityAlias . '.' . $fieldName . ' ' .
-                        $op->getMeta() .' ' .
+                        $op->getMeta() . ' ' .
                         ':field_' . $fieldName . $salt;
                 }
             } else {
@@ -411,7 +411,7 @@ class QueryBuilderFactory extends AbstractQuery
             $relationEntityAlias = $this->getRelationEntityAlias();
 
             $embeddedFields = explode('.', $fieldName);
-            $fieldName = $this->parser->camelize($embeddedFields[count($embeddedFields)-1]);
+            $fieldName = $this->parser->camelize($embeddedFields[count($embeddedFields) - 1]);
 
             $salt = '';
             foreach ($this->qBuilder->getParameters() as $parameter) {
@@ -423,12 +423,12 @@ class QueryBuilderFactory extends AbstractQuery
             if ($filtering->hasOperator() && 'list' == $filtering->getOperator()) {
                 $whereCondition =
                     $relationEntityAlias . '.' . $fieldName . ' ' .
-                    $op->getMeta() .' ' .
+                    $op->getMeta() . ' ' .
                     '(:field_' . $fieldName . $salt . ')';
             } else {
                 $whereCondition =
-                    $relationEntityAlias . '.' . $fieldName . ' '.
-                    $op->getMeta() .' ' .
+                    $relationEntityAlias . '.' . $fieldName . ' ' .
+                    $op->getMeta() . ' ' .
                     ':field_' . $fieldName . $salt;
             }
 
