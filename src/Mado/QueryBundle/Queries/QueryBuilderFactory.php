@@ -4,6 +4,7 @@ namespace Mado\QueryBundle\Queries;
 
 use Mado\QueryBundle\Objects\FilteringObject;
 use Mado\QueryBundle\Objects\Operator;
+use Mado\QueryBundle\Objects\Salt;
 use Mado\QueryBundle\Vocabulary\Operators;
 
 class QueryBuilderFactory extends AbstractQuery
@@ -222,21 +223,18 @@ class QueryBuilderFactory extends AbstractQuery
 
         $op = Operator::fromFilteringObject($filtering);
 
+        $saltObj = new Salt($this->qBuilder);
+
         if (in_array($fieldName, $this->fields)) {
 
-            $salt = '';
-            foreach ($this->qBuilder->getParameters() as $parameter) {
-                if ($parameter->getName() == 'field_' . $fieldName) {
-                    $salt = '_' . rand(111, 999);
-                }
-            }
+            $saltObj->generateSaltForName($fieldName);
 
             if ($filtering->hasOperator()) {
                 if ('list' == $filtering->getOperator()) {
                     $whereCondition =
                         $this->entityAlias . '.' . $fieldName . ' ' .
                         $op->getMeta() . ' ' .
-                        '(:field_' . $fieldName . $salt . ')';
+                        '(:field_' . $fieldName . $saltObj->getSalt() . ')';
                 } else if ('field_eq' == $filtering->getOperator()) {
                     $whereCondition =
                         $this->entityAlias . '.' . $fieldName . ' ' .
@@ -246,13 +244,13 @@ class QueryBuilderFactory extends AbstractQuery
                     $whereCondition =
                         $this->entityAlias . '.' . $fieldName . ' ' .
                         $op->getMeta() . ' ' .
-                        ':field_' . $fieldName . $salt;
+                        ':field_' . $fieldName . $saltObj->getSalt();
                 }
             } else {
                 $whereCondition =
                     $this->entityAlias . '.' . $fieldName . ' ' .
                     $op->getMeta() . ' ' .
-                    ':field_' . $fieldName . $salt;
+                    ':field_' . $fieldName . $saltObj->getSalt();
             }
 
             $this->qBuilder->andWhere($whereCondition);
@@ -269,7 +267,7 @@ class QueryBuilderFactory extends AbstractQuery
                 }
             }
 
-            $this->qBuilder->setParameter('field_' . $fieldName . $salt, $value);
+            $this->qBuilder->setParameter('field_' . $fieldName . $saltObj->getSalt(), $value);
         } else {
             $isNotARelation = 0 !== strpos($fieldName, 'Embedded.');
             if ($isNotARelation) {
@@ -289,23 +287,16 @@ class QueryBuilderFactory extends AbstractQuery
             $embeddedFields = explode('.', $fieldName);
             $fieldName = $this->parser->camelize($embeddedFields[count($embeddedFields) - 1]);
 
-            $salt = '';
-            foreach ($this->qBuilder->getParameters() as $parameter) {
-                if ($parameter->getName() == 'field_' . $fieldName) {
-                    $salt = '_' . rand(111, 999);
-                }
-            }
-
             if ($filtering->hasOperator() && 'list' == $filtering->getOperator()) {
                 $whereCondition =
                     $relationEntityAlias . '.' . $fieldName . ' ' .
                     $op->getMeta() . ' ' .
-                    '(:field_' . $fieldName . $salt . ')';
+                    '(:field_' . $fieldName . $saltObj->getSalt() . ')';
             } else {
                 $whereCondition =
                     $relationEntityAlias . '.' . $fieldName . ' ' .
                     $op->getMeta() .
-                    ' :field_' . $fieldName . $salt;
+                    ' :field_' . $fieldName . $saltObj->getSalt();
             }
 
             $this->qBuilder->andWhere($whereCondition);
@@ -321,7 +312,7 @@ class QueryBuilderFactory extends AbstractQuery
                 }
             }
 
-            $this->qBuilder->setParameter('field_' . $fieldName . $salt, $value);
+            $this->qBuilder->setParameter('field_' . $fieldName . $saltObj->getSalt(), $value);
         }
     }
 
