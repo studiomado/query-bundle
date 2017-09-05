@@ -43,7 +43,7 @@ final class Operator
     public static function fromFilteringObject(
         FilteringObject $filteringObject
     ) : Operator {
-        if(true === $filteringObject->hasOperator()){
+        if (true === $filteringObject->hasOperator()){
             $operatorName = $filteringObject->getOperator();
             $operator = Operators::get($operatorName);
 
