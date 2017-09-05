@@ -18,7 +18,7 @@ This is just an example: for this example we use sqlite but in production you ca
 
 # Install query-bundle
 
-    composer require studiomado/query-bundle
+    prompt> composer require studiomado/query-bundle
 
 # Create at least one entity
 
@@ -81,9 +81,9 @@ and take a look of the content
 
 First of all install vendors
 
-    composer require jms/serializer-bundle
-    composer require willdurand/hateoas-bundle
-    composer require white-october/pagerfanta-bundle
+    prompt> composer require jms/serializer-bundle
+    prompt> composer require willdurand/hateoas-bundle
+    prompt> composer require white-october/pagerfanta-bundle
 
 and then, … add vendors in your app/AppKernel 
 
