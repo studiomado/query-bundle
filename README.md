@@ -121,11 +121,36 @@ class DefaultController extends Controller
 }
 ```
 
+# Configure your entity repository
+
+Now be sure that your repository extends the right BaseRepository.
+
+```
+namespace AppBundle\Repository;
+
+class TaskRepository extends \Mado\QueryBundle\Repositories\BaseRepository
+{
+    // to do …
+}
+```
+
+```
+namespace AppBundle\Entity;
+
+/** @ORM\Entity(repositoryClass="AppBundle\Repository\TaskRepository") */
+class Task
+{
+    // to do …
+}
+```
+
+# Customize entity serialization
+
 Now if you want to customize responses add
 
-    use JSM\Serializer\Annotation as JMS;
+    use JMS\Serializer\Annotation as JMS;
 
-on top of your entities and complete your JMS configurations. See JMS documentation to get all the complete documentation.
+On top of your entities and complete your JMS configurations. See JMS documentation to get all the complete documentation.
 
 Here some examples:
 
