@@ -24,7 +24,7 @@ This is just an example: for this example we use sqlite but in production you ca
 
 Create at least one entity ...
 
-    ./bin/console doctrine:generate:entity
+    prompt> ./bin/console doctrine:generate:entity
 
 In this example I created an entity Task following command steps.
 
@@ -35,7 +35,7 @@ In this example I created an entity Task following command steps.
 
 ... and update the schema ...
 
-		 ./bin/console doctrine:schema:update
+		prompt> ./bin/console doctrine:schema:update
 		ATTENTION: This operation should not be executed in a production environment.
 							 Use the incremental update to detect changes during development and use
 							 the SQL DDL provided to manually update your database in production.
@@ -47,13 +47,13 @@ In this example I created an entity Task following command steps.
 
 The schema update works only with force option
 
-    ./bin/console doctrine:schema:update --force
+    prompt> ./bin/console doctrine:schema:update --force
     Updating database schema...
     Database schema updated successfully! "1" query was executed
 
 Just take a look of the database content (that now is simply empty).
 
-    ./bin/console doctrine:query:dql "select t from AppBundle:Task t"
+    prompt> ./bin/console doctrine:query:dql "select t from AppBundle:Task t"
 
 The query will return an empty array of result
 
@@ -62,7 +62,7 @@ The query will return an empty array of result
 
 Just add first task ... 
 
-    ./bin/console doctrine:query:sql "insert into task values (null, 'complete this guide', 'todo') "
+    prompt> ./bin/console doctrine:query:sql "insert into task values (null, 'complete this guide', 'todo') "
 
 and take a look of the content
 
