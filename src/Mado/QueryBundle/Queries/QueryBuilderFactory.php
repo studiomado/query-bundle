@@ -224,10 +224,9 @@ class QueryBuilderFactory extends AbstractQuery
         $op = Operator::fromFilteringObject($filtering);
 
         $saltObj = new Salt($this->qBuilder);
+        $saltObj->generateSaltForName($fieldName);
 
         if (in_array($fieldName, $this->fields)) {
-
-            $saltObj->generateSaltForName($fieldName);
 
             if ($filtering->hasOperator()) {
                 if ($filtering->isListOperator()) {
@@ -295,8 +294,8 @@ class QueryBuilderFactory extends AbstractQuery
             } else {
                 $whereCondition =
                     $relationEntityAlias . '.' . $fieldName . ' ' .
-                    $op->getMeta() .
-                    ' :field_' . $fieldName . $saltObj->getSalt();
+                    $op->getMeta() . ' ' .
+                    ':field_' . $fieldName . $saltObj->getSalt();
             }
 
             $this->qBuilder->andWhere($whereCondition);
@@ -325,21 +324,17 @@ class QueryBuilderFactory extends AbstractQuery
 
         $op = Operator::fromFilteringObject($filtering);
 
-        if (in_array($fieldName, $this->fields)) {
+        $saltObj = new Salt($this->qBuilder);
+        $saltObj->generateSaltForName($fieldName);
 
-            $salt = '';
-            foreach ($this->qBuilder->getParameters() as $parameter) {
-                if ($parameter->getName() == 'field_' . $fieldName) {
-                    $salt = '_' . rand(111, 999);
-                }
-            }
+        if (in_array($fieldName, $this->fields)) {
 
             if ($filtering->hasOperator()) {
                 if ($filtering->isListOperator()) {
                     $whereCondition =
                         $this->entityAlias . '.' . $fieldName . ' ' .
                         $op->getMeta()
-                        .' (:field_' . $fieldName . $salt . ')';
+                        .' (:field_' . $fieldName . $saltObj->getSalt() . ')';
                 } else if ($filtering->isFieldEqualsOperator()) {
                     $whereCondition =
                         $this->entityAlias . '.' . $fieldName . ' ' .
@@ -350,13 +345,13 @@ class QueryBuilderFactory extends AbstractQuery
                     $whereCondition =
                         $this->entityAlias . '.' . $fieldName . ' ' .
                         $op->getMeta() . ' ' .
-                        ':field_' . $fieldName . $salt;
+                        ':field_' . $fieldName . $saltObj->getSalt();
                 }
             } else {
                 $whereCondition =
                     $this->entityAlias . '.' . $fieldName . ' ' .
                     '=' . ' ' .
-                    ':field_' . $fieldName . $salt;
+                    ':field_' . $fieldName . $saltObj->getSalt();
             }
 
             if ($orCondition['orCondition'] != null) {
@@ -404,23 +399,16 @@ class QueryBuilderFactory extends AbstractQuery
             $embeddedFields = explode('.', $fieldName);
             $fieldName = $this->parser->camelize($embeddedFields[count($embeddedFields) - 1]);
 
-            $salt = '';
-            foreach ($this->qBuilder->getParameters() as $parameter) {
-                if ($parameter->getName() == 'field_' . $fieldName) {
-                    $salt = '_' . rand(111, 999);
-                }
-            }
-
             if ($filtering->isListOperator()) {
                 $whereCondition =
                     $relationEntityAlias . '.' . $fieldName . ' ' .
                     $op->getMeta() . ' ' .
-                    '(:field_' . $fieldName . $salt . ')';
+                    '(:field_' . $fieldName . $saltObj->getSalt() . ')';
             } else {
                 $whereCondition =
                     $relationEntityAlias . '.' . $fieldName . ' ' .
                     $op->getMeta() . ' ' .
-                    ':field_' . $fieldName . $salt;
+                    ':field_' . $fieldName . $saltObj->getSalt();
             }
 
             if ($orCondition['orCondition'] != null) {
@@ -442,7 +430,7 @@ class QueryBuilderFactory extends AbstractQuery
             }
 
             $orCondition['parameters'][] = [
-                'field' => 'field_' . $fieldName . $salt,
+                'field' => 'field_' . $fieldName . $saltObj->getSalt(),
                 'value' => $value
             ];
         }
