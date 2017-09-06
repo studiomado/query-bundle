@@ -71,4 +71,49 @@ class FilteringObjectTest extends TestCase
 
         $this->assertSame('foo', $fo->getFieldName());
     }
+
+    /**
+     * @covers ::__construct
+     * @covers ::fromFilter
+     * @covers ::isListOperator
+     * @covers ::getOperator
+     * @covers ::hasOperator
+     * @covers ::is
+     */
+    public function testKnowsIfOperatorIsListOneOrNot()
+    {
+        $fo = FilteringObject::fromFilter('foo|list');
+
+        $this->assertSame(true, $fo->isListOperator());
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::fromFilter
+     * @covers ::isFieldEqualsOperator
+     * @covers ::getOperator
+     * @covers ::hasOperator
+     * @covers ::is
+     */
+    public function testKnowsIfOperatorIsFieldEqualsOrNot()
+    {
+        $fo = FilteringObject::fromFilter('foo|field_eq');
+
+        $this->assertSame(true, $fo->isFieldEqualsOperator());
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::fromFilter
+     * @covers ::isListOperator
+     * @covers ::getOperator
+     * @covers ::hasOperator
+     * @covers ::is
+     */
+    public function testKnowsIfHaveNotAnOperator()
+    {
+        $fo = FilteringObject::fromFilter('foo');
+
+        $this->assertSame(false, $fo->hasOperator());
+    }
 }

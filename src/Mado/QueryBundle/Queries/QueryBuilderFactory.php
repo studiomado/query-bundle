@@ -230,12 +230,12 @@ class QueryBuilderFactory extends AbstractQuery
             $saltObj->generateSaltForName($fieldName);
 
             if ($filtering->hasOperator()) {
-                if ('list' == $filtering->getOperator()) {
+                if ($filtering->isListOperator()) {
                     $whereCondition =
                         $this->entityAlias . '.' . $fieldName . ' ' .
                         $op->getMeta() . ' ' .
                         '(:field_' . $fieldName . $saltObj->getSalt() . ')';
-                } else if ('field_eq' == $filtering->getOperator()) {
+                } else if ($filtering->isFieldEqualsOperator()) {
                     $whereCondition =
                         $this->entityAlias . '.' . $fieldName . ' ' .
                         $op->getMeta() . ' ' .
@@ -256,7 +256,7 @@ class QueryBuilderFactory extends AbstractQuery
             $this->qBuilder->andWhere($whereCondition);
 
             if ($op->haveSubstitutionPattern()) {
-                if ($filtering->hasOperator() && 'list' == $filtering->getOperator()) {
+                if ($filtering->isListOperator()) {
                     $value = explode(',', $value);
                 } else {
                     $value = str_replace(
@@ -287,7 +287,7 @@ class QueryBuilderFactory extends AbstractQuery
             $embeddedFields = explode('.', $fieldName);
             $fieldName = $this->parser->camelize($embeddedFields[count($embeddedFields) - 1]);
 
-            if ($filtering->hasOperator() && 'list' == $filtering->getOperator()) {
+            if ($filtering->isListOperator()) {
                 $whereCondition =
                     $relationEntityAlias . '.' . $fieldName . ' ' .
                     $op->getMeta() . ' ' .
@@ -301,7 +301,7 @@ class QueryBuilderFactory extends AbstractQuery
 
             $this->qBuilder->andWhere($whereCondition);
             if ($op->haveSubstitutionPattern()) {
-                if ($filtering->hasOperator() && 'list' == $filtering->getOperator()) {
+                if ($filtering->isListOperator()) {
                     $value = explode(',', $value);
                 } else {
                     $value = str_replace(
@@ -335,12 +335,12 @@ class QueryBuilderFactory extends AbstractQuery
             }
 
             if ($filtering->hasOperator()) {
-                if ('list' == $filtering->getOperator()) {
+                if ($filtering->isListOperator()) {
                     $whereCondition =
                         $this->entityAlias . '.' . $fieldName . ' ' .
                         $op->getMeta()
                         .' (:field_' . $fieldName . $salt . ')';
-                } else if ('field_eq' == $filtering->getOperator()) {
+                } else if ($filtering->isFieldEqualsOperator()) {
                     $whereCondition =
                         $this->entityAlias . '.' . $fieldName . ' ' .
                         $op->getMeta() . ' ' .
@@ -366,7 +366,7 @@ class QueryBuilderFactory extends AbstractQuery
             }
 
             if ($op->haveSubstitutionPattern()) {
-                if ($filtering->hasOperator() && 'list' == $filtering->getOperator()) {
+                if ($filtering->isListOperator()) {
                     $value = explode(',', $value);
                 } else {
                     $value = str_replace(
@@ -411,7 +411,7 @@ class QueryBuilderFactory extends AbstractQuery
                 }
             }
 
-            if ($filtering->hasOperator() && 'list' == $filtering->getOperator()) {
+            if ($filtering->isListOperator()) {
                 $whereCondition =
                     $relationEntityAlias . '.' . $fieldName . ' ' .
                     $op->getMeta() . ' ' .
@@ -430,7 +430,7 @@ class QueryBuilderFactory extends AbstractQuery
             }
 
             if ($op->haveSubstitutionPattern()) {
-                if ($filtering->hasOperator() && 'list' == $filtering->getOperator()) {
+                if ($filtering->isListOperator()) {
                     $value = explode(',', $value);
                 } else {
                     $value = str_replace(
