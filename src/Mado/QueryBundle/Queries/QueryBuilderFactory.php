@@ -117,7 +117,7 @@ class QueryBuilderFactory extends AbstractQuery
         return $this->filtering;
     }
 
-    public function getOrFiltering()
+    public function getOrFiltering() : array
     {
         return $this->orFiltering;
     }
