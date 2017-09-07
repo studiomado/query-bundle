@@ -22,7 +22,7 @@ class StringParserTest extends TestCase
      * @covers Mado\QueryBundle\Services\StringParser::tokenize
      * @dataProvider tokens
      */
-    public function testSplitStringInTokenViaUnderscore(
+    public function testSplitStringInTokensUsingUnderscore(
         int $numberOfTokens,
         string $string
     ) {
@@ -39,7 +39,7 @@ class StringParserTest extends TestCase
      * @covers Mado\QueryBundle\Services\StringParser::tokenize
      * @dataProvider tokens
      */
-    public function testTo(
+    public function testProvideTokenAtPosition(
         int $numberOfTokens,
         string $string,
         int $tokenPosition,

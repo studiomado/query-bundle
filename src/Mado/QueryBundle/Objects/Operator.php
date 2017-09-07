@@ -4,7 +4,7 @@ namespace Mado\QueryBundle\Objects;
 
 use Mado\QueryBundle\Vocabulary\Operators;
 
-final class Operator
+class Operator
 {
     private $operator;
 

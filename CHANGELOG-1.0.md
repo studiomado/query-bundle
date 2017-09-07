@@ -5,6 +5,7 @@ in 1.0 minor versions.
 
 ## 1.0.9
 
+ - feature #45 - add Objects/WhereCondition object
  - feature #42 - add Objects/Operator object
  - feature #34 - ensure methods
  - feature #36 - add Objects/Operator object

@@ -4,7 +4,7 @@ namespace Mado\QueryBundle\Objects;
 
 use Doctrine\ORM\QueryBuilder;
 
-final class Salt
+class Salt
 {
     private $qBuilder;
 

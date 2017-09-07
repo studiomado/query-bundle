@@ -11,5 +11,5 @@ build:
                     format: 'clover'
 filter:
     excluded_paths:
-        - "src/Mado/QueryBundle/Tests"
+        - "src/Mado/QueryBundle/Tests/**"
 

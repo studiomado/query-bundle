@@ -1,5 +1,7 @@
 <?php
 
+namespace Mado\QueryBundle\Tests\Objects;
+
 use Mado\QueryBundle\Objects\Salt;
 use PHPUnit\Framework\TestCase;
 
@@ -13,7 +15,7 @@ class SaltTest extends TestCase
      * @covers ::generateSaltForName
      * @covers ::getSalt
      */
-    public function testIsEqualByDefault()
+    public function testGenerateThreeDigitRandonNumberPrecededByAnUnderscoreString()
     {
         $this->queryBuilder = $this
             ->getMockBuilder('Doctrine\ORM\QueryBuilder')
