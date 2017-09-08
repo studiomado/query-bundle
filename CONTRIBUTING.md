@@ -15,6 +15,7 @@ Just copy this template in your PR's description.
     - [ ] test code
     - [ ] document the code
     - [ ] update changelog
-    - [ ] wait 
+    - [ ] check if methods return type 
+    - [ ] wait for approvals
     - [ ] squash everything
     - [ ] release new tag
