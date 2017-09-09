@@ -1,5 +1,7 @@
 <?php
 
+namespace Mado\QueryBundle\Tests\Objects;
+
 use Mado\QueryBundle\Objects\Operator;
 use Mado\QueryBundle\Vocabulary\Operators;
 use PHPUnit\Framework\TestCase;
