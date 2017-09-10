@@ -100,7 +100,7 @@ class BaseRepository extends EntityRepository
     {
         $requestAttributes = self::getRequestAttributes($request);
 
-        $requestOptionObject = RequestOptions::fromRequest($request, $this->entityAlias);
+        $requestOptionObject = RequestOptions::fromRequest($request);
         $requestOptions = $requestOptionObject->asArray();
 
         $filterOrCorrected = [];
@@ -147,7 +147,7 @@ class BaseRepository extends EntityRepository
     {
         $requestAttributes = self::getRequestAttributes($request);
 
-        $requestOptionObject = RequestOptions::fromRequest($request, $this->entityAlias);
+        $requestOptionObject = RequestOptions::fromRequest($request);
         $requestOptions = $requestOptionObject->asArray();
 
         $filters = array_merge($requestOption['filters'], $filter);
@@ -182,7 +182,7 @@ class BaseRepository extends EntityRepository
     {
         $requestAttributes = self::getRequestAttributes($request);
 
-        $requestOptionObject = RequestOptions::fromRequest($request, $this->entityAlias);
+        $requestOptionObject = RequestOptions::fromRequest($request);
         $requestOptions = $requestOptionObject->asArray();
 
         $orFiltering = array_merge($requestOptions['orFiltering'], $orFilter);
