@@ -30,9 +30,9 @@ class QueryBuilderOptions
         return $this->get('filters', []);
     }
 
-    public function getOrFilters()
+    public function getOrFiltering() : array
     {
-        return $this->get('orFilters', []);
+        return $this->get('orFiltering', []);
     }
 
     public function getSorting()
