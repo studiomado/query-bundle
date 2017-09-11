@@ -26,7 +26,7 @@ class RequestOptions
         $requestOption['printing'] = $request->query->get('printing', []);
         $requestOption['rel'] = $request->query->get('rel', []);
         $requestOption['page'] = $request->query->get('page', []);
-        $requestOption['select'] = $request->query->get('select');
+        $requestOption['select'] = $request->query->get('select', '');
         $requestOption['filtering'] = $request->query->get('filtering', []);
         $requestOption['limit'] = $request->query->get('limit', []);
 
