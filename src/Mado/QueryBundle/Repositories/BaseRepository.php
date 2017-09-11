@@ -150,7 +150,7 @@ class BaseRepository extends EntityRepository
         $requestOptionObject = RequestOptions::fromRequest($request);
         $requestOptions = $requestOptionObject->asArray();
 
-        $filters = array_merge($requestOption['filters'], $filter);
+        $filters = array_merge($requestOptions['filters'], $filter);
 
         $filterOrCorrected = [];
 
