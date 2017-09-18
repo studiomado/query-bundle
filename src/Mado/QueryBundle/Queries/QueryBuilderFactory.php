@@ -389,6 +389,10 @@ class QueryBuilderFactory extends AbstractQuery
                 }
             }
 
+            if ($salt == '') {
+                $salt = '_' . rand(111, 999);
+            }
+
             // filtering[foo|bar]
             // $filterAndOperator[0] = 'foo'
             // $filterAndOperator[1] = 'bar'
@@ -461,6 +465,10 @@ class QueryBuilderFactory extends AbstractQuery
                 if ($parameter->getName() == 'field_' . $fieldName) {
                     $salt = '_' . rand(111, 999);
                 }
+            }
+
+            if ($salt == '') {
+                $salt = '_' . rand(111, 999);
             }
 
             if (isset($filterAndOperator[1]) && 'list' == $filterAndOperator[1]) {
@@ -616,7 +624,7 @@ class QueryBuilderFactory extends AbstractQuery
         return $this->pageLength;
     }
 
-    public function setSelect(string $select) : QueryBuilderFactory
+    public function setSelect( $select) : QueryBuilderFactory
     {
         $this->select = $select;
 
