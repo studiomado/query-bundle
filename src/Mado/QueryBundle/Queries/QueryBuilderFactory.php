@@ -545,7 +545,7 @@ class QueryBuilderFactory extends AbstractQuery
         return $this->pageLength;
     }
 
-    public function setSelect(string $select) : QueryBuilderFactory
+    public function setSelect( $select) : QueryBuilderFactory
     {
         $this->select = $select;
 
