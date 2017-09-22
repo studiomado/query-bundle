@@ -61,6 +61,8 @@ class BaseRepository extends EntityRepository
         $this->queryBuilderFactory->setRel($options->getRel());
         $this->queryBuilderFactory->setPrinting($options->getPrinting());
         $this->queryBuilderFactory->setSelect($options->getSelect());
+
+        return $this;
     }
 
     public function getQueryBuilderFactory()
@@ -93,6 +95,8 @@ class BaseRepository extends EntityRepository
     public function setQueryOptions(QueryBuilderOptions $options)
     {
         $this->queryOptions = $options;
+
+        return $this;
     }
 
     public function setQueryOptionsFromRequest(Request $request = null)
