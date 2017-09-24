@@ -6,7 +6,7 @@ use Mado\QueryBundle\Objects\FilteringObject;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @coversDefaultClass \Mado\QueryBundle\Objects\FilteringObject
+ * @covers \Mado\QueryBundle\Objects\FilteringObject
  */
 class FilteringObjectTest extends TestCase
 {
@@ -39,6 +39,8 @@ class FilteringObjectTest extends TestCase
      * @covers ::fromFilter
      * @covers ::getOperatorSign
      * @covers ::getOperator
+     * @covers ::getAll
+     * @covers ::getDefaultOperator
      */
     public function testProvideOperatorsSign()
     {

@@ -282,17 +282,16 @@ class BaseRepositoryTest extends TestCase
             QueryBuilderOptions::fromArray([
                 '_route' => [],
                 'customer_id' => [],
-                'id' => [],
-                '_route' => [],
                 'filtering' => [],
-                'limit' => [],
-                'page' => [],
                 'filters' => [],
+                'id' => [],
+                'limit' => [],
                 'orFilters' => [],
-                'sorting' => [],
-                'rel' => [],
+                'page' => [],
                 'printing' => [],
+                'rel' => [],
                 'select' => [],
+                'sorting' => [],
             ]),
             $this->repository->getQueryBuilderOptions()
         );

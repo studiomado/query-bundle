@@ -37,6 +37,11 @@ class QueryBuilderFactory extends AbstractQuery
 
     protected $select;
 
+    public function ensureFieldsDefinedPublic()
+    {
+        $this->ensureFieldsDefined();
+    }
+
     private function ensureFieldsDefined()
     {
         if (!$this->fields) {
@@ -270,6 +275,12 @@ class QueryBuilderFactory extends AbstractQuery
         } else {
             $isNotARelation = 0 !== strpos($fieldName, 'Embedded.');
             if ($isNotARelation) {
+                if (is_array($value)) {
+                    throw new \LogicException(
+                        'Mmm! Value cannot be an array'
+                    );
+                }
+
                 $whereCondition =
                     $this->entityAlias . '.' . $fieldName . ' ' .
                     $op->getMeta() . ' ' .
