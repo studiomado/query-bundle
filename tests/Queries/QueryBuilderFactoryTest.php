@@ -6,9 +6,6 @@ use Mado\QueryBundle\Queries\QueryBuilderFactory;
 use Mado\QueryBundle\Vocabulary\Operators;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \Mado\QueryBundle\Queries\QueryBuilderFactory
- */
 class QueryBuilderFactoryTest extends TestCase
 {
     public function setUp()
@@ -23,10 +20,6 @@ class QueryBuilderFactoryTest extends TestCase
         ));
     }
 
-    /**
-     * @covers \Mado\QueryBundle\Queries\QueryBuilderFactory::__construct
-     * @covers \Mado\QueryBundle\Queries\QueryBuilderFactory::getAvailableFilters
-     */
     public function testCanFilterThanksToOperators()
     {
         $this->manager = $this
@@ -43,8 +36,6 @@ class QueryBuilderFactoryTest extends TestCase
     }
 
     /**
-     * @covers \Mado\QueryBundle\Queries\QueryBuilderFactory::__construct
-     * @covers \Mado\QueryBundle\Queries\QueryBuilderFactory::getAvailableFilters
      * @expectedException \RuntimeException
      */
     public function testThrowExceptionWheneverUsedWithoutFields()
@@ -58,10 +49,6 @@ class QueryBuilderFactoryTest extends TestCase
         $queryBuilderFactory->ensureFieldsDefinedPublic();
     }
 
-    /**
-     * @covers \Mado\QueryBundle\Queries\QueryBuilderFactory::__construct
-     * @covers \Mado\QueryBundle\Queries\QueryBuilderFactory::getAvailableFilters
-     */
     public function testBuildQueryHandly()
     {
         $queryBuilderFactory = new QueryBuilderFactory($this->manager);

@@ -4,16 +4,8 @@ use Mado\QueryBundle\Objects\Operator;
 use Mado\QueryBundle\Vocabulary\Operators;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass \Mado\QueryBundle\Objects\Operator
- */
 class OperatorTest extends TestCase
 {
-    /**
-     * @covers ::__construct
-     * @covers ::getDefault
-     * @covers ::getMeta
-     */
     public function testIsEqualByDefault()
     {
         $op = Operator::getDefault();
@@ -21,7 +13,6 @@ class OperatorTest extends TestCase
     }
 
     /**
-     * @covers ::fromRawValue
      * @expectedException \RuntimeException
      * @expectedExceptionMessage Raw operator must contain `meta` parameter
      */
@@ -32,11 +23,6 @@ class OperatorTest extends TestCase
         ]);
     }
 
-    /**
-     * @covers ::__construct
-     * @covers ::fromRawValue
-     * @covers ::getMeta
-     */
     public function testCreationIsValidWithMetaParameter()
     {
         $op = Operator::fromRawValue([
@@ -50,10 +36,6 @@ class OperatorTest extends TestCase
     }
 
     /**
-     * @covers ::fromRawValue
-     * @covers ::__construct
-     * @covers ::getSubstitutionPattern
-     * @covers ::haveSubstitutionPattern
      * @expectedException \RuntimeException
      * @expectedExceptionMessage Oops! Current operator have not substitution pattern.
      */
@@ -66,12 +48,6 @@ class OperatorTest extends TestCase
         $op->getSubstitutionPattern();
     }
 
-    /**
-     * @covers ::fromRawValue
-     * @covers ::__construct
-     * @covers ::getSubstitutionPattern
-     * @covers ::haveSubstitutionPattern
-     */
     public function testProvideSubstitutionPatternIfDefinedInConstructor()
     {
         $op = Operator::fromRawValue([
@@ -85,11 +61,6 @@ class OperatorTest extends TestCase
         );
     }
 
-    /**
-     * @covers ::fromFilteringObject
-     * @covers ::__construct
-     * @covers ::getDefault
-     */
     public function testReturnDefaultOperatorWheneverFilteringObjectHasNoOperator()
     {
         $this->filteringObject = $this
@@ -108,11 +79,6 @@ class OperatorTest extends TestCase
         );
     }
 
-    /**
-     * @covers ::fromFilteringObject
-     * @covers ::__construct
-     * @covers ::getDefault
-     */
     public function testDontReturnDefaultOperatorWheneverFilteringObjectHasOperator()
     {
         $this->filteringObject = $this
@@ -131,12 +97,6 @@ class OperatorTest extends TestCase
         $this->assertNotEquals($op, Operator::getDefault());
     }
 
-    /**
-     * @covers ::fromFilteringObject
-     * @covers ::__construct
-     * @covers ::getDefault
-     * @covers ::getRawValue
-     */
     public function testProvideRawOperatorValue()
     {
         $this->filteringObject = $this

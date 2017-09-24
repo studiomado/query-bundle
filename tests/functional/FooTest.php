@@ -7,7 +7,6 @@ use Mado\QueryBundle\Queries\QueryBuilderOptions;
 use Mado\QueryBundle\Repositories\BaseRepository;
 use PHPUnit\Framework\Testcase;
 
-/** @covers Mado\QueryBundle\Repositories\BaseRepository  */
 final class FooTest extends Testcase
 {
     public function setUp()
