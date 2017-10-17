@@ -15,7 +15,17 @@
     "config": {
         "bin-dir": "bin"
     },
-    "require": {},
+    "require": {
+        "symfony/dependency-injection": "^3.3",
+        "symfony/config": "^3.3",
+        "symfony/http-kernel": "^3.3",
+        "doctrine/orm": "^2.5"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    },
     "require-dev": {
         "phpunit/phpunit": "^6.3"
     },

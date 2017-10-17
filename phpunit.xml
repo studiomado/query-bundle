@@ -2,18 +2,23 @@
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/6.3/phpunit.xsd"
          bootstrap="vendor/autoload.php"
-         forceCoversAnnotation="true"
+         forceCoversAnnotation="false"
          beStrictAboutCoversAnnotation="true"
          beStrictAboutOutputDuringTests="true"
          beStrictAboutTodoAnnotatedTests="true"
          verbose="true">
+
     <testsuite>
-        <directory suffix="Test.php">tests</directory>
+        <directory suffix="Test.php">tests/</directory>
     </testsuite>
 
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
-            <directory suffix=".php">src</directory>
+            <directory suffix=".php">src/</directory>
+            <exclude>
+                <directory suffix=".php">src/Mado/QueryBundle/DependencyInjection/</directory>
+            </exclude>
         </whitelist>
     </filter>
+
 </phpunit>

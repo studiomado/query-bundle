@@ -6,24 +6,8 @@ class QueryBuilderOptions
 {
     private $options;
 
-    private static $fields = [
-        'filters',
-        'sorting',
-        'rel',
-        'printing',
-        'select',
-    ];
-
     private function __construct(array $options)
     {
-        //foreach (self::$fields as $field) {
-            //if (!in_array($field, $options)) {
-                //throw new \RuntimeException(
-                    //'Oops! Field ' . $field . ' is missing.'
-                //);
-            //}
-        //}
-
         $this->options = $options;
     }
 

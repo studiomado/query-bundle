@@ -32,6 +32,8 @@ class AbstractQuery
         $this->qBuilder = $this->manager->createQueryBuilder($this->entityName)
             ->select($select)
             ->groupBy($groupBy);
+
+        return $this;
     }
 
     public function createQueryBuilder($entityName, $alias)
@@ -42,6 +44,8 @@ class AbstractQuery
         $this->qBuilder = $this->manager->createQueryBuilder($this->entityName)
             ->select($alias)
             ->from($this->entityName, $alias);
+
+        return $this;
     }
 
     public function getEntityName()

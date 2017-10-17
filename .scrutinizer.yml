@@ -1,0 +1,15 @@
+build:
+    environment:
+        php:
+            version: 7.1.8
+    tests:
+        override:
+            -
+                command: './bin/phpunit --coverage-clover=some-file'
+                coverage:
+                    file: 'some-file'
+                    format: 'clover'
+filter:
+    excluded_paths:
+        - "src/Mado/QueryBundle/Tests"
+

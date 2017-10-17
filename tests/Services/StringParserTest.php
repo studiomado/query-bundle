@@ -5,6 +5,9 @@ namespace Mado\QueryBundle\Tests\Services;
 use Mado\QueryBundle\Services\StringParser;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @coversDefaultClass \Mado\QueryBundle\Services\StringParser
+ */
 class StringParserTest extends TestCase
 {
     public function setUp()
@@ -12,7 +15,13 @@ class StringParserTest extends TestCase
         $this->parser = new StringParser();
     }
 
-    /** @dataProvider tokens */
+    /**
+     * @covers \Mado\QueryBundle\Services\StringParser::numberOfTokens
+     * @covers \Mado\QueryBundle\Services\StringParser::exploded
+     * @covers Mado\QueryBundle\Services\StringParser::numberOfTokens
+     * @covers Mado\QueryBundle\Services\StringParser::tokenize
+     * @dataProvider tokens
+     */
     public function testSplitStringInTokenViaUnderscore(
         int $numberOfTokens,
         string $string
@@ -23,7 +32,13 @@ class StringParserTest extends TestCase
         );
     }
 
-    /** @dataProvider tokens */
+    /**
+     * @covers \Mado\QueryBundle\Services\StringParser::tokenize
+     * @covers \Mado\QueryBundle\Services\StringParser::exploded
+     * @covers Mado\QueryBundle\Services\StringParser::numberOfTokens
+     * @covers Mado\QueryBundle\Services\StringParser::tokenize
+     * @dataProvider tokens
+     */
     public function testTo(
         int $numberOfTokens,
         string $string,
@@ -45,6 +60,13 @@ class StringParserTest extends TestCase
         ];
     }
 
+    /**
+     * @covers \Mado\QueryBundle\Services\StringParser::camelize
+     * @covers \Mado\QueryBundle\Services\StringParser::exploded
+     * @covers Mado\QueryBundle\Services\StringParser::numberOfTokens
+     * @covers Mado\QueryBundle\Services\StringParser::tokenize
+     * @dataProvider tokens
+     */
     public function testCamelizeSnakeCaseToCamelCase()
     {
         $this->assertEquals(
