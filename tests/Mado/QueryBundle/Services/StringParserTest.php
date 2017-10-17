@@ -5,7 +5,7 @@ use PHPUnit\Framework\TestCase;
 
 class StringParserTest extends TestCase
 {
-    public function testTransformSnakeCaseStringInTokens()
+    public function testTransformSnakeCaseInLowerCamelCaseStrings()
     {
         $this->parser = new StringParser();
 
