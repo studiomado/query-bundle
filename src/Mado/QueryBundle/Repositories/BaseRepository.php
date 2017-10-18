@@ -5,13 +5,13 @@ namespace Mado\QueryBundle\Repositories;
 use Doctrine\ORM\EntityRepository;
 use Hateoas\Configuration\Route;
 use Hateoas\Representation\Factory\PagerfantaFactory;
+use Mado\QueryBundle\Queries\QueryBuilderFactory;
+use Mado\QueryBundle\Queries\QueryBuilderOptions;
 use Pagerfanta\Adapter\DoctrineORMAdapter;
 use Pagerfanta\Pagerfanta;
-use Symfony\Component\HttpFoundation\Request;
-use Mado\QueryBundle\Queries\QueryBuilderOptions;
-use Mado\QueryBundle\Queries\QueryBuilderFactory;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Symfony\Component\HttpFoundation\Request;
 
 class BaseRepository extends EntityRepository implements ContainerAwareInterface
 {
