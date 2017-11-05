@@ -60,7 +60,7 @@ class QueryBuilderFactoryTest extends TestCase
             ],
         ];
 
-        $availableFilters = $queryBuilderFactory->getAvailableFilters();
+        $availableFilters = $queryBuilderFactory->getValueAvailableFilters();
 
         $this->assertEquals($expectedFilters, $availableFilters);
     }

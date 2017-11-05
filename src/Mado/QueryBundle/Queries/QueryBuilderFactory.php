@@ -42,6 +42,11 @@ class QueryBuilderFactory extends AbstractQuery
 
     public function getAvailableFilters()
     {
+        return array_keys(Operators::getOperators());
+    }
+
+    public function getValueAvailableFilters()
+    {
         return Operators::getOperators();
     }
 
@@ -213,9 +218,9 @@ class QueryBuilderFactory extends AbstractQuery
         $fieldName = $filterAndOperator[0];
         $fieldName = $this->parser->camelize($fieldName);
 
-        $operator = $this->getAvailableFilters()[self::DEFAULT_OPERATOR];
+        $operator = $this->getValueAvailableFilters()[self::DEFAULT_OPERATOR];
         if(isset($filterAndOperator[1])){
-            $operator = $this->getAvailableFilters()[$filterAndOperator[1]];
+            $operator = $this->getValueAvailableFilters()[$filterAndOperator[1]];
         }
 
         // controllo se il filtro che mi arriva dalla richiesta è una proprietà di questa entità
@@ -323,9 +328,9 @@ class QueryBuilderFactory extends AbstractQuery
         $fieldName = $filterAndOperator[0];
         $fieldName = $this->parser->camelize($fieldName);
 
-        $operator = $this->getAvailableFilters()[self::DEFAULT_OPERATOR];
+        $operator = $this->getValueAvailableFilters()[self::DEFAULT_OPERATOR];
         if(isset($filterAndOperator[1])){
-            $operator = $this->getAvailableFilters()[$filterAndOperator[1]];
+            $operator = $this->getValueAvailableFilters()[$filterAndOperator[1]];
         }
 
         // controllo se il filtro che mi arriva dalla richiesta è una proprietà di questa entità
