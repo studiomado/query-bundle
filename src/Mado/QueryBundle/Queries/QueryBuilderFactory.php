@@ -42,7 +42,7 @@ class QueryBuilderFactory extends AbstractQuery
 
     public function getAvailableFilters()
     {
-        return array_keys(Operators::getOperators());
+        return array_keys($this->getValueAvailableFilters());
     }
 
     public function getValueAvailableFilters()
