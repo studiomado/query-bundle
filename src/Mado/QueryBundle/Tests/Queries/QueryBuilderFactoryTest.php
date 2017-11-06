@@ -4,6 +4,7 @@ namespace Mado\QueryBundle\Tests\Queries;
 
 use Mado\QueryBundle\Queries\QueryBuilderFactory;
 use PHPUnit\Framework\TestCase;
+use Mado\QueryBundle\Dictionary\Operators;
 
 class QueryBuilderFactoryTest extends TestCase
 {
@@ -60,7 +61,7 @@ class QueryBuilderFactoryTest extends TestCase
             ],
         ];
 
-        $availableFilters = $queryBuilderFactory->getValueAvailableFilters();
+        $availableFilters = Operators::getOperators();
 
         $this->assertEquals($expectedFilters, $availableFilters);
     }
