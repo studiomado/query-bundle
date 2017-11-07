@@ -37,7 +37,7 @@ class QueryBuilderFactoryTest extends TestCase
         );
     }
 
-    public function testSampleQueryMakedWithWueryBuilderFacgory()
+    public function testSampleQueryMakedWithQueryBuilderFactory()
     {
         $queryBuilderFactory = new QueryBuilderFactory($this->manager);
         $queryBuilderFactory->setFields([ 'id' ]);
