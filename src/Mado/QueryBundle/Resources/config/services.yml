@@ -4,3 +4,9 @@ services:
         class: Mado\QueryBundle\Queries\QueryBuilderFactory
         arguments:
             - "@doctrine.orm.entity_manager"
+
+    mado.query-bundle.config.provider:
+        class: Mado\QueryBundle\Services\ConfigProvider
+        arguments:
+            - "@request_stack"
+            - "@security.token_storage"

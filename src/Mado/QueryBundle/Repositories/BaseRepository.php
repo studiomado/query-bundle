@@ -7,6 +7,7 @@ use Hateoas\Configuration\Route;
 use Hateoas\Representation\Factory\PagerfantaFactory;
 use Mado\QueryBundle\Queries\QueryBuilderFactory;
 use Mado\QueryBundle\Queries\QueryBuilderOptions;
+use Mado\QueryBundle\Component\ConfigProvider;
 use Pagerfanta\Adapter\DoctrineORMAdapter;
 use Pagerfanta\Pagerfanta;
 use Symfony\Component\HttpFoundation\Request;
@@ -32,6 +33,8 @@ class BaseRepository extends EntityRepository
     protected $queryBuilderFactory;
 
     protected $queryOptions;
+
+    protected $configProvider;
 
     public function __construct($manager, $class)
     {
@@ -65,6 +68,8 @@ class BaseRepository extends EntityRepository
 
     public function getQueryBuilderFactory()
     {
+        $this->ensureQueryOptionIsDefined();
+
         $this->initFromQueryBuilderOptions($this->queryOptions);
 
         return $this->queryBuilderFactory;
@@ -260,6 +265,13 @@ class BaseRepository extends EntityRepository
 
     public function findAllPaginated()
     {
+        if ($this->configProvider) {
+            $this->setRequest($this->configProvider->getRequest());
+            $this->queryBuilderFactory->setConfigProvider($this->configProvider);
+        }
+
+        $this->ensureQueryOptionIsDefined();
+
         $this->initFromQueryBuilderOptions($this->queryOptions);
 
         $this->queryBuilderFactory->filter();
@@ -271,6 +283,8 @@ class BaseRepository extends EntityRepository
     protected function paginateResults(
         \Doctrine\ORM\QueryBuilder $queryBuilder
     ) {
+        $this->ensureQueryOptionIsDefined();
+
         $limit = $this->queryOptions->get('limit', 10);
         $page = $this->queryOptions->get('page', 1);
 
@@ -312,6 +326,8 @@ class BaseRepository extends EntityRepository
             'page',
             'sorting',
         ], $this->customQueryStringValues());
+
+        $this->ensureQueryOptionIsDefined();
 
         foreach ($list as $itemKey => $itemValue) {
             $params[$itemValue] = $this->queryOptions->get($itemValue);
@@ -358,5 +374,21 @@ class BaseRepository extends EntityRepository
     public function getQueryBuilderFactoryWithoutInitialization()
     {
         return $this->queryBuilderFactory;
+    }
+
+    public function setConfigProvider(ConfigProvider $provider)
+    {
+        $this->configProvider = $provider;
+
+        return $this;
+    }
+
+    public function ensureQueryOptionIsDefined()
+    {
+        if (!$this->queryOptions) {
+            throw new \RuntimeException(
+                'Oops! QueryBuilderOptions was never defined.'
+            );
+        }
     }
 }

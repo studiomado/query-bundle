@@ -37,6 +37,8 @@ class QueryBuilderFactory extends AbstractQuery
 
     protected $select;
 
+    protected $configProvider;
+
     public function getAvailableFilters()
     {
         return array_keys($this->getValueAvailableFilters());
@@ -153,6 +155,13 @@ class QueryBuilderFactory extends AbstractQuery
 
                 if ($this->noExistsJoin($relationEntityAlias, $relation)) {
                     $this->qBuilder->join($entityAlias . "." . $fieldName, $relationEntityAlias);
+
+                    if ($this->configProvider) {
+                        // add where conditions
+                        // with user's additional filters
+                        // il config provider deve fornire anche le aclp
+                    }
+
                     $this->storeJoin($relationEntityAlias, $relation);
                 }
 
@@ -589,5 +598,10 @@ class QueryBuilderFactory extends AbstractQuery
     public function getEntityManager()
     {
         return $this->manager;
+    }
+
+    public function setConfigProvider(ConfigProvider $configProvider)
+    {
+        $this->configProvider = $configProvider;
     }
 }
