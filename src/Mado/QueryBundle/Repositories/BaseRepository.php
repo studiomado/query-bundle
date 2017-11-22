@@ -9,14 +9,10 @@ use Mado\QueryBundle\Queries\QueryBuilderFactory;
 use Mado\QueryBundle\Queries\QueryBuilderOptions;
 use Pagerfanta\Adapter\DoctrineORMAdapter;
 use Pagerfanta\Pagerfanta;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\HttpFoundation\Request;
 
-class BaseRepository extends EntityRepository implements ContainerAwareInterface
+class BaseRepository extends EntityRepository
 {
-    use ContainerAwareTrait;
-
     protected $fields;
 
     protected $request;
@@ -33,14 +29,8 @@ class BaseRepository extends EntityRepository implements ContainerAwareInterface
 
     protected $joins = [];
 
-    /**
-     * @var QueryBuilderFactory
-     */
     protected $queryBuilderFactory;
 
-    /**
-     * @var QueryBuilderOptions
-     */
     protected $queryOptions;
 
     public function __construct($manager, $class)
