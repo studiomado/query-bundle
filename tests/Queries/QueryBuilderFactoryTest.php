@@ -20,7 +20,7 @@ class QueryBuilderFactoryTest extends TestCase
         ));
     }
 
-    public function testCanFilterThanksToOperators()
+    public function testCanFilterThanksByOperator()
     {
         $this->manager = $this
             ->getMockBuilder('Doctrine\ORM\EntityManager')
