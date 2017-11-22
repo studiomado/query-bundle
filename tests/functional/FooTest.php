@@ -112,7 +112,7 @@ class Foo implements EntityClass
     /** @Column(type="string") */
     private $name;
 
-    public function getFQNC()
+    public function getFullyQualifiedNameClass()
     {
         return self::class;
     }

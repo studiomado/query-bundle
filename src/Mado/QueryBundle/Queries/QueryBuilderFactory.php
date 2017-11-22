@@ -37,12 +37,7 @@ class QueryBuilderFactory extends AbstractQuery
 
     protected $select;
 
-    public function ensureFieldsDefinedPublic()
-    {
-        $this->ensureFieldsDefined();
-    }
-
-    private function ensureFieldsDefined()
+    public function ensureFieldsDefined()
     {
         if (!$this->fields) {
             throw new \RuntimeException(

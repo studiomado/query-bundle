@@ -46,7 +46,7 @@ class QueryBuilderFactoryTest extends TestCase
             ->getMock();
 
         $queryBuilderFactory = new QueryBuilderFactory($this->manager);
-        $queryBuilderFactory->ensureFieldsDefinedPublic();
+        $queryBuilderFactory->ensureFieldsDefined();
     }
 
     public function testBuildQueryHandly()

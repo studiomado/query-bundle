@@ -27,7 +27,7 @@ final class CreateQuery
     private function getQuery()
     {
         return (new BaseRepository($this->manager,
-            $this->manager->getClassMetadata($this->class->getFQNC())
+            $this->manager->getClassMetadata($this->class->getFullyQualifiedNameClass())
         ))
         ->setQueryOptions($this->options)
         ->getQueryBuilderFactory()
