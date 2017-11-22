@@ -9,12 +9,11 @@
 
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
-            <directory suffix=".php">src</directory>
-            <exclude>
-                <directory suffix="Test.php">src/Mado/QueryBundle/Tests</directory>
-                <directory suffix="Test.php">src/Mado/QueryBundle/DependencyInjection</directory>
-                <directory suffix="Test.php">src/Mado/QueryBundle/MadoQueryBundle.php</directory>
-            </exclude>
+            <directory suffix=".php">src/Mado/QueryBundle/Dictionary</directory>
+            <directory suffix=".php">src/Mado/QueryBundle/Queries</directory>
+            <directory suffix=".php">src/Mado/QueryBundle/Repositories</directory>
+            <directory suffix=".php">src/Mado/QueryBundle/Resources</directory>
+            <directory suffix=".php">src/Mado/QueryBundle/Services</directory>
         </whitelist>
     </filter>
 
