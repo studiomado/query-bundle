@@ -5,9 +5,9 @@ use Mado\QueryBundle\Interfaces\EntityClass;
 use Mado\QueryBundle\Queries\QueryBuilderFactory;
 use Mado\QueryBundle\Queries\QueryBuilderOptions;
 use Mado\QueryBundle\Repositories\BaseRepository;
-use PHPUnit\Framework\Testcase;
+use PHPUnit\Framework\TestCase;
 
-final class FooTest extends Testcase
+final class CreateQueryTest extends TestCase
 {
     public function setUp()
     {
@@ -50,7 +50,7 @@ final class FooTest extends Testcase
         );
     }
 
-    public function testFooooo()
+    public function testGenerateValidSqlThrowDoctrineQueryBuilder()
     {
         $expected = "SELECT f0_.id AS id_0, f0_.name AS name_1 FROM Foo f0_";
 
@@ -62,7 +62,7 @@ final class FooTest extends Testcase
             'select' => 'f',
         ]))
         ->getQueryBuilderFactory()
-        ->getQueryBuilder()
+        ->getQueryBuilder() // this provide doctrine's query builder
         ->getQuery()
         ->getSql();
 
