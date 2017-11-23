@@ -5,6 +5,7 @@ namespace Mado\QueryBundle\Services;
 use Mado\QueryBundle\Component\ConfigProvider as ConfigProviderInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class ConfigProvider implements ConfigProviderInterface
 {
@@ -33,6 +34,6 @@ class ConfigProvider implements ConfigProviderInterface
 
     public function getUserRoles()
     {
-        return $this->token->getRoles();
+        return (new Voter())->extractRoles($this->token);
     }
 }

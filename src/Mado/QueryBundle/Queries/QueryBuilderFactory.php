@@ -4,6 +4,7 @@ namespace Mado\QueryBundle\Queries;
 
 use Doctrine\ORM\QueryBuilder;
 use Mado\QueryBundle\Dictionary\Operators;
+use Mado\QueryBundle\Services\ConfigProvider;
 
 class QueryBuilderFactory extends AbstractQuery
 {
@@ -155,13 +156,6 @@ class QueryBuilderFactory extends AbstractQuery
 
                 if ($this->noExistsJoin($relationEntityAlias, $relation)) {
                     $this->qBuilder->join($entityAlias . "." . $fieldName, $relationEntityAlias);
-
-                    if ($this->configProvider) {
-                        // add where conditions
-                        // with user's additional filters
-                        // il config provider deve fornire anche le aclp
-                    }
-
                     $this->storeJoin($relationEntityAlias, $relation);
                 }
 
@@ -187,6 +181,10 @@ class QueryBuilderFactory extends AbstractQuery
             throw new \RuntimeException(
                 'Oops! Fields are not defined'
             );
+        }
+
+        if ($this->configProvider) {
+            // $userRoles = $this->configProvider->getUserRoles();
         }
 
         foreach ($this->filtering as $filter => $value) {
