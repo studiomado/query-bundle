@@ -13,9 +13,6 @@ class QueryBuilderFactory extends AbstractQuery
 
     const DEFAULT_OPERATOR = 'eq';
 
-    /**
-     * @var QueryBuilder
-     */
     protected $qBuilder;
 
     protected $fields;
@@ -155,11 +152,10 @@ class QueryBuilderFactory extends AbstractQuery
                 $fieldName = $this->parser->camelize($association['fieldName']);
 
                 if ($this->noExistsJoin($relationEntityAlias, $relation)) {
-
                     $this->qBuilder->join($entityAlias . "." . $fieldName, $relationEntityAlias);
-
                     $this->storeJoin($relationEntityAlias, $relation);
                 }
+
                 $entityName = $association['targetEntity'];
                 $entityAlias = $relationEntityAlias;
             }
