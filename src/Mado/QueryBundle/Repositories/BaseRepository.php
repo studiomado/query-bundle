@@ -324,64 +324,6 @@ class BaseRepository extends EntityRepository
         return new Route($this->route_name, $params);
     }
 
-    /** @deprecate use QueryBuilderFatory instead */
-    public function noExistsJoin($prevEntityAlias, $currentEntityAlias)
-    {
-        $needle = $prevEntityAlias . "_" . $currentEntityAlias;
-        return ! in_array($needle, $this->joins);
-    }
-
-    /** @deprecate use QueryBuilderFatory instead */
-    public function storeJoin($prevEntityAlias, $currentEntityAlias)
-    {
-        $needle = $prevEntityAlias . "_" . $currentEntityAlias;
-        $this->joins[$needle] = $needle;
-    }
-
-    /** @deprecate use QueryBuilderFatory instead */
-    public function join($queryBuilder, $key, $val) 
-    {
-        if (strstr($key, '_embedded.')) {
-            $embeddedFields = explode('.', $key);
-            $numFields = count($embeddedFields);
-
-            $prevEntityAlias = $this->entityAlias; // Stocksellouts
-            $prevEntityName = $this->getEntityName(); // Stocksellouts
-
-            for ($i = 1; $i < $numFields - 1; $i++) {
-                $metadata = $this->getEntityManager()->getClassMetadata($prevEntityName);
-
-                $currentRelation = $embeddedFields[$i];
-
-                if ($metadata->hasAssociation($currentRelation)) {
-
-                    $association = $metadata->getAssociationMapping($currentRelation);
-
-                    $currentEntityAlias = $this->getEntityAlias($association['targetEntity']);
-
-                    if ($this->noExistsJoin($prevEntityAlias, $currentRelation)) {
-                        if ($association['isOwningSide']) {
-                            $queryBuilder->join($association['targetEntity'], "$currentEntityAlias", "WITH", "$currentEntityAlias.id = " . "$prevEntityAlias.$currentRelation");
-                        } else {
-                            $mappedBy = $association['mappedBy'];
-                            $queryBuilder->join($association['targetEntity'], "$currentEntityAlias", "WITH", "$currentEntityAlias.$mappedBy = " . "$prevEntityAlias.id");
-                        }
-
-                        $this->storeJoin($prevEntityAlias, $currentRelation);
-                    }
-                }
-
-                $prevEntityAlias = $currentEntityAlias;
-                $prevEntityName = $association['targetEntity'];
-            }
-
-            $this->setEmbeddedFields($embeddedFields);
-            $this->setCurrentEntityAlias($currentEntityAlias);
-        }
-
-        return $queryBuilder;
-    }
-
     protected function getCurrentEntityAlias() : string
     {
         return $this->currentEntityAlias;
@@ -400,143 +342,17 @@ class BaseRepository extends EntityRepository
     protected function setEmbeddedFields(array $embeddedFields) 
     {
         $this->embeddedFields = $embeddedFields;
-    }    
-
-    /** @deprecate use QueryBuilderFatory component instead */
-    //protected function sort($queryBuilder)
-    //{
-        //$request = $this->getRequest();
-        //$sorting = $request->query->get('sorting', array());
-
-        //foreach ($this->fields as $field) {
-            //if (isset($sorting[$field])) {
-                //$direction = ($sorting[$field] === 'asc') ? 'asc' : 'desc';
-                //$queryBuilder->addOrderBy($this->entityAlias.'.'.$field, $direction);
-            //}
-        //}
-
-        //// &sorting[_embedded.{{relazione}}.{{campo}}={{val}}
-        //foreach ($sorting as $sort => $val) {
-            //if (strstr($sort, '_embedded.')) {
-
-                //$queryBuilder = $this->join($queryBuilder, $sort, $val);
-
-                //$currentEntityAlias = $this->getCurrentEntityAlias();
-                //$embeddedFields = $this->getEmbeddedFields();
-                //$numFields = count($embeddedFields);
-
-                //$fieldName = $embeddedFields[$numFields - 1];
-                //$direction = ($val === 'asc') ? 'asc' : 'desc';
-                //$queryBuilder->addOrderBy("$currentEntityAlias." . $fieldName, $direction);
-            //}
-        //}
-
-        //return $queryBuilder;
-    //}
+    }
 
     public function getEntityAlias(string $entityName) : string
     {
         $arrayEntityName = explode('\\', strtolower($entityName) );
-        $entityAlias = $arrayEntityName[count($arrayEntityName)-1];
-        return $entityAlias;
+        return $arrayEntityName[count($arrayEntityName)-1];
     }
-
-    /** @deprecate use QueryBuilderFatory component instead */
-    //protected function filter($queryBuilder)
-    //{
-        //$request = $this->getRequest();
-        //$filtering = $request->query->get('filtering', array());
-
-        //foreach ($this->fields as $field) {
-            //if (isset($filtering[$field])) {
-                //switch ($field) {
-                //case 'id':
-                //case 'year':
-                //case 'week':                        
-                    //$queryBuilder->andWhere($this->entityAlias.'.'.$field.' = :filter_'.$field)
-                        //->setParameter('filter_'.$field, $filtering[$field]);                        
-                    //break;
-                //default:
-                    //$queryBuilder->andWhere($this->entityAlias.'.'.$field.' LIKE :filter_'.$field)
-                        //->setParameter('filter_'.$field, '%'.$filtering[$field].'%');
-                //}
-            //}
-        //}
-
-        //// &filtering[_embedded.{{relazione}}.{{campo}}]={{val}}
-        //foreach ($filtering as $filter => $val) {
-            //if (strstr($filter, '_embedded.')) {
-
-                //$queryBuilder = $this->join($queryBuilder, $filter, $val);
-
-                //$currentEntityAlias = $this->getCurrentEntityAlias();
-                //$embeddedFields = $this->getEmbeddedFields();
-                //$numFields = count($embeddedFields);
-                //$fieldName = $embeddedFields[$numFields - 1];
-
-                //$paramName = str_replace(".", "_", $filter);
-
-                //switch ($fieldName) {
-                //case 'id':
-                //case 'codiceClienteFornitore':
-                //case 'codiceFamily':
-                //case 'year':
-                //case 'week':
-                    //$queryBuilder->andWhere("$currentEntityAlias." . $fieldName . ' = :filter_' . $paramName)
-                        //->setParameter('filter_' . $paramName, $val);
-                    //break;
-                //default :
-                    //$queryBuilder->andWhere("$currentEntityAlias." . $fieldName . ' LIKE :filter_' . $paramName)
-                        //->setParameter('filter_' . $paramName, '%' . $val . '%');                        
-                //}
-            //}
-        //}
-
-        //return $queryBuilder;
-    //}
 
     protected function relationship($queryBuilder)
     {
         return $queryBuilder;
-    }
-
-    /**
-     *
-     * @param type $insertFields
-     * @param type $updateFields
-     *
-     * USE:
-     *
-     * $this->getEntityManager()
-     *      ->getRepository('User')
-     *      ->onDuplicateUpdate(['column1' => 'user_reminder_1', 'column2' => 235], ['column2' => 255]);
-     */
-    public function onDuplicateUpdate($insertFields, $updateFields)
-    {
-        //---CHIAVI
-        $array_keys = array_keys($insertFields);
-        $list_keys = '`' . implode('`,`', $array_keys) . '`';
-
-        //---VALORI
-        $list_values = "'" . implode("', '", $insertFields) . "'";
-
-        $table = $this->getEntityManager()->getClassMetadata($this->getEntityName())->getTableName();
-
-        $sql = 'INSERT INTO '.$table;
-        $sql .= '('. $list_keys . ') ';
-        //$sql .= 'VALUES("'.implode('","', $insertFields).'") ';
-        $sql .= "VALUES(". $list_values.") ";
-        $sql .= 'ON DUPLICATE KEY UPDATE ';
-
-        $c = 0;
-        foreach($updateFields as $column => $value) {
-            if($c>0)$sql .= ", ";
-            $sql .= '`'.$column . "` = '". $value."'";
-            $c++;
-        }
-
-        $stmt = $this->getEntityManager()->getConnection()->prepare($sql);
-        $stmt->execute();
     }
 
     public function getQueryBuilderFactoryWithoutInitialization()
