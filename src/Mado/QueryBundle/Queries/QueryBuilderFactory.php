@@ -156,8 +156,7 @@ class QueryBuilderFactory extends AbstractQuery
 
                 if ($this->noExistsJoin($relationEntityAlias, $relation)) {
 
-                    $this->qBuilder
-                            ->join($entityAlias . "." . $fieldName, $relationEntityAlias);
+                    $this->qBuilder->join($entityAlias . "." . $fieldName, $relationEntityAlias);
 
                     $this->storeJoin($relationEntityAlias, $relation);
                 }
