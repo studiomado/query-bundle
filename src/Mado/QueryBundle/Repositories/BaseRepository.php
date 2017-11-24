@@ -3,8 +3,10 @@
 namespace Mado\QueryBundle\Repositories;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Hateoas\Configuration\Route;
 use Hateoas\Representation\Factory\PagerfantaFactory;
+use Mado\QueryBundle\Component\ConfigProvider;
 use Mado\QueryBundle\Queries\QueryBuilderFactory;
 use Mado\QueryBundle\Queries\QueryBuilderOptions;
 use Pagerfanta\Adapter\DoctrineORMAdapter;
@@ -33,6 +35,8 @@ class BaseRepository extends EntityRepository
 
     protected $queryOptions;
 
+    protected $configProvider;
+
     public function __construct($manager, $class)
     {
         parent::__construct($manager, $class);
@@ -41,8 +45,8 @@ class BaseRepository extends EntityRepository
 
         $entityName = explode('\\', strtolower($this->getEntityName()) );
         $entityName = $entityName[count($entityName)-1];
-        $entityAlias = $entityName[0];
-        $this->entityAlias = $entityAlias;
+        //$entityAlias = $entityName[0];
+        $this->entityAlias = $entityName;
 
         $this->queryBuilderFactory = new QueryBuilderFactory($this->getEntityManager());
     }
@@ -65,6 +69,8 @@ class BaseRepository extends EntityRepository
 
     public function getQueryBuilderFactory()
     {
+        $this->ensureQueryOptionIsDefined();
+
         $this->initFromQueryBuilderOptions($this->queryOptions);
 
         return $this->queryBuilderFactory;
@@ -260,17 +266,32 @@ class BaseRepository extends EntityRepository
 
     public function findAllPaginated()
     {
+        if ($this->configProvider) {
+            $this->setRequest($this->configProvider->getRequest());
+            $this->queryBuilderFactory->setConfigProvider($this->configProvider);
+        }
+
+        $this->ensureQueryOptionIsDefined();
+
         $this->initFromQueryBuilderOptions($this->queryOptions);
 
         $this->queryBuilderFactory->filter();
         $this->queryBuilderFactory->sort();
 
-        return $this->paginateResults($this->queryBuilderFactory->getQueryBuilder());
+        $qb = $this->queryBuilderFactory->getQueryBuilder();
+
+        if ($this->configProvider) {
+            $qb = $this->configProvider->filterRelation($qb);
+        }
+
+        return $this->paginateResults($qb);
     }
 
     protected function paginateResults(
         \Doctrine\ORM\QueryBuilder $queryBuilder
     ) {
+        $this->ensureQueryOptionIsDefined();
+
         $limit = $this->queryOptions->get('limit', 10);
         $page = $this->queryOptions->get('page', 1);
 
@@ -312,6 +333,8 @@ class BaseRepository extends EntityRepository
             'page',
             'sorting',
         ], $this->customQueryStringValues());
+
+        $this->ensureQueryOptionIsDefined();
 
         foreach ($list as $itemKey => $itemValue) {
             $params[$itemValue] = $this->queryOptions->get($itemValue);
@@ -358,5 +381,22 @@ class BaseRepository extends EntityRepository
     public function getQueryBuilderFactoryWithoutInitialization()
     {
         return $this->queryBuilderFactory;
+    }
+
+    public function setConfigProvider(ConfigProvider $provider, array $domainConfiguration = [])
+    {
+        $this->configProvider = $provider;
+        $this->configProvider->setDomainConfiguration($domainConfiguration);
+
+        return $this;
+    }
+
+    public function ensureQueryOptionIsDefined()
+    {
+        if (!$this->queryOptions) {
+            throw new \RuntimeException(
+                'Oops! QueryBuilderOptions was never defined.'
+            );
+        }
     }
 }

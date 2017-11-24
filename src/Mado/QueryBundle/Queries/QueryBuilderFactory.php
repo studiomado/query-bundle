@@ -4,6 +4,7 @@ namespace Mado\QueryBundle\Queries;
 
 use Doctrine\ORM\QueryBuilder;
 use Mado\QueryBundle\Dictionary\Operators;
+use Mado\QueryBundle\Services\ConfigProvider;
 
 class QueryBuilderFactory extends AbstractQuery
 {
@@ -27,6 +28,8 @@ class QueryBuilderFactory extends AbstractQuery
 
     protected $joins;
 
+    protected $entityAliases;
+
     protected $rel;
 
     protected $printing;
@@ -36,6 +39,8 @@ class QueryBuilderFactory extends AbstractQuery
     protected $pageLength;
 
     protected $select;
+
+    protected $configProvider;
 
     public function getAvailableFilters()
     {
@@ -96,21 +101,24 @@ class QueryBuilderFactory extends AbstractQuery
         return $this->orFiltering;
     }
 
-    private function noExistsJoin($prevEntityAlias, $currentEntityAlias)
+    private function noExistsJoin($prevEntityAlias, $relationEntityAlias)
     {
         if (null === $this->joins) {
             $this->joins = [];
         }
 
-        $needle = $prevEntityAlias . "_" . $currentEntityAlias;
+        $needle = $prevEntityAlias . "_" . $relationEntityAlias;
+
+        //$this->entityAliases[$relationEntityAlias]['alias'] = $prevEntityAlias . "_" . $relationEntityAlias;
 
         return ! in_array($needle, $this->joins);
     }
 
-    private function storeJoin($prevEntityAlias, $currentEntityAlias)
+    private function storeJoin($relationEntityAlias, $relation, $association)
     {
-        $needle = $prevEntityAlias . "_" . $currentEntityAlias;
+        $needle = $relationEntityAlias . "_" . $relation;
         $this->joins[$needle] = $needle;
+        $this->entityAliases[$relation] = $association;
     }
 
     /**
@@ -153,7 +161,13 @@ class QueryBuilderFactory extends AbstractQuery
 
                 if ($this->noExistsJoin($relationEntityAlias, $relation)) {
                     $this->qBuilder->join($entityAlias . "." . $fieldName, $relationEntityAlias);
-                    $this->storeJoin($relationEntityAlias, $relation);
+                    //var_dump($entityAlias);
+                    //die;
+                    $this->storeJoin(
+                        $relationEntityAlias,
+                        $relation,
+                        $association
+                    );
                 }
 
                 $entityName = $association['targetEntity'];
@@ -589,5 +603,20 @@ class QueryBuilderFactory extends AbstractQuery
     public function getEntityManager()
     {
         return $this->manager;
+    }
+
+    public function setConfigProvider(ConfigProvider $configProvider)
+    {
+        $this->configProvider = $configProvider;
+    }
+
+    public function getJoins()
+    {
+        return $this->joins;
+    }
+
+    public function getEntityAliases()
+    {
+        return $this->entityAliases;
     }
 }
