@@ -22,8 +22,23 @@ $this->getDoctrine()
 After:
 
 ```php
-$this->getDoctrine()
-     ->getRepository('AppBundle:User')
-     ->setConfigProvider($this->get('mado.query-bundle.config.provider'))
-     ->findAllPaginated();
+$domainConfiguration = [
+		'root-entity' => \AppBundle\Entity\EntityName:class,
+		'additional-filters' => [
+				\AppBundle\Entity\RelationEntity::class => [2, 3],
+		],
+		'entity-map' => [
+				\AppBundle\Entity\EntityName:class => [
+						\AppBundle\Entity\RelationEntity::class => 'relation_name'
+				],
+		],
+];
+
+return $this->getDoctrine()
+		->getRepository('AppBundle:Sva')
+		->setConfigProvider(
+				$this->get('mado.query-bundle.config.provider'),
+				$domainConfiguration
+		)
+		->findAllPaginated();
 ```

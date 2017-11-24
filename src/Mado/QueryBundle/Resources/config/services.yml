@@ -10,3 +10,4 @@ services:
         arguments:
             - "@request_stack"
             - "@security.token_storage"
+            - "@doctrine.orm.entity_manager"

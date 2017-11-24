@@ -3,11 +3,12 @@
 namespace Mado\QueryBundle\Repositories;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Hateoas\Configuration\Route;
 use Hateoas\Representation\Factory\PagerfantaFactory;
+use Mado\QueryBundle\Component\ConfigProvider;
 use Mado\QueryBundle\Queries\QueryBuilderFactory;
 use Mado\QueryBundle\Queries\QueryBuilderOptions;
-use Mado\QueryBundle\Component\ConfigProvider;
 use Pagerfanta\Adapter\DoctrineORMAdapter;
 use Pagerfanta\Pagerfanta;
 use Symfony\Component\HttpFoundation\Request;
@@ -44,8 +45,8 @@ class BaseRepository extends EntityRepository
 
         $entityName = explode('\\', strtolower($this->getEntityName()) );
         $entityName = $entityName[count($entityName)-1];
-        $entityAlias = $entityName[0];
-        $this->entityAlias = $entityAlias;
+        //$entityAlias = $entityName[0];
+        $this->entityAlias = $entityName;
 
         $this->queryBuilderFactory = new QueryBuilderFactory($this->getEntityManager());
     }
@@ -277,7 +278,13 @@ class BaseRepository extends EntityRepository
         $this->queryBuilderFactory->filter();
         $this->queryBuilderFactory->sort();
 
-        return $this->paginateResults($this->queryBuilderFactory->getQueryBuilder());
+        $qb = $this->queryBuilderFactory->getQueryBuilder();
+
+        if ($this->configProvider) {
+            $qb = $this->configProvider->filterRelation($qb);
+        }
+
+        return $this->paginateResults($qb);
     }
 
     protected function paginateResults(
@@ -376,9 +383,10 @@ class BaseRepository extends EntityRepository
         return $this->queryBuilderFactory;
     }
 
-    public function setConfigProvider(ConfigProvider $provider)
+    public function setConfigProvider(ConfigProvider $provider, array $domainConfiguration = [])
     {
         $this->configProvider = $provider;
+        $this->configProvider->setDomainConfiguration($domainConfiguration);
 
         return $this;
     }
