@@ -70,7 +70,7 @@ class JsonPathFinder
 
         $path = $this->getSourceRelation($innerEntity);
 
-        if ($this->numberOfRealtionTo($innerEntity) != 1) {
+        if ($this->numberOfRelationsToEntity($innerEntity) != 1) {
             $this->clearMap($innerEntity);
         }
 
@@ -124,19 +124,19 @@ class JsonPathFinder
         }
     }
 
-    public function numberOfRealtionTo(string $entityToReach)
+    public function numberOfRelationsToEntity(string $entityToReach)
     {
-        $numberOfRealtionTo = 0;
+        $numberOfRelationsToEntity = 0;
 
         foreach ($this->map as $rootEntity => $meta) {
             foreach ($meta['relations'] as $name => $entity) {
                 if ($entity == $entityToReach) {
-                    $numberOfRealtionTo++;
+                    $numberOfRelationsToEntity++;
                 }
             }
         }
 
-        return $numberOfRealtionTo;
+        return $numberOfRelationsToEntity;
     }
 
     public function listOfParentsOf(string $entityToReach)

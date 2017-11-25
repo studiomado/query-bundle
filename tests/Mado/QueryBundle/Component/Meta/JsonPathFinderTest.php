@@ -260,7 +260,7 @@ class JsonPathFinderTest extends TestCase
 
         $this->assertEquals(
             2,
-            $this->pathFinder->numberOfRealtionTo("AppBundle\\Entity\\Foo")
+            $this->pathFinder->numberOfRelationsToEntity("AppBundle\\Entity\\Foo")
         );
     }
 
