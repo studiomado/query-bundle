@@ -19,9 +19,9 @@ class JsonPathFinder
     private $wrongPath = [];
 
     public function __construct(
-        RelationDatamapper $mappaer
+        RelationDatamapper $mapper
     ) {
-        $this->map = $mappaer->getMap();
+        $this->map = $mapper->getMap();
     }
 
     public function setEntity(string $entity)
@@ -67,20 +67,16 @@ class JsonPathFinder
     public function getPathTo(string $innerEntity = '')
     {
         $this->entitiesPath[] = $innerEntity;
-        $mem = $innerEntity;
 
         $path = $this->getSourceRelation($innerEntity);
 
-        if (
-            $this->numberOfRealtionTo($innerEntity) != 1 &&
-            $innerEntity != $this->entity
-        ) {
+        if ($this->numberOfRealtionTo($innerEntity) != 1) {
             $this->clearMap($innerEntity);
         }
 
         if ($this->entity != $this->getFirstParentOf($innerEntity)) {
             if (!($relation = $this->getFirstParentOf($innerEntity))) {
-                throw new \RuntimeException(var_export([
+                throw new Exceptions\UnreachablePathException(var_export([
                     'innerEntity' => $innerEntity,
                     'relation' => $relation,
                 ], true));

@@ -10,6 +10,7 @@
 
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">src/Mado/QueryBundle/Component</directory>
             <directory suffix=".php">src/Mado/QueryBundle/Dictionary</directory>
             <directory suffix=".php">src/Mado/QueryBundle/Queries</directory>
             <directory suffix=".php">src/Mado/QueryBundle/Repositories</directory>
