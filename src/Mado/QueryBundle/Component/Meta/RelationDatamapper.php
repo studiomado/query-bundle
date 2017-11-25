@@ -2,7 +2,7 @@
 
 namespace Mado\QueryBundle\Component\Meta;
 
-interface RelationDatamapper
+interface RelationDataMapper
 {
     public function getMap() : array;
 }
