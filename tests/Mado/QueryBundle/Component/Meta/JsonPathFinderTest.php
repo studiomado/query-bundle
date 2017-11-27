@@ -228,7 +228,7 @@ class JsonPathFinderTest extends TestCase
         $this->pathFinder->getPathToEntity("AppBundle\\Entity\\Family");
     }
 
-    public function testCountNumberOfParentOfInnerEntity()
+    public function testCountNumberOfParentOfRelationEntity()
     {
         $this->samepleJson = [
             "GammaBundle\\Entity\\Zzz" => [

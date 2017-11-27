@@ -37,7 +37,7 @@ class MapBuilderTest extends TestCase
         );
     }
 
-    public function testBuildMap()
+    public function testBuildMapWithParentAndRelationEntities()
     {
         $expectedMap = [];
 
@@ -49,9 +49,9 @@ class MapBuilderTest extends TestCase
             ->method('getAllMetadata')
             ->will($this->returnValue(function () {
                 return [
-                    'SomeBundle\EntityName' => [
+                    'SomeBundle\Entity\ParentEntity' => [
                         'relations' => [
-                            'relName' => 'Target\Entity\Name',
+                            'relName' => 'SomeOtherBundle\Entity\ChildEntity',
                         ]
                     ]
                 ];
