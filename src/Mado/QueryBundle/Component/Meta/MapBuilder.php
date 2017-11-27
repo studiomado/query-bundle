@@ -21,9 +21,16 @@ class MapBuilder implements RelationDataMapper
 
     public function getMap() : array
     {
-        $this->rebuildRelationMap();
+        if (!$this->map) {
+            $this->rebuildRelationMap();
+        }
 
         return $this->map;
+    }
+
+    public function forceCache(array $map)
+    {
+        $this->map = $map;
     }
 
     /** @codeCoverageIgnore */

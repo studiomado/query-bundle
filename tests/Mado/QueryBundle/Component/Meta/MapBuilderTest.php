@@ -76,4 +76,34 @@ class MapBuilderTest extends TestCase
             $map
         );
     }
+
+    public function testUsingCacheDoctirneIsNotCalled()
+    {
+        $expectedMap = [
+            'root' => [
+                'relations' => [
+                    'rel_name' => 'Entity'
+                ]
+            ]
+        ];
+
+        $this->manager = $this
+            ->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->manager->expects($this->never())
+            ->method('getMetadataFactory');
+
+        $mapBuilder = new MapBuilder($this->manager);
+
+        $mapBuilder->forceCache($expectedMap);
+
+        $map = $mapBuilder->getMap();
+
+        $this->assertEquals(
+            $expectedMap,
+            $map
+        );
+    }
 }
