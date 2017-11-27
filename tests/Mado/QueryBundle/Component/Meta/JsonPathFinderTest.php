@@ -466,44 +466,13 @@ class JsonPathFinderTest extends TestCase
 
     public function testGenerateHasKeyFoRequest()
     {
-        $this->samepleJson = [
-            "FooBundle\\Entity\\Item" => [
-                "relations" => [
-                    "items" => "AppBundle\\Entity\\Foo",
-                ]
-            ],
-            "AppBundle\\Entity\\Wrong" => [
-                "relations" => [
-                    "item" => "ZarroBundle\\Entity\\Item",
-                ]
-            ],
-            "AppBundle\\Entity\\Sbagliato" => [
-                "relations" => [
-                    "item" => "ZarroBundle\\Entity\\Item",
-                ]
-            ],
-            "AppBundle\\Entity\\Foo" => [
-                "relations" => [
-                    "item" => "ZarroBundle\\Entity\\Item",
-                ]
-            ],
-            "ZarroBundle\\Entity\\Item" => [
-                "relations" => [
-                    "family" => "AppBundle\\Entity\\Family",
-                ]
-            ],
-        ];
-
         $this->mapper = $this
             ->getMockBuilder('Mado\QueryBundle\Component\Meta\RelationDatamapper')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->mapper->expects($this->once())
-            ->method('getMap')
-            ->will($this->returnValue(
-                $this->samepleJson
-            ));
+        $this->mapper->expects($this->never())
+            ->method('getMap');
 
         $this->pathFinder = new JsonPathFinder(
             $this->mapper

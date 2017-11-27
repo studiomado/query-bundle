@@ -21,10 +21,12 @@ class JsonPathFinder
 
     private $wrongPath = [];
 
+    private $mapper;
+
     public function __construct(
         RelationDatamapper $mapper
     ) {
-        $this->map = $mapper->getMap();
+        $this->mapper = $mapper;
     }
 
     public function setEntity(string $entity)
@@ -34,6 +36,8 @@ class JsonPathFinder
 
     public function getFirstParentOf(string $innerEntity)
     {
+        $this->getMap();
+
         return $this->keep(
             self::INDEX_ENTITY_PARENT,
             $innerEntity
@@ -98,7 +102,7 @@ class JsonPathFinder
 
     public function getPathToEntity(string $entityToReach)
     {
-        foreach ($this->map as $rootEntity => $meta) {
+        foreach ($this->getMap() as $rootEntity => $meta) {
             if (in_array($rootEntity, $this->wrongPath)) {
                 unset($this->map[$rootEntity]);
             }
@@ -109,7 +113,7 @@ class JsonPathFinder
 
     public function keep($val, $innerEntity)
     {
-        foreach ($this->map as $rootEntity => $meta) {
+        foreach ($this->getMap() as $rootEntity => $meta) {
             foreach ($meta['relations'] as $name => $entity) {
                 if (self::INDEX_ENTITY_FIRST_CHILD == $val) {
                     return $entity;
@@ -131,7 +135,7 @@ class JsonPathFinder
     {
         $numberOfRelationsToEntity = 0;
 
-        foreach ($this->map as $rootEntity => $meta) {
+        foreach ($this->getMap() as $rootEntity => $meta) {
             foreach ($meta['relations'] as $name => $entity) {
                 if ($entity == $entityToReach) {
                     $numberOfRelationsToEntity++;
@@ -146,7 +150,7 @@ class JsonPathFinder
     {
         $parents = [];
 
-        foreach ($this->map as $rootEntity => $meta) {
+        foreach ($this->getMap() as $rootEntity => $meta) {
             foreach ($meta['relations'] as $name => $entity) {
                 if ($entity == $entityToReach) {
                     $parents[] = $rootEntity;
@@ -170,5 +174,14 @@ class JsonPathFinder
     public function getHashKeyForDestination(string $destination)
     {
         return md5($this->entity . $destination);
+    }
+
+    private function getMap()
+    {
+        if (!$this->map) {
+            $this->map = $this->mapper->getMap();
+        }
+
+        return $this->map;
     }
 }
