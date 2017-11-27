@@ -463,4 +463,61 @@ class JsonPathFinderTest extends TestCase
             $this->pathFinder->getPathToEntity("AppBundle\\Entity\\Family")
         );
     }
+
+    public function testGenerateHasKeyFoRequest()
+    {
+        $this->samepleJson = [
+            "FooBundle\\Entity\\Item" => [
+                "relations" => [
+                    "items" => "AppBundle\\Entity\\Foo",
+                ]
+            ],
+            "AppBundle\\Entity\\Wrong" => [
+                "relations" => [
+                    "item" => "ZarroBundle\\Entity\\Item",
+                ]
+            ],
+            "AppBundle\\Entity\\Sbagliato" => [
+                "relations" => [
+                    "item" => "ZarroBundle\\Entity\\Item",
+                ]
+            ],
+            "AppBundle\\Entity\\Foo" => [
+                "relations" => [
+                    "item" => "ZarroBundle\\Entity\\Item",
+                ]
+            ],
+            "ZarroBundle\\Entity\\Item" => [
+                "relations" => [
+                    "family" => "AppBundle\\Entity\\Family",
+                ]
+            ],
+        ];
+
+        $this->mapper = $this
+            ->getMockBuilder('Mado\QueryBundle\Component\Meta\RelationDatamapper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->mapper->expects($this->once())
+            ->method('getMap')
+            ->will($this->returnValue(
+                $this->samepleJson
+            ));
+
+        $this->pathFinder = new JsonPathFinder(
+            $this->mapper
+        );
+
+        $startEntity = "FooBundle\\Entity\\Item";
+        $endEntity = "AppBundle\\Entity\\Family";
+
+        $this->pathFinder->setQueryStartEntity($startEntity);
+        $hash = $this->pathFinder->getHashKeyForDestination($endEntity);
+
+        $this->assertEquals(
+            md5($startEntity . $endEntity),
+            $hash
+        );
+    }
 }

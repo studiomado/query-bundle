@@ -166,4 +166,9 @@ class JsonPathFinder
     {
         $this->wrongPath[] = $parentToSkip;
     }
+
+    public function getHashKeyForDestination(string $destination)
+    {
+        return md5($this->entity . $destination);
+    }
 }
