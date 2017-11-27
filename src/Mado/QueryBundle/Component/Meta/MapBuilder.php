@@ -23,6 +23,7 @@ class MapBuilder implements RelationDatamapper
         return $this->map;
     }
 
+    /** @codeCoverageIgnore */
     public static function relations(ClassMetadata $classMetadata)
     {
         $encoded = json_encode($classMetadata);
@@ -45,7 +46,9 @@ class MapBuilder implements RelationDatamapper
             ->getAllMetadata();
 
         foreach ($allMetadata as $singleEntityMetadata) {
+            // @codeCoverageIgnoreStart
             $this->map[$singleEntityMetadata->getName()]['relations'] = self::relations($singleEntityMetadata);
+            // @codeCoverageIgnoreEnd
         }
     }
 }
