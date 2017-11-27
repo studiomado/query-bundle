@@ -2,6 +2,9 @@
 
 namespace Mado\QueryBundle\Component\Meta;
 
+/**
+ * @since Class available since Release 2.1.0
+ */
 class JsonPathFinder
 {
     const INDEX_ENTITY_PARENT = 0;
