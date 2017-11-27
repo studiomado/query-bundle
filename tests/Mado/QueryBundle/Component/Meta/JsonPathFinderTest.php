@@ -146,7 +146,7 @@ class JsonPathFinderTest extends TestCase
     public function testBuildPathBetweenTwoEntities()
     {
         $this->samepleJson = [
-            "GammaBundle\\Entity\\Item" => [
+            "FooBundle\\Entity\\Item" => [
                 "relations" => [
                     "items" => "AppBundle\\Entity\\Foo",
                 ]
@@ -178,7 +178,7 @@ class JsonPathFinderTest extends TestCase
             $this->mapper
         );
 
-        $this->pathFinder->setQueryStartEntity("GammaBundle\\Entity\\Item");
+        $this->pathFinder->setQueryStartEntity("FooBundle\\Entity\\Item");
 
         $this->assertEquals(
             "_embedded.items.item.family",
@@ -192,7 +192,7 @@ class JsonPathFinderTest extends TestCase
     public function testThrowExceptionIfPathNotExists()
     {
         $this->samepleJson = [
-            "GammaBundle\\Entity\\Merenghe" => [
+            "FooBundle\\Entity\\Merenghe" => [
                 "relations" => [
                     "items" => "AppBundle\\Entity\\Foo",
                 ]
@@ -224,19 +224,19 @@ class JsonPathFinderTest extends TestCase
             $this->mapper
         );
 
-        $this->pathFinder->setQueryStartEntity("GammaBundle\\Entity\\Item");
+        $this->pathFinder->setQueryStartEntity("FooBundle\\Entity\\Item");
         $this->pathFinder->getPathToEntity("AppBundle\\Entity\\Family");
     }
 
     public function testCountNumberOfParentOfRelationEntity()
     {
         $this->samepleJson = [
-            "GammaBundle\\Entity\\Zzz" => [
+            "FooBundle\\Entity\\Zzz" => [
                 "relations" => [
                     "items" => "AppBundle\\Entity\\Foo",
                 ]
             ],
-            "GammaBundle\\Entity\\Item" => [
+            "FooBundle\\Entity\\Item" => [
                 "relations" => [
                     "items" => "AppBundle\\Entity\\Foo",
                 ]
@@ -267,12 +267,12 @@ class JsonPathFinderTest extends TestCase
     public function testListParentOfInnerEntity()
     {
         $this->samepleJson = [
-            "GammaBundle\\Entity\\Zzz" => [
+            "FooBundle\\Entity\\Zzz" => [
                 "relations" => [
                     "items" => "AppBundle\\Entity\\Foo",
                 ]
             ],
-            "GammaBundle\\Entity\\Item" => [
+            "FooBundle\\Entity\\Item" => [
                 "relations" => [
                     "items" => "AppBundle\\Entity\\Foo",
                 ]
@@ -296,8 +296,8 @@ class JsonPathFinderTest extends TestCase
 
         $this->assertEquals(
             [
-                "GammaBundle\\Entity\\Zzz",
-                "GammaBundle\\Entity\\Item",
+                "FooBundle\\Entity\\Zzz",
+                "FooBundle\\Entity\\Item",
             ],
             $this->pathFinder->listOfParentsOf("AppBundle\\Entity\\Foo")
         );
@@ -306,12 +306,12 @@ class JsonPathFinderTest extends TestCase
     public function testBuildListOfEntityReachedDuringTheWalk()
     {
         $this->samepleJson = [
-            "GammaBundle\\Entity\\Zzz" => [
+            "FooBundle\\Entity\\Zzz" => [
                 "relations" => [
                     "items" => "AppBundle\\Entity\\Foo",
                 ]
             ],
-            "GammaBundle\\Entity\\Item" => [
+            "FooBundle\\Entity\\Item" => [
                 "relations" => [
                     "items" => "AppBundle\\Entity\\Foo",
                 ]
@@ -343,7 +343,7 @@ class JsonPathFinderTest extends TestCase
             $this->mapper
         );
 
-        $this->pathFinder->setQueryStartEntity("GammaBundle\\Entity\\Item");
+        $this->pathFinder->setQueryStartEntity("FooBundle\\Entity\\Item");
 
         $this->assertEquals(
             "_embedded.items.item.family",
@@ -363,12 +363,12 @@ class JsonPathFinderTest extends TestCase
     public function testBuildRightPathAlsoWhenAtTheEndThereIsAFork()
     {
         $this->samepleJson = [
-            "GammaBundle\\Entity\\Zzz" => [
+            "FooBundle\\Entity\\Zzz" => [
                 "relations" => [
                     "items" => "AppBundle\\Entity\\Foo",
                 ]
             ],
-            "GammaBundle\\Entity\\Item" => [
+            "FooBundle\\Entity\\Item" => [
                 "relations" => [
                     "items" => "AppBundle\\Entity\\Foo",
                 ]
@@ -400,7 +400,7 @@ class JsonPathFinderTest extends TestCase
             $this->mapper
         );
 
-        $this->pathFinder->setQueryStartEntity("GammaBundle\\Entity\\Item");
+        $this->pathFinder->setQueryStartEntity("FooBundle\\Entity\\Item");
 
         $this->assertEquals(
             "_embedded.items.item.family",
@@ -411,7 +411,7 @@ class JsonPathFinderTest extends TestCase
     public function testBuildRightPathAlsoWithForksIntPath()
     {
         $this->samepleJson = [
-            "GammaBundle\\Entity\\Item" => [
+            "FooBundle\\Entity\\Item" => [
                 "relations" => [
                     "items" => "AppBundle\\Entity\\Foo",
                 ]
@@ -453,7 +453,7 @@ class JsonPathFinderTest extends TestCase
             $this->mapper
         );
 
-        $this->pathFinder->setQueryStartEntity("GammaBundle\\Entity\\Item");
+        $this->pathFinder->setQueryStartEntity("FooBundle\\Entity\\Item");
 
         $this->pathFinder->removeStep("AppBundle\\Entity\\Wrong");
         $this->pathFinder->removeStep("AppBundle\\Entity\\Sbagliato");
