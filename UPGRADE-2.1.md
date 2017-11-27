@@ -11,7 +11,7 @@ MapBuilder
 
  * Build a map based on Doctrine's DataMapper.
 
-Datamapper
+DataMapper
 ----------
 
  * An interface to build maps of relations of database entities.
