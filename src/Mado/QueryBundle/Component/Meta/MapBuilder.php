@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 /**
  * @since Class available since Release 2.1.0
  */
-class MapBuilder implements RelationDatamapper
+class MapBuilder implements RelationDataMapper
 {
     private $manager;
 
