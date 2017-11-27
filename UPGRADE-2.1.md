@@ -4,7 +4,7 @@ UPGRADE FROM 2.0 to 2.1
 UnreachablePathException
 ------------------------
 
- * An exception that's throwed when is not possibile to gfet the path.
+ * An exception that's throwed when is not possibile to get the path.
 
 MapBuilder
 ----------
