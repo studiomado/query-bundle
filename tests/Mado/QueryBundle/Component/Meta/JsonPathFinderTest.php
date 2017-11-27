@@ -18,7 +18,7 @@ class JsonPathFinderTest extends TestCase
         ];
 
         $this->mapper = $this
-            ->getMockBuilder('Mado\QueryBundle\Component\Meta\RelationDatamapper')
+            ->getMockBuilder('Mado\QueryBundle\Component\Meta\DataMapper')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -49,7 +49,7 @@ class JsonPathFinderTest extends TestCase
         ];
 
         $this->mapper = $this
-            ->getMockBuilder('Mado\QueryBundle\Component\Meta\RelationDatamapper')
+            ->getMockBuilder('Mado\QueryBundle\Component\Meta\DataMapper')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -80,7 +80,7 @@ class JsonPathFinderTest extends TestCase
         ];
 
         $this->mapper = $this
-            ->getMockBuilder('Mado\QueryBundle\Component\Meta\RelationDatamapper')
+            ->getMockBuilder('Mado\QueryBundle\Component\Meta\DataMapper')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -121,7 +121,7 @@ class JsonPathFinderTest extends TestCase
         ];
 
         $this->mapper = $this
-            ->getMockBuilder('Mado\QueryBundle\Component\Meta\RelationDatamapper')
+            ->getMockBuilder('Mado\QueryBundle\Component\Meta\DataMapper')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -164,7 +164,7 @@ class JsonPathFinderTest extends TestCase
         ];
 
         $this->mapper = $this
-            ->getMockBuilder('Mado\QueryBundle\Component\Meta\RelationDatamapper')
+            ->getMockBuilder('Mado\QueryBundle\Component\Meta\DataMapper')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -210,7 +210,7 @@ class JsonPathFinderTest extends TestCase
         ];
 
         $this->mapper = $this
-            ->getMockBuilder('Mado\QueryBundle\Component\Meta\RelationDatamapper')
+            ->getMockBuilder('Mado\QueryBundle\Component\Meta\DataMapper')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -244,7 +244,7 @@ class JsonPathFinderTest extends TestCase
         ];
 
         $this->mapper = $this
-            ->getMockBuilder('Mado\QueryBundle\Component\Meta\RelationDatamapper')
+            ->getMockBuilder('Mado\QueryBundle\Component\Meta\DataMapper')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -280,7 +280,7 @@ class JsonPathFinderTest extends TestCase
         ];
 
         $this->mapper = $this
-            ->getMockBuilder('Mado\QueryBundle\Component\Meta\RelationDatamapper')
+            ->getMockBuilder('Mado\QueryBundle\Component\Meta\DataMapper')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -329,7 +329,7 @@ class JsonPathFinderTest extends TestCase
         ];
 
         $this->mapper = $this
-            ->getMockBuilder('Mado\QueryBundle\Component\Meta\RelationDatamapper')
+            ->getMockBuilder('Mado\QueryBundle\Component\Meta\DataMapper')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -386,7 +386,7 @@ class JsonPathFinderTest extends TestCase
         ];
 
         $this->mapper = $this
-            ->getMockBuilder('Mado\QueryBundle\Component\Meta\RelationDatamapper')
+            ->getMockBuilder('Mado\QueryBundle\Component\Meta\DataMapper')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -439,7 +439,7 @@ class JsonPathFinderTest extends TestCase
         ];
 
         $this->mapper = $this
-            ->getMockBuilder('Mado\QueryBundle\Component\Meta\RelationDatamapper')
+            ->getMockBuilder('Mado\QueryBundle\Component\Meta\DataMapper')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -467,7 +467,7 @@ class JsonPathFinderTest extends TestCase
     public function testGenerateHasKeyFoRequest()
     {
         $this->mapper = $this
-            ->getMockBuilder('Mado\QueryBundle\Component\Meta\RelationDatamapper')
+            ->getMockBuilder('Mado\QueryBundle\Component\Meta\DataMapper')
             ->disableOriginalConstructor()
             ->getMock();
 

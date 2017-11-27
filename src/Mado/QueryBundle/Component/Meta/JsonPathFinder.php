@@ -24,7 +24,7 @@ class JsonPathFinder
     private $mapper;
 
     public function __construct(
-        RelationDatamapper $mapper
+        DataMapper $mapper
     ) {
         $this->mapper = $mapper;
     }
