@@ -6,3 +6,4 @@ in 2.0 minor versions.
 
  - feature #55 - add missing phpunit configuration for coverage
  - fix #50 - add pagerfanta in composer
+ - fix #64 - add installation guidelines
