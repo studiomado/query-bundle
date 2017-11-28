@@ -1,6 +1,11 @@
 UPGRADE FROM 2.0 to 2.1
 =======================
 
+NestingException
+----------------
+
+ * Notice if some loop is nested too many times.
+
 UnespectedValueException
 ------------------------
 
