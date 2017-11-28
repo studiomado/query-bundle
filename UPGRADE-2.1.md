@@ -1,6 +1,11 @@
 UPGRADE FROM 2.0 to 2.1
 =======================
 
+UnespectedValueException
+------------------------
+
+ * Trhowed whenever parent root entity of a relation not exists.
+
 UnreachablePathException
 ------------------------
 
