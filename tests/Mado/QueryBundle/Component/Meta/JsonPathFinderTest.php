@@ -187,7 +187,7 @@ class JsonPathFinderTest extends TestCase
     }
 
     /**
-     * @expectedException \Mado\QueryBundle\Component\Meta\Exceptions\UnreachablePathException
+     * @expectedException \Mado\QueryBundle\Component\Meta\Exceptions\UnespectedValueException
      */
     public function testThrowExceptionIfPathNotExists()
     {
@@ -528,5 +528,51 @@ class JsonPathFinderTest extends TestCase
         $this->pathFinder = new JsonPathFinder($this->mapper);
 
         $this->pathFinder->getEntitiesPath("AppBundle\\Entity\\Family");
+    }
+
+    /**
+     * @expectedException \Mado\QueryBundle\Component\Meta\Exceptions\UnreachablePathException
+     */
+    public function testUnreachablePathExceptionIsThrownWheneverEntityIsMissed()
+    {
+        $this->samepleJson = [
+            "" => [
+                "relations" => [
+                    "foo" => "AppBundle\\Entity\\Foo",
+                ]
+            ],
+            "AppBundle\\Entity\\Foo" => [
+                "relations" => [
+                    "bar" => "AppBundle\\Entity\\Bar",
+                ]
+            ],
+            "AppBundle\\Entity\\Bar" => [
+                "relations" => [
+                    "fizz" => "AppBundle\\Entity\\Fizz",
+                ]
+            ],
+        ];
+
+        $this->mapper = $this
+            ->getMockBuilder('Mado\QueryBundle\Component\Meta\DataMapper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->mapper->expects($this->once())
+            ->method('getMap')
+            ->will($this->returnValue(
+                $this->samepleJson
+            ));
+
+        $this->pathFinder = new JsonPathFinder(
+            $this->mapper
+        );
+
+        $this->pathFinder->setEntity("AppBundle\\Entity\\Root");
+
+        $this->assertEquals(
+            "foo.bar.fizz",
+            $this->pathFinder->getPathTo("AppBundle\\Entity\\Fizz")
+        );
     }
 }

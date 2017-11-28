@@ -27,6 +27,12 @@ class JsonPathFinder
 
     private $incrementSubject;
 
+    private static $indeToDescriptionMap = [
+        self::INDEX_ENTITY_PARENT      => 'parent',
+        self::INDEX_FK_RELATION_NAME   => 'relation',
+        self::INDEX_ENTITY_FIRST_CHILD => 'first child',
+    ];
+
     public function __construct(
         DataMapper $mapper
     ) {
@@ -142,6 +148,12 @@ class JsonPathFinder
                 }
             }
         }
+
+        throw new Exceptions\UnespectedValueException(var_export([
+            'val'         => self::$indeToDescriptionMap[$val],
+            'innerEntity' => $innerEntity,
+            'map'         => $this->getMap(),
+        ], true));
     }
 
     public function numberOfRelationsToEntity(string $entityToReach)
