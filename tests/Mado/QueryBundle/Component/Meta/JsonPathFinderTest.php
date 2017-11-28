@@ -514,4 +514,19 @@ class JsonPathFinderTest extends TestCase
             $endCollection
         );
     }
+
+    /**
+     * @expectedException \Mado\QueryBundle\Component\Meta\Exceptions\UndefinedPathException
+     */
+    public function testEntitiesPathCantExistsIfAnyPathWasLoaded()
+    {
+        $this->mapper = $this
+            ->getMockBuilder('Mado\QueryBundle\Component\Meta\DataMapper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->pathFinder = new JsonPathFinder($this->mapper);
+
+        $this->pathFinder->getEntitiesPath("AppBundle\\Entity\\Family");
+    }
 }

@@ -164,6 +164,12 @@ class JsonPathFinder
 
     public function getEntitiesPath()
     {
+        if (!$this->entitiesPath) {
+            throw new Exceptions\UndefinedPathException(
+                'Any path was requested'
+            );
+        }
+
         return $this->entitiesPath;
     }
 

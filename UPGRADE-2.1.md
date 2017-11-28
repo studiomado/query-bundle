@@ -6,6 +6,11 @@ UnreachablePathException
 
  * An exception that's throwed when is not possibile to get the path.
 
+UndefinedPathException
+----------------------
+
+ * An exception that's throwed when entities path is requested too early.
+
 MapBuilder
 ----------
 

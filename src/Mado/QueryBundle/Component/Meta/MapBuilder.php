@@ -4,6 +4,7 @@ namespace Mado\QueryBundle\Component\Meta;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Psr\Log\LoggerInterface;
 
 /**
  * @since Class available since Release 2.1.0
@@ -14,9 +15,14 @@ class MapBuilder implements DataMapper
 
     private $map = [];
 
-    public function __construct(EntityManager $manager)
-    {
+    private $logger;
+
+    public function __construct(
+        EntityManager $manager,
+        LoggerInterface $logger = null
+    ) {
         $this->manager = $manager;
+        $this->logger = $logger;
     }
 
     public function getMap() : array
@@ -34,8 +40,10 @@ class MapBuilder implements DataMapper
     }
 
     /** @codeCoverageIgnore */
-    public static function relations(ClassMetadata $classMetadata)
-    {
+    public static function relations(
+        ClassMetadata $classMetadata,
+        LoggerInterface $logger = null
+    ) {
         $encoded = json_encode($classMetadata);
         $decoded = json_decode($encoded, true);
         $relations = $decoded['associationMappings'];
@@ -44,6 +52,10 @@ class MapBuilder implements DataMapper
 
         foreach ($relations as $name => $meta) {
             $relMap[$name] = $meta['targetEntity'];
+        }
+
+        if ($logger) {
+            $logger->critical(var_export($relMap, true));
         }
 
         return $relMap;
@@ -57,7 +69,10 @@ class MapBuilder implements DataMapper
 
         foreach ($allMetadata as $singleEntityMetadata) {
             // @codeCoverageIgnoreStart
-            $this->map[$singleEntityMetadata->getName()]['relations'] = self::relations($singleEntityMetadata);
+            $this->map[$singleEntityMetadata->getName()]['relations'] = self::relations(
+                $singleEntityMetadata,
+                $this->logger
+            );
             // @codeCoverageIgnoreEnd
         }
     }
