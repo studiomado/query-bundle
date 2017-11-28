@@ -569,11 +569,7 @@ class JsonPathFinderTest extends TestCase
         );
 
         $this->pathFinder->setEntity("AppBundle\\Entity\\Root");
-
-        $this->assertEquals(
-            "foo.bar.fizz",
-            $this->pathFinder->getPathTo("AppBundle\\Entity\\Fizz")
-        );
+        $this->pathFinder->getPathTo("AppBundle\\Entity\\Fizz");
     }
 
     /**
