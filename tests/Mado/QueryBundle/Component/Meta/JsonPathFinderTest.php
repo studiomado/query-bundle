@@ -489,4 +489,29 @@ class JsonPathFinderTest extends TestCase
             $hash
         );
     }
+
+    public function testIncrementEntities()
+    {
+        $this->mapper = $this
+            ->getMockBuilder('Mado\QueryBundle\Component\Meta\DataMapper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->mapper->expects($this->never())
+            ->method('getMap');
+
+        $this->pathFinder = new JsonPathFinder($this->mapper);
+
+        $startingCollection = [];
+
+        $endCollection = $this->pathFinder->addEntity(
+            $startingCollection,
+            'ciaone'
+        );
+
+        $this->assertEquals(
+            ['ciaone'],
+            $endCollection
+        );
+    }
 }

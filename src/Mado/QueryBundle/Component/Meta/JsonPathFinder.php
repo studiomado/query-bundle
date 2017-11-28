@@ -23,10 +23,23 @@ class JsonPathFinder
 
     private $mapper;
 
+    private $appendRootEntityToSubject;
+
+    private $incrementSubject;
+
     public function __construct(
         DataMapper $mapper
     ) {
         $this->mapper = $mapper;
+
+        $this->appendRootEntityToSubject =  function($subject, $rootEntity) {
+            $subject[] = $rootEntity;
+            return $subject;
+        };
+
+        $this->incrementSubject = function($subject) {
+            return ++$subject;
+        };
     }
 
     public function setEntity(string $entity)
@@ -63,9 +76,9 @@ class JsonPathFinder
     public function clearMap(string $innerEntity)
     {
         if (in_array($this->entity, $this->listOfParentsOf($innerEntity))) {
-            foreach ($this->map as $root => $meta) {
-                if ($this->entity != $root) {
-                    unset($this->map[$root]);
+            foreach ($this->map as $rootEntity => $meta) {
+                if ($this->entity != $rootEntity) {
+                    unset($this->map[$rootEntity]);
                 }
             }
         }
@@ -133,32 +146,20 @@ class JsonPathFinder
 
     public function numberOfRelationsToEntity(string $entityToReach)
     {
-        $numberOfRelationsToEntity = 0;
-
-        foreach ($this->getMap() as $rootEntity => $meta) {
-            foreach ($meta['relations'] as $name => $entity) {
-                if ($entity == $entityToReach) {
-                    $numberOfRelationsToEntity++;
-                }
-            }
-        }
-
-        return $numberOfRelationsToEntity;
+        return $this->mapTargetRelations(
+            $this->incrementSubject,
+            $subject = 0,
+            $entityToReach
+        );
     }
 
     public function listOfParentsOf(string $entityToReach)
     {
-        $parents = [];
-
-        foreach ($this->getMap() as $rootEntity => $meta) {
-            foreach ($meta['relations'] as $name => $entity) {
-                if ($entity == $entityToReach) {
-                    $parents[] = $rootEntity;
-                }
-            }
-        }
-
-        return $parents;
+        return $this->mapTargetRelations(
+            $this->appendRootEntityToSubject,
+            $subject = [],
+            $entityToReach
+        );
     }
 
     public function getEntitiesPath()
@@ -183,5 +184,28 @@ class JsonPathFinder
         }
 
         return $this->map;
+    }
+
+    public function addEntity(array $parents, $rootEntity) : array
+    {
+        $parents[] = $rootEntity;
+
+        return $parents;
+    }
+
+    public function mapTargetRelations(
+        callable $action,
+        $subject,
+        string $entityToReach
+    ) {
+        foreach ($this->getMap() as $rootEntity => $meta) {
+            foreach ($meta['relations'] as $name => $relationEntity) {
+                if ($relationEntity == $entityToReach) {
+                    $subject = $action($subject, $rootEntity);
+                }
+            }
+        }
+
+        return $subject;
     }
 }
