@@ -54,10 +54,6 @@ class MapBuilder implements DataMapper
             $relMap[$name] = $meta['targetEntity'];
         }
 
-        if ($logger) {
-            $logger->critical(var_export($relMap, true));
-        }
-
         return $relMap;
     }
 

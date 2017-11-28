@@ -575,4 +575,37 @@ class JsonPathFinderTest extends TestCase
             $this->pathFinder->getPathTo("AppBundle\\Entity\\Fizz")
         );
     }
+
+    /**
+     * @expectedException \Mado\QueryBundle\Component\Meta\Exceptions\NestingException
+     */
+    public function testCatchNesting()
+    {
+        $this->samepleJson = [
+            "AppBundle\\Entity\\Fizz" => [
+                "relations" => [
+                    "fizz" => "AppBundle\\Entity\\Fizz",
+                ]
+            ],
+        ];
+
+        $this->mapper = $this
+            ->getMockBuilder('Mado\QueryBundle\Component\Meta\DataMapper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->mapper->expects($this->once())
+            ->method('getMap')
+            ->will($this->returnValue(
+                $this->samepleJson
+            ));
+
+        $this->pathFinder = new JsonPathFinder(
+            $this->mapper
+        );
+
+        $this->pathFinder->setEntity("AppBundle\\Entity\\Root");
+
+        $this->pathFinder->getPathTo("AppBundle\\Entity\\Fizz");
+    }
 }

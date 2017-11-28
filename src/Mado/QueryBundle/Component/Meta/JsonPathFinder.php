@@ -2,6 +2,8 @@
 
 namespace Mado\QueryBundle\Component\Meta;
 
+use Psr\Log\LoggerInterface;
+
 /**
  * @since Class available since Release 2.1.0
  */
@@ -33,10 +35,14 @@ class JsonPathFinder
         self::INDEX_ENTITY_FIRST_CHILD => 'first child',
     ];
 
+    private $logger;
+
     public function __construct(
-        DataMapper $mapper
+        DataMapper $mapper,
+        LoggerInterface $logger = null
     ) {
         $this->mapper = $mapper;
+        $this->logger = $logger;
 
         $this->appendRootEntityToSubject =  function($subject, $rootEntity) {
             $subject[] = $rootEntity;
@@ -90,7 +96,7 @@ class JsonPathFinder
         }
     }
 
-    public function getPathTo(string $innerEntity = '')
+    public function getPathTo(string $innerEntity = '', $nest = 0)
     {
         $this->entitiesPath[] = $innerEntity;
 
@@ -108,7 +114,20 @@ class JsonPathFinder
                 ], true));
             }
 
-            return $this->getPathTo($relation) . '.' . $path;
+            if ($nest > 10) {
+                // @codeCoverageIgnoreStart
+                if ($this->logger) {
+                    $this->logger->critical(json_encode([
+                        'nest'         => $nest,
+                        'entitiesPath' => $this->getEntitiesPath(),
+                    ], true));
+                }
+                // @codeCoverageIgnoreEnd
+
+                throw new Exceptions\NestingException('loop found');
+            }
+
+            return $this->getPathTo($relation, ++$nest) . '.' . $path;
         }
 
         return $path;
