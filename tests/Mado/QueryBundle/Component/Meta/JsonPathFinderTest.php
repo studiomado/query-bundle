@@ -611,6 +611,7 @@ class JsonPathFinderTest extends TestCase
                 "relations" => [
                     "items" => "AppBundle\\Entity\\Foo",
                     "alts" => "AppBundle\\Entity\\Alternative",
+                    "aaaa" => "AppBundle\\Entity\\aaaa",
                 ]
             ],
             "ZarroBundle\\Entity\\Item" => [
@@ -624,6 +625,11 @@ class JsonPathFinderTest extends TestCase
                 ]
             ],
             "AppBundle\\Entity\\Foo" => [
+                "relations" => [
+                    "item" => "ZarroBundle\\Entity\\Item",
+                ]
+            ],
+            "AppBundle\\Entity\\aaaa" => [
                 "relations" => [
                     "item" => "ZarroBundle\\Entity\\Item",
                 ]
@@ -659,14 +665,21 @@ class JsonPathFinderTest extends TestCase
             'AppBundle\Entity\Alternative',
         ];
 
+        $thirdPath = [
+            'AppBundle\Entity\Family',
+            'ZarroBundle\Entity\Item',
+            'AppBundle\Entity\aaaa',
+        ];
+
         $allPaths = [
             $firstPath,
-            $secondPath
+            $secondPath,
+            $thirdPath
         ];
 
         array_multisort($allPaths);
 
-        $this->pathFinder->findAllPathsTo('sdaf');
+        $this->pathFinder->findAllPathsTo('AppBundle\\Entity\\Family');
 
         $this->assertEquals(
             $allPaths,

@@ -264,7 +264,7 @@ class JsonPathFinder
     {
         for ($stay = true;;) {
             try {
-                $this->getPathToEntity('AppBundle\\Entity\\Family');
+                $this->getPathToEntity($dest);
                 $entities = $this->getEntitiesPath();
                 $lastEntityFound = end($entities);
                 $this->removeStep($lastEntityFound);
