@@ -658,40 +658,5 @@ class JsonPathFinderTest extends TestCase
 
         $this->pathFinder->setQueryStartEntity("FooBundle\\Entity\\Item");
         $this->pathFinder->findAllPathsTo('AppBundle\\Entity\\Family');
-
-        //$firstPath = [
-            //'AppBundle\Entity\Family',
-            //'ZarroBundle\Entity\Item',
-            //'AppBundle\Entity\Foo',
-        //];
-
-        //$secondPath = [
-            //'AppBundle\Entity\Family',
-            //'ZarroBundle\Entity\Item',
-            //'AppBundle\Entity\Alternative',
-        //];
-
-        //$thirdPath = [
-            //'AppBundle\Entity\Family',
-            //'ZarroBundle\Entity\Item',
-            //'AppBundle\Entity\aaaa',
-            //'AppBundle\Entity\XXXX',
-        //];
-
-        //$allPaths = [
-            //$firstPath,
-            //$secondPath,
-            //$thirdPath
-        //];
-
-        //array_multisort($allPaths);
-
-        var_dump($this->pathFinder->getAllPaths());
-
-
-        //$this->assertEquals(
-            //$allPaths,
-            //$this->pathFinder->getAllPaths()
-        //);
     }
 }
