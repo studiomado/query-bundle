@@ -29,6 +29,8 @@ class JsonPathFinder
 
     private $incrementSubject;
 
+    private $allPaths = [];
+
     private static $indeToDescriptionMap = [
         self::INDEX_ENTITY_PARENT      => 'parent',
         self::INDEX_FK_RELATION_NAME   => 'relation',
@@ -140,13 +142,19 @@ class JsonPathFinder
 
     public function getPathToEntity(string $entityToReach)
     {
+        $this->entitiesPath = [];
+
         foreach ($this->getMap() as $rootEntity => $meta) {
             if (in_array($rootEntity, $this->wrongPath)) {
                 unset($this->map[$rootEntity]);
             }
         }
 
-        return '_embedded.' . $this->getPathTo($entityToReach);
+        $return = '_embedded.' . $this->getPathTo($entityToReach);
+
+        $this->allPaths[] = $this->entitiesPath;
+
+        return $return;
     }
 
     public function keep($val, $innerEntity)
@@ -244,5 +252,29 @@ class JsonPathFinder
         }
 
         return $subject;
+    }
+
+    public function getAllPaths() : array
+    {
+        array_multisort($this->allPaths);
+        return $this->allPaths;
+    }
+
+    public function findAllPathsTo(string $dest)
+    {
+        for ($stay = true;;) {
+            try {
+                $this->getPathToEntity('AppBundle\\Entity\\Family');
+                $entities = $this->getEntitiesPath();
+                $lastEntityFound = end($entities);
+                $this->removeStep($lastEntityFound);
+            } catch(\Mado\QueryBundle\Component\Meta\Exceptions\UnespectedValueException $e) {
+                $stay = false;
+            }
+
+            if (!$stay) {
+                return;
+            }
+        }
     }
 }

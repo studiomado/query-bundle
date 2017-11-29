@@ -603,4 +603,74 @@ class JsonPathFinderTest extends TestCase
         $this->pathFinder->setEntity("AppBundle\\Entity\\Root");
         $this->pathFinder->getPathTo("AppBundle\\Entity\\Fizz");
     }
+
+    public function testFindAllPossibilePath()
+    {
+        $this->samepleJson = [
+            "FooBundle\\Entity\\Item" => [
+                "relations" => [
+                    "items" => "AppBundle\\Entity\\Foo",
+                    "alts" => "AppBundle\\Entity\\Alternative",
+                ]
+            ],
+            "ZarroBundle\\Entity\\Item" => [
+                "relations" => [
+                    "family" => "AppBundle\\Entity\\Family",
+                ]
+            ],
+            "AppBundle\\Entity\\Alternative" => [
+                "relations" => [
+                    "item" => "ZarroBundle\\Entity\\Item"
+                ]
+            ],
+            "AppBundle\\Entity\\Foo" => [
+                "relations" => [
+                    "item" => "ZarroBundle\\Entity\\Item",
+                ]
+            ],
+        ];
+
+        $this->mapper = $this
+            ->getMockBuilder('Mado\QueryBundle\Component\Meta\DataMapper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->mapper->expects($this->once())
+            ->method('getMap')
+            ->will($this->returnValue(
+                $this->samepleJson
+            ));
+
+        $this->pathFinder = new JsonPathFinder(
+            $this->mapper
+        );
+
+        $this->pathFinder->setQueryStartEntity("FooBundle\\Entity\\Item");
+
+        $firstPath = [
+            'AppBundle\Entity\Family',
+            'ZarroBundle\Entity\Item',
+            'AppBundle\Entity\Foo',
+        ];
+
+        $secondPath = [
+            'AppBundle\Entity\Family',
+            'ZarroBundle\Entity\Item',
+            'AppBundle\Entity\Alternative',
+        ];
+
+        $allPaths = [
+            $firstPath,
+            $secondPath
+        ];
+
+        array_multisort($allPaths);
+
+        $this->pathFinder->findAllPathsTo('sdaf');
+
+        $this->assertEquals(
+            $allPaths,
+            $this->pathFinder->getAllPaths()
+        );
+    }
 }
