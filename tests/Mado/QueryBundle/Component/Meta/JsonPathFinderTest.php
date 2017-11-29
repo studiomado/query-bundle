@@ -601,7 +601,6 @@ class JsonPathFinderTest extends TestCase
         );
 
         $this->pathFinder->setEntity("AppBundle\\Entity\\Root");
-
         $this->pathFinder->getPathTo("AppBundle\\Entity\\Fizz");
     }
 }
