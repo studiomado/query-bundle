@@ -631,6 +631,11 @@ class JsonPathFinderTest extends TestCase
             ],
             "AppBundle\\Entity\\aaaa" => [
                 "relations" => [
+                    "item" => "ZarroBundle\\Entity\\xxx",
+                ]
+            ],
+            "ZarroBundle\\Entity\\xxx" => [
+                "relations" => [
                     "item" => "ZarroBundle\\Entity\\Item",
                 ]
             ],
@@ -668,6 +673,7 @@ class JsonPathFinderTest extends TestCase
         $thirdPath = [
             'AppBundle\Entity\Family',
             'ZarroBundle\Entity\Item',
+            'ZarroBundle\Entity\xxx',
             'AppBundle\Entity\aaaa',
         ];
 
@@ -681,9 +687,11 @@ class JsonPathFinderTest extends TestCase
 
         $this->pathFinder->findAllPathsTo('AppBundle\\Entity\\Family');
 
+        $paths = $this->pathFinder->getAllPaths();
+
         $this->assertEquals(
             $allPaths,
-            $this->pathFinder->getAllPaths()
+            $paths
         );
     }
 }
