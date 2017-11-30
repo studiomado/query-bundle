@@ -694,4 +694,43 @@ class JsonPathFinderTest extends TestCase
             $paths
         );
     }
+
+    public function testReloadMapWheneverPathIsRequestedTwice()
+    {
+        $this->samepleJson = [
+            "AppBundle\\Entity\\Foo" => [
+                "relations" => [
+                    "item" => "ZarroBundle\\Entity\\Item",
+                ]
+            ],
+            "ZarroBundle\\Entity\\Item" => [
+                "relations" => [
+                    "family" => "AppBundle\\Entity\\Family",
+                ]
+            ],
+        ];
+
+        $this->mapper = $this
+            ->getMockBuilder('Mado\QueryBundle\Component\Meta\DataMapper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->mapper->expects($this->exactly(2))
+            ->method('getMap')
+            ->will($this->returnValue(
+                $this->samepleJson
+            ));
+
+        $this->pathFinder = new JsonPathFinder(
+            $this->mapper
+        );
+
+        $this->pathFinder->setQueryStartEntity("ZarroBundle\\Entity\\Item");
+        $firstPath = $this->pathFinder->getPathToEntity("AppBundle\\Entity\\Family");
+        $this->assertEquals('_embedded.family', $firstPath);
+
+        $this->pathFinder->setQueryStartEntity("AppBundle\\Entity\\Foo");
+        $secondPath = $this->pathFinder->getPathToEntity("ZarroBundle\\Entity\\Item", true);
+        $this->assertEquals('_embedded.item', $secondPath);
+    }
 }
