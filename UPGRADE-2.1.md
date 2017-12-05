@@ -37,7 +37,24 @@ JsonPathFinder
  * Build the path of relations between entities.
 
 ```php
-$finder = new JsonPathFinder($this->mapper);
+use Mado\QueryBundle\Meta\DataMapper;
+
+class MyCustomMapper implements DataMapper
+{
+  public function getMap() : array
+  {
+    return [
+      "FooBundle\\Entity\\Start" => [
+        "relations" => [
+          "end" => "AppBundle\\Entity\\End",
+          "foo" => "AppBundle\\Entity\\Foo",
+        ]
+      ]
+    ];
+  }
+};
+
+$finder = new JsonPathFinder(new MyCustomMapper($entityManager));
 $finder->setQueryStartEntity("FooBundle\\Entity\\Start");
 $finder->getPathToEntity("AppBundle\\Entity\\End"); // _embedded.start.end
 ```
