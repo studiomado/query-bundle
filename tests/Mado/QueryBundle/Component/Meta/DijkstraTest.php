@@ -87,11 +87,11 @@ class DijkstraTest extends TestCase
         );
 
         $this->assertEquals(
-            [[
+            [
                 'AppBundle\\Entity\\a',
                 'AppBundle\\Entity\\Fizz',
                 'AppBundle\\Entity\\b',
-            ]],
+            ],
             $paths
         );
     }

@@ -41,3 +41,19 @@ $finder = new JsonPathFinder($this->mapper);
 $finder->setQueryStartEntity("FooBundle\\Entity\\Start");
 $finder->getPathToEntity("AppBundle\\Entity\\End"); // _embedded.start.end
 ```
+
+Dijkstra
+--------
+
+ * Navigate the graph to find the minimum spanning tree
+
+```php
+$dijkstra = new Dijkstra($this->mapper);
+$entities = $dijkstra->shortestPaths($from, $to)
+```
+
+DijkstraWalker
+--------------
+
+ * Use Dijkstra to find paths
+
