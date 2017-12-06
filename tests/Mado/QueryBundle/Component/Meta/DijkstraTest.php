@@ -92,7 +92,7 @@ class DijkstraTest extends TestCase
                 'AppBundle\\Entity\\Fizz',
                 'AppBundle\\Entity\\b',
             ],
-            $paths
+            $paths[0]
         );
     }
 }
