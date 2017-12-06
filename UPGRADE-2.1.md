@@ -65,7 +65,7 @@ Dijkstra
  * Navigate the graph to find the minimum spanning tree
 
 ```php
-$dijkstra = new Dijkstra($this->mapper);
+$dijkstra = new Dijkstra(new MyCustomMapper($entityManager));
 $entities = $dijkstra->shortestPaths($from, $to)
 ```
 
@@ -74,3 +74,13 @@ DijkstraWalker
 
  * Use Dijkstra to find paths
 
+```php
+$walker = new DijkstraWalker(
+  new MyCustomMapper($entityManager),
+  new Dijkstra()
+);
+
+$walker->buildPathBetween($from, $to)
+
+$path = $walker->getPath();
+```
