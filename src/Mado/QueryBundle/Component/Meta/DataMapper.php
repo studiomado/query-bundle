@@ -7,5 +7,9 @@ namespace Mado\QueryBundle\Component\Meta;
  */
 interface DataMapper
 {
+    public function setMap(array $map) : bool;
+
     public function getMap() : array;
+
+    public function rebuildRelationMap() : bool;
 }

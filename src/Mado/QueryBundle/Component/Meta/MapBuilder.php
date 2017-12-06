@@ -25,6 +25,13 @@ class MapBuilder implements DataMapper
         $this->logger = $logger;
     }
 
+    public function setMap(array $map) : bool
+    {
+        $this->map = $map;
+
+        return true;
+    }
+
     public function getMap() : array
     {
         if (!$this->map) {
@@ -57,7 +64,7 @@ class MapBuilder implements DataMapper
         return $relMap;
     }
 
-    public function rebuildRelationMap()
+    public function rebuildRelationMap() : bool
     {
         $allMetadata = $this->manager
             ->getMetadataFactory()
@@ -71,5 +78,7 @@ class MapBuilder implements DataMapper
             );
             // @codeCoverageIgnoreEnd
         }
+
+        return true;
     }
 }

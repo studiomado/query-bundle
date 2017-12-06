@@ -27,7 +27,7 @@ final class DijkstraWalker
 
         $map = $this->builder->getMap();
 
-        $this->dijkstra->setMap($map);
+        $this->builder->setMap($map);
 
         $percorso = $tutta = $this->dijkstra->shortestPaths($start, $end);
         $prevRelations = $map[$start]['relations'];
