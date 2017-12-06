@@ -126,7 +126,10 @@ class JsonPathFinder
                 }
                 // @codeCoverageIgnoreEnd
 
-                throw new Exceptions\NestingException('loop found');
+                throw new Exceptions\NestingException(
+                    'Loop found in entities : ' .
+                    var_export($this->getEntitiesPath(), true)
+                );
             }
 
             return $this->getPathTo($relation, ++$nest) . '.' . $path;
@@ -140,11 +143,11 @@ class JsonPathFinder
         $this->setEntity($startEntity);
     }
 
-    public function getPathToEntity(string $entityToReach)
+    public function getPathToEntity(string $entityToReach, $reloadMap = false)
     {
         $this->entitiesPath = [];
 
-        foreach ($this->getMap() as $rootEntity => $meta) {
+        foreach ($this->getMap($reloadMap) as $rootEntity => $meta) {
             if (in_array($rootEntity, $this->wrongPath)) {
                 unset($this->map[$rootEntity]);
             }
@@ -222,10 +225,15 @@ class JsonPathFinder
         return md5($this->entity . $destination);
     }
 
-    private function getMap()
+    public function forceMapReloading()
     {
-        if (!$this->map) {
-            $this->map = $this->mapper->getMap();
+        $this->map = $this->mapper->getMap();
+    }
+
+    private function getMap($reloadMap = false)
+    {
+        if ($reloadMap || !$this->map) {
+            $this->forceMapReloading();
         }
 
         return $this->map;
