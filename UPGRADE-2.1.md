@@ -72,15 +72,30 @@ $entities = $dijkstra->shortestPaths($from, $to)
 DijkstraWalker
 --------------
 
- * Use Dijkstra to find paths
+ * Use Dijkstra to find paths to use in querystring. For example to query all
+   users with a group that is inside certain category with id 2, 3 or 5 we
+   need this in query string.
+
+   `filtering[_embedded.groups.category.id|list]=2,3,5`
+
+   If we want to force this filter in queryBundle
 
 ```php
 $walker = new DijkstraWalker(
-  new MyCustomMapper($entityManager),
+  new \Mado\QueryBundle\Component\Meta\MapBuilder($manager)
   new Dijkstra()
 );
 
-$walker->buildPathBetween($from, $to)
+$walker->buildPathBetween(
+  \AppBundle\Entity\Start::class,
+  \FooBundle\Entity\End:class
+);
 
-$path = $walker->getPath();
+$filter = $walker->getPath();
+
+$repository = $this->getDoctrine()
+    ->getRepository('AppBundle:User')
+    ->setRequestWithFilter($request, [
+      $filter . '.id|list' => '2,3,5'
+    ]);
 ```
