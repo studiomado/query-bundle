@@ -36,7 +36,7 @@ class DijkstraWalkerTest extends TestCase
             ->getMock();
         $this->mapper->expects($this->once())
             ->method('getMap')
-            ->will($this->returnValue([
+            ->will($this->returnValue($laMappa = [
                 'start' => [
                     'relations' => [
                         'fine' => 'end',
@@ -53,6 +53,9 @@ class DijkstraWalkerTest extends TestCase
             ->getMockBuilder('Mado\QueryBundle\Component\Meta\Dijkstra')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->dijkstra->expects($this->once())
+            ->method('setMap')
+            ->with($laMappa);
         $this->dijkstra->expects($this->once())
             ->method('shortestPaths')
             ->will($this->returnValue([[

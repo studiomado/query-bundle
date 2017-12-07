@@ -13,24 +13,24 @@ final class DijkstraWalker
 
     private $path;
 
+    private $map;
+
     public function __construct(
         DataMapper $builder,
         Dijkstra $dijkstra
     ) {
         $this->builder = $builder;
         $this->dijkstra = $dijkstra;
+
+        $this->init();
     }
 
     public function buildPathBetween($start, $end) : bool
     {
         $this->builder->rebuildRelationMap();
 
-        $map = $this->builder->getMap();
-
-        $this->builder->setMap($map);
-
         $percorso = $tutta = $this->dijkstra->shortestPaths($start, $end);
-        $prevRelations = $map[$start]['relations'];
+        $prevRelations = $this->map[$start]['relations'];
 
         $this->path = '_embedded';
 
@@ -39,7 +39,7 @@ final class DijkstraWalker
                 $this->path .= '.' . $relationName;
             }
 
-            $prevRelations = $map[$meta]['relations'];
+            $prevRelations = $this->map[$meta]['relations'];
         }
 
         return true;
@@ -54,5 +54,12 @@ final class DijkstraWalker
         }
 
         return $this->path;
+    }
+
+    public function init()
+    {
+        $this->dijkstra->setMap(
+            $this->map = $this->builder->getMap()
+        );
     }
 }

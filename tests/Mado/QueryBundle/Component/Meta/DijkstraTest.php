@@ -32,7 +32,8 @@ class DijkstraTest extends TestCase
             ],
         ];
 
-        $dijkstra = new Dijkstra($this->samepleJson);
+        $dijkstra = new Dijkstra();
+        $dijkstra->setMap($this->samepleJson);
 
         $paths = $dijkstra->shortestPaths(
             'AppBundle\\Entity\\a',
@@ -76,7 +77,8 @@ class DijkstraTest extends TestCase
             ],
         ];
 
-        $dijkstra = new Dijkstra($this->samepleJson);
+        $dijkstra = new Dijkstra();
+        $dijkstra->setMap($this->samepleJson);
 
         $paths = $dijkstra->shortestPaths(
             'AppBundle\\Entity\\a',

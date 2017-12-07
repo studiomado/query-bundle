@@ -15,7 +15,7 @@ class Dijkstra
 
     private $visited;
 
-    public function __construct($map)
+    public function setMap($map)
     {
         foreach ($map as $nodeName => $metaData) {
             foreach ($metaData['relations'] as $itemKey => $itemValue) {
@@ -26,6 +26,8 @@ class Dijkstra
 
     private function processQueue(array $excluded)
     {
+        $this->ensureMapIsDefined();
+
         $node = array_search(min($this->visited), $this->visited);
 
         if (!empty($this->map[$node]) && !in_array($node, $excluded)) {
@@ -67,6 +69,8 @@ class Dijkstra
 
     public function shortestPaths($source, $target, array $excluded = array())
     {
+        $this->ensureMapIsDefined();
+
         $this->distance = array_fill_keys(array_keys($this->map), INF);
         $this->distance[$source] = 0;
         $this->prev = array_fill_keys(array_keys($this->map), []);
@@ -83,5 +87,14 @@ class Dijkstra
         }
 
         return $this->extractPaths($target);
+    }
+
+    public function ensureMapIsDefined()
+    {
+        if (!$this->map) {
+            throw new \RuntimeException(
+                'Oops! Map is not defined'
+            );
+        }
     }
 }
