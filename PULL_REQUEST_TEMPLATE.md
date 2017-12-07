@@ -1,6 +1,6 @@
 | Q             | A
 | ------------- | ---
-| Branch?       | master for features / 2.7 up to 4.0 for bug fixes <!-- see below -->
+| Branch?       | master for features / x.y for bug fixes <!-- see below -->
 | Bug fix?      | yes/no
 | New feature?  | yes/no <!-- don't forget to update src/**/CHANGELOG.md files -->
 | BC breaks?    | yes/no
