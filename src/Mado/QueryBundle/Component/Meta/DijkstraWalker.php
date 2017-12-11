@@ -29,12 +29,12 @@ final class DijkstraWalker
     {
         $this->builder->rebuildRelationMap();
 
-        $percorso = $tutta = $this->dijkstra->shortestPaths($start, $end);
+        $shortestPath = $this->dijkstra->shortestPaths($start, $end);
         $prevRelations = $this->map[$start]['relations'];
 
         $this->path = '_embedded';
 
-        foreach ($percorso[0] as $nodo => $meta) {
+        foreach ($shortestPath[0] as $meta) {
             if ($relationName = array_search($meta, $prevRelations)) {
                 $this->path .= '.' . $relationName;
             }

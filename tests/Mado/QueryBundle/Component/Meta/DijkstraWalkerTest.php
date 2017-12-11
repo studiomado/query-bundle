@@ -28,7 +28,7 @@ class DijkstraWalkerTest extends TestCase
         $this->walker->getPath();
     }
 
-    public function testFoo()
+    public function testBuildPathUsingDijkstra()
     {
         $this->mapper = $this
             ->getMockBuilder('Mado\QueryBundle\Component\Meta\DataMapper')
@@ -68,10 +68,13 @@ class DijkstraWalkerTest extends TestCase
             $this->dijkstra
         );
 
-        // complete test with map
-
         $this->walker->buildPathBetween('start', 'end');
 
-        $this->walker->getPath();
+        $pathFound = $this->walker->getPath();
+
+        $this->assertEquals(
+            '_embedded.fine',
+            $pathFound
+        );
     }
 }
