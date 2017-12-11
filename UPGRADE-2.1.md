@@ -9,7 +9,7 @@ NestingException
 UnespectedValueException
 ------------------------
 
- * Trhowed whenever parent root entity of a relation not exists.
+ * Throwed whenever parent root entity of a relation not exists.
 
 UnreachablePathException
 ------------------------
