@@ -5,7 +5,8 @@ namespace Mado\QueryBundle\Component\Meta;
 /**
  * @since Class available since Release 2.1.0
  */
-final class DijkstraWalker
+final class DijkstraWalker implements
+    GraphWalker
 {
     private $builder;
 
