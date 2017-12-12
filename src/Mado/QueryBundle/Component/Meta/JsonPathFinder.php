@@ -31,7 +31,7 @@ class JsonPathFinder
 
     private $allPaths = [];
 
-    private static $indeToDescriptionMap = [
+    private static $indexesToDescriptionMap = [
         self::INDEX_ENTITY_PARENT      => 'parent',
         self::INDEX_FK_RELATION_NAME   => 'relation',
         self::INDEX_ENTITY_FIRST_CHILD => 'first child',
@@ -180,7 +180,7 @@ class JsonPathFinder
         }
 
         throw new Exceptions\UnexpectedValueException(var_export([
-            'val'         => self::$indeToDescriptionMap[$val],
+            'val'         => self::$indexesToDescriptionMap[$val],
             'innerEntity' => $innerEntity,
             'map'         => $this->getMap(),
         ], true));
