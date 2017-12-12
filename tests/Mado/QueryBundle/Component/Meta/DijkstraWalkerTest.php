@@ -4,7 +4,7 @@ use Mado\QueryBundle\Component\Meta\DijkstraWalker;
 use PHPUnit\Framework\TestCase as TestCase;
 
 class DijkstraWalkerTest extends TestCase
-:
+{
     /**
      * @expectedException \RuntimeException
      */
