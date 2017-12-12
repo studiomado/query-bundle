@@ -270,17 +270,13 @@ class JsonPathFinder
 
     public function findAllPathsTo(string $dest)
     {
-        for ($stay = true;;) {
+        while (true) {
             try {
                 $this->getPathToEntity($dest);
                 $entities = $this->getEntitiesPath();
                 $lastEntityFound = end($entities);
                 $this->removeStep($lastEntityFound);
             } catch(\Mado\QueryBundle\Component\Meta\Exceptions\UnexpectedValueException $e) {
-                $stay = false;
-            }
-
-            if (!$stay) {
                 return;
             }
         }
