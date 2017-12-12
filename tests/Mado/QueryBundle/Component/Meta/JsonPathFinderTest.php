@@ -187,7 +187,7 @@ class JsonPathFinderTest extends TestCase
     }
 
     /**
-     * @expectedException \Mado\QueryBundle\Component\Meta\Exceptions\UnespectedValueException
+     * @expectedException \Mado\QueryBundle\Component\Meta\Exceptions\UnexpectedValueException
      */
     public function testThrowExceptionIfPathNotExists()
     {

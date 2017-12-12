@@ -179,7 +179,7 @@ class JsonPathFinder
             }
         }
 
-        throw new Exceptions\UnespectedValueException(var_export([
+        throw new Exceptions\UnexpectedValueException(var_export([
             'val'         => self::$indeToDescriptionMap[$val],
             'innerEntity' => $innerEntity,
             'map'         => $this->getMap(),
@@ -276,7 +276,7 @@ class JsonPathFinder
                 $entities = $this->getEntitiesPath();
                 $lastEntityFound = end($entities);
                 $this->removeStep($lastEntityFound);
-            } catch(\Mado\QueryBundle\Component\Meta\Exceptions\UnespectedValueException $e) {
+            } catch(\Mado\QueryBundle\Component\Meta\Exceptions\UnexpectedValueException $e) {
                 $stay = false;
             }
 
