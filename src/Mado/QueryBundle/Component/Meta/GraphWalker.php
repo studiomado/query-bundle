@@ -7,7 +7,7 @@ namespace Mado\QueryBundle\Component\Meta;
  */
 interface GraphWalker
 {
-    public function buildPathBetween($start, $end) : bool;
+    public function buildPathBetween($firstNode, $lastNode) : bool;
 
     public function getPath() : string;
 
