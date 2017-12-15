@@ -12,7 +12,9 @@ final class Value
 
     public function getFilter()
     {
-        $isAdditionalFilter = !is_string($this->filter);
+        $filterCameFromQueryString = is_string($this->filter);
+
+        $isAdditionalFilter = !$filterCameFromQueryString;
 
         if ($isAdditionalFilter) {
             return $this->filter['list'][0];
