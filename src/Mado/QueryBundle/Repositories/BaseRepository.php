@@ -344,6 +344,7 @@ class BaseRepository extends EntityRepository
         $this->embeddedFields = $embeddedFields;
     }
 
+    /** @deprecated since version 2.2.0 */
     public function getEntityAlias(string $entityName) : string
     {
         $arrayEntityName = explode('\\', strtolower($entityName) );

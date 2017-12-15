@@ -512,6 +512,7 @@ class QueryBuilderFactory extends AbstractQuery
         return $this->qBuilder;
     }
 
+    /** @deprecated since version 2.2.0 */
     public function buildSelectValue() : string
     {
         if ("" == $this->getSelect()) {
