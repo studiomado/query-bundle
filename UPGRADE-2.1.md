@@ -99,3 +99,27 @@ $repository = $this->getDoctrine()
       $filter . '.id|list' => '2,3,5'
     ]);
 ```
+
+Objects\Value
+-------------
+
+ * When a value is not a string, it comes from an additional filter.
+   Additional filters should be stored as ...
+
+```php
+{
+  "filter_name": {
+    "list" : [23, 666],
+    "entities" : [
+      {id:23,foo:"foo",bar:"bar"},
+      {id:666,foo:"foo",bar:"bar"},
+    ]
+  },
+  "filter_name": {
+    "list" : [/* array of id */],
+    "entities" : [
+      // complete objects
+    ]
+  }
+}
+```
