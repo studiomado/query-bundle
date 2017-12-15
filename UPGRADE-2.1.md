@@ -108,14 +108,14 @@ Objects\Value
 
 ```php
 {
-  "fiter_name": {
+  "filter_name": {
     "list" : [23, 666],
     "entities" : [
       {id:23,foo:"foo",bar:"bar"},
       {id:666,foo:"foo",bar:"bar"},
     ]
   },
-  "fiter_name": {
+  "filter_name": {
     "list" : [/* array of id */],
     "entities" : [
       // complete objects
