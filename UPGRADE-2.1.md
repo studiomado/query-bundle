@@ -99,3 +99,8 @@ $repository = $this->getDoctrine()
       $filter . '.id|list' => '2,3,5'
     ]);
 ```
+
+Objects\Value
+-------------
+
+ * When a value is not a string, it comes from an additional filter.

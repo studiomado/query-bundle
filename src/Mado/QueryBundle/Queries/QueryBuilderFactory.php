@@ -181,7 +181,11 @@ class QueryBuilderFactory extends AbstractQuery
         }
 
         foreach ($this->filtering as $filter => $value) {
-            $this->applyFilterAnd($filter, $value);
+            $this->applyFilterAnd(
+                $filter,
+                $value,
+                Objects\Value::fromFilter($value)
+            );
         }
 
         if (null !== $this->orFiltering) {
@@ -205,8 +209,11 @@ class QueryBuilderFactory extends AbstractQuery
         return $this;
     }
 
-    private function applyFilterAnd($filter, $value)
-    {
+    private function applyFilterAnd(
+        $filter,
+        $value,
+        Objects\Value $filterValue
+    ) {
         $whereCondition = null;
         $filterAndOperator = explode('|',$filter);
 
@@ -301,7 +308,7 @@ class QueryBuilderFactory extends AbstractQuery
             $this->qBuilder->andWhere($whereCondition);
             if (isset($operator['substitution_pattern'])) {
                 if (isset($filterAndOperator[1]) && 'list' == $filterAndOperator[1]) {
-                    $value = explode(',', $value);
+                    $value = explode(',', $filterValue->getFilter());
                 } else {
                     $value = str_replace(
                         '{string}',
