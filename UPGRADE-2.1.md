@@ -104,3 +104,22 @@ Objects\Value
 -------------
 
  * When a value is not a string, it comes from an additional filter.
+   Additional filters should be stored as ...
+
+```php
+{
+  "fiter_name": {
+    "list" : [23, 666],
+    "entities" : [
+      {id:23,foo:"foo",bar:"bar"},
+      {666,foo:"foo",bar:"bar"},
+    ]
+  },
+  "fiter_name": {
+    "list" : [/* array of id */],
+    "entities" : [
+      // complete objects
+    ]
+  }
+}
+```
