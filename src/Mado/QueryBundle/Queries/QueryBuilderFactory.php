@@ -4,6 +4,9 @@ namespace Mado\QueryBundle\Queries;
 
 use Doctrine\ORM\QueryBuilder;
 use Mado\QueryBundle\Dictionary;
+use Mado\QueryBundle\Queries\Objects\Value;
+use Mado\QueryBundle\Queries\Objects\Operator;
+use Mado\QueryBundle\Queries\Objects\Parameter;
 
 class QueryBuilderFactory extends AbstractQuery
 {
@@ -184,7 +187,7 @@ class QueryBuilderFactory extends AbstractQuery
             $this->applyFilterAnd(
                 $filter,
                 $value,
-                Objects\Value::fromFilter($value)
+                Value::fromFilter($value)
             );
         }
 
@@ -201,7 +204,15 @@ class QueryBuilderFactory extends AbstractQuery
                 $this->qBuilder->andWhere($orFilter['orCondition']);
 
                 foreach ($orFilter['parameters'] as $parameter) {
-                    $this->qBuilder->setParameter($parameter['field'], $parameter['value']);
+                    $paramObject = Parameter::withKeyAndValue(
+                        $parameter['field'],
+                        $parameter['value']
+                    );
+
+                    $this->qBuilder->setParameter(
+                        $paramObject->getKey(),
+                        $paramObject->getValue()
+                    );
                 }
             }
         }
@@ -212,7 +223,7 @@ class QueryBuilderFactory extends AbstractQuery
     private function applyFilterAnd(
         $filter,
         $value,
-        Objects\Value $filterValue
+        Value $filterValue
     ) {
         $whereCondition = null;
         $filterAndOperator = explode('|',$filter);
@@ -220,7 +231,7 @@ class QueryBuilderFactory extends AbstractQuery
         if (!isset($filterAndOperator[1])) {
             $filterAndOperator[1] = 'eq';
         }
-        $op = Objects\Operator::fromString($filterAndOperator[1]);
+        $op = Operator::fromString($filterAndOperator[1]);
 
         $fieldName = $filterAndOperator[0];
         $fieldName = $this->parser->camelize($fieldName);
@@ -252,17 +263,20 @@ class QueryBuilderFactory extends AbstractQuery
                     $whereCondition =
                         $this->entityAlias . '.' . $fieldName . ' '.
                         $operator['meta'] . '' .
-                        $this->entityAlias . '.' . $value
-                        ;
+                        $this->entityAlias . '.' . $value;
                     //} else {
                     //throw new \RuntimeException(
                     //'Oops! Eccezzione'
                     //);
                 } else {
-                    $whereCondition = $this->entityAlias.'.'.$fieldName.' '.$operator['meta'].' :field_'.$fieldName . $salt;
+                    $whereCondition = $this->entityAlias . '.' . $fieldName . ' '
+                        . $operator['meta']
+                        . ' :field_' . $fieldName . $salt;
                 }
             } else {
-                $whereCondition = $this->entityAlias.'.'.$fieldName.' = :field_'.$fieldName . $salt;
+                $whereCondition = $this->entityAlias . '.' . $fieldName . ' '
+                    . '='
+                    . ' :field_' . $fieldName . $salt;
             }
 
             $this->qBuilder->andWhere($whereCondition);
@@ -279,11 +293,21 @@ class QueryBuilderFactory extends AbstractQuery
                 }
             }
 
-            $this->qBuilder->setParameter('field_' . $fieldName . $salt, $value);
+            $paramObject = Parameter::withKeyAndValue(
+                'field_' . $fieldName . $salt,
+                $value
+            );
+
+            $this->qBuilder->setParameter(
+                $paramObject->getKey(),
+                $paramObject->getValue()
+            );
         } else {
             $isNotARelation = 0 !== strpos($fieldName, 'Embedded.');
             if ($isNotARelation) {
-                $whereCondition = $this->entityAlias . '.' . $fieldName . ' ' . $operator['meta'] . ' ' . $this->entityAlias . '.' . $value;
+                $whereCondition = $this->entityAlias . '.' . $fieldName . ' '
+                    . $operator['meta']
+                    . ' ' . $this->entityAlias . '.' . $value;
                 $this->qBuilder->andWhere($whereCondition);
             }
         }
@@ -328,7 +352,15 @@ class QueryBuilderFactory extends AbstractQuery
                 }
             }
 
-            $this->qBuilder->setParameter('field_' . $fieldName . $salt, $value);
+            $paramObject = Parameter::withKeyAndValue(
+                'field_' . $fieldName . $salt,
+                $value
+            );
+
+            $this->qBuilder->setParameter(
+                $paramObject->getKey(),
+                $paramObject->getValue()
+            );
         }
     }
 
@@ -336,7 +368,7 @@ class QueryBuilderFactory extends AbstractQuery
     {
         $whereCondition = null;
         $filterAndOperator = explode('|',$filter);
-        $op = Objects\Operator::fromString($filterAndOperator[1]);
+        $op = Operator::fromString($filterAndOperator[1]);
 
         $fieldName = $filterAndOperator[0];
         $fieldName = $this->parser->camelize($fieldName);
@@ -385,7 +417,9 @@ class QueryBuilderFactory extends AbstractQuery
                         . ' :field_' . $fieldName . $salt;
                 }
             } else {
-                $whereCondition = $this->entityAlias.'.'.$fieldName.' = :field_'.$fieldName . $salt;
+                $whereCondition = $this->entityAlias . '.' . $fieldName . ' '
+                    . '='
+                    . ' :field_'.$fieldName . $salt;
             }
 
             if ($orCondition['orCondition'] != null) {
@@ -413,7 +447,9 @@ class QueryBuilderFactory extends AbstractQuery
         } else {
             $isNotARelation = 0 !== strpos($fieldName, 'Embedded.');
             if ($isNotARelation) {
-                $whereCondition = $this->entityAlias.'.'.$fieldName.' '.$operator['meta'].' ' . $this->entityAlias . '.' . $value;
+                $whereCondition = $this->entityAlias . '.' . $fieldName . ' '
+                    . $operator['meta']
+                    . ' ' . $this->entityAlias . '.' . $value;
                 if ($orCondition['orCondition'] != null) {
                     $orCondition['orCondition'] .= ' OR ' . $whereCondition;
                 } else {
@@ -444,9 +480,13 @@ class QueryBuilderFactory extends AbstractQuery
             }
 
             if (isset($filterAndOperator[1]) && $op->isListOrNlist()) {
-                $whereCondition = $relationEntityAlias.'.'.$fieldName.' '.$operator['meta'].' (:field_'.$fieldName . $salt . ')';
+                $whereCondition = $relationEntityAlias . '.' . $fieldName . ' '
+                    . $operator['meta']
+                    . ' (:field_' . $fieldName . $salt . ')';
             } else {
-                $whereCondition = $relationEntityAlias.'.'.$fieldName.' '.$operator['meta'].' :field_'.$fieldName . $salt;
+                $whereCondition = $relationEntityAlias . '.' . $fieldName . ' '
+                    . $operator['meta']
+                    . ' :field_' . $fieldName . $salt;
             }
 
             if ($orCondition['orCondition'] != null) {
