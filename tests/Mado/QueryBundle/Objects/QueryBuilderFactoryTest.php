@@ -3,7 +3,6 @@
 namespace Mado\QueryBundle\Tests\Objects;
 
 use Mado\QueryBundle\Queries\QueryBuilderFactory;
-use Mado\QueryBundle\Vocabulary\Operators;
 use PHPUnit\Framework\TestCase;
 
 class QueryBuilderFactoryTest extends TestCase

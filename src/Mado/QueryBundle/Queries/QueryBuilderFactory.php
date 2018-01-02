@@ -3,7 +3,7 @@
 namespace Mado\QueryBundle\Queries;
 
 use Doctrine\ORM\QueryBuilder;
-use Mado\QueryBundle\Dictionary\Operators;
+use Mado\QueryBundle\Dictionary;
 
 class QueryBuilderFactory extends AbstractQuery
 {
@@ -44,7 +44,7 @@ class QueryBuilderFactory extends AbstractQuery
 
     public function getValueAvailableFilters()
     {
-        return Operators::getOperators();
+        return Dictionary::getOperators();
     }
 
     public function setFields(array $fields = [])
