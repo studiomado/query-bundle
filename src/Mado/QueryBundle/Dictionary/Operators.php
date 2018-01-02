@@ -43,6 +43,10 @@ class Operators
             'meta' => 'IN',
             'substitution_pattern' => '({string})',
         ],
+        'nlist' => [
+            'meta' => 'NOT IN',
+            'substitution_pattern' => '({string})',
+        ],
         'field_eq' => [
             'meta' => '=',
         ],

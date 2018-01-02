@@ -84,6 +84,32 @@ class QueryBuilderFactoryTest extends TestCase
             $queryBuilderFactory->getQueryBuilder()->getQuery()->getSql()
         );
     }
+
+    public function testFiltersMustContainsAlsoFieldEquality()
+    {
+        $factory = new QueryBuilderFactory($this->manager);
+
+        $validFilters = [
+            'eq',
+            'neq',
+            'gt',
+            'gte',
+            'lt',
+            'lte',
+            'startswith',
+            'contains',
+            'notcontains',
+            'endswith',
+            'list',
+            'nlist',
+            'field_eq',
+        ];
+
+        $this->assertEquals(
+            $validFilters,
+            $factory->getAvailableFilters()
+        );
+    }
 }
 
 /** @Entity() */

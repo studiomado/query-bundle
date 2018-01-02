@@ -217,6 +217,11 @@ class QueryBuilderFactory extends AbstractQuery
         $whereCondition = null;
         $filterAndOperator = explode('|',$filter);
 
+        if (!isset($filterAndOperator[1])) {
+            $filterAndOperator[1] = 'eq';
+        }
+        $op = Objects\Operator::fromString($filterAndOperator[1]);
+
         $fieldName = $filterAndOperator[0];
         $fieldName = $this->parser->camelize($fieldName);
 
@@ -228,7 +233,6 @@ class QueryBuilderFactory extends AbstractQuery
         // controllo se il filtro che mi arriva dalla richiesta è una proprietà di questa entità
         // esempio per users: filtering[username|contains]=mado
         if (in_array($fieldName, $this->fields)) {
-
             $salt = '';
             foreach ($this->qBuilder->getParameters() as $parameter) {
                 if ($parameter->getName() == 'field_' . $fieldName) {
@@ -240,8 +244,10 @@ class QueryBuilderFactory extends AbstractQuery
             // $filterAndOperator[0] = 'foo'
             // $filterAndOperator[1] = 'bar'
             if (isset($filterAndOperator[1])) {
-                if ('list' == $filterAndOperator[1]) {
-                    $whereCondition = $this->entityAlias.'.'.$fieldName.' '.$operator['meta'].' (:field_'.$fieldName . $salt . ')';
+                if ($op->isListOrNlist()) {
+                    $whereCondition = $this->entityAlias . '.' . $fieldName . ' '
+                        . $operator['meta']
+                        . ' (:field_' . $fieldName . $salt . ')';
                 } else if ('field_eq' == $filterAndOperator[1]) {
                     $whereCondition =
                         $this->entityAlias . '.' . $fieldName . ' '.
@@ -262,7 +268,7 @@ class QueryBuilderFactory extends AbstractQuery
             $this->qBuilder->andWhere($whereCondition);
 
             if (isset($operator['substitution_pattern'])) {
-                if (isset($filterAndOperator[1]) && 'list' == $filterAndOperator[1]) {
+                if (isset($filterAndOperator[1]) && $op->isListOrNlist()) {
                     $value = explode(',', $value);
                 } else {
                     $value = str_replace(
@@ -277,7 +283,7 @@ class QueryBuilderFactory extends AbstractQuery
         } else {
             $isNotARelation = 0 !== strpos($fieldName, 'Embedded.');
             if ($isNotARelation) {
-                $whereCondition = $this->entityAlias.'.'.$fieldName.' '.$operator['meta'].' ' . $this->entityAlias . '.' . $value;
+                $whereCondition = $this->entityAlias . '.' . $fieldName . ' ' . $operator['meta'] . ' ' . $this->entityAlias . '.' . $value;
                 $this->qBuilder->andWhere($whereCondition);
             }
         }
@@ -299,15 +305,19 @@ class QueryBuilderFactory extends AbstractQuery
                 }
             }
 
-            if (isset($filterAndOperator[1]) && 'list' == $filterAndOperator[1]) {
-                $whereCondition = $relationEntityAlias.'.'.$fieldName.' '.$operator['meta'].' (:field_'.$fieldName . $salt . ')';
+            if (isset($filterAndOperator[1]) && $op->isListOrNlist()) {
+                $whereCondition = $relationEntityAlias . '.' . $fieldName . ' '
+                    . $operator['meta']
+                    . ' (:field_' . $fieldName . $salt . ')';
             } else {
-                $whereCondition = $relationEntityAlias.'.'.$fieldName.' '.$operator['meta'].' :field_'.$fieldName . $salt;
+                $whereCondition = $relationEntityAlias . '.' . $fieldName . ' '
+                    . $operator['meta']
+                    . ' :field_' . $fieldName . $salt;
             }
 
             $this->qBuilder->andWhere($whereCondition);
             if (isset($operator['substitution_pattern'])) {
-                if (isset($filterAndOperator[1]) && 'list' == $filterAndOperator[1]) {
+                if (isset($filterAndOperator[1]) && $op->isListOrNlist()) {
                     $value = explode(',', $filterValue->getFilter());
                 } else {
                     $value = str_replace(
@@ -326,6 +336,7 @@ class QueryBuilderFactory extends AbstractQuery
     {
         $whereCondition = null;
         $filterAndOperator = explode('|',$filter);
+        $op = Objects\Operator::fromString($filterAndOperator[1]);
 
         $fieldName = $filterAndOperator[0];
         $fieldName = $this->parser->camelize($fieldName);
@@ -354,8 +365,10 @@ class QueryBuilderFactory extends AbstractQuery
             // $filterAndOperator[0] = 'foo'
             // $filterAndOperator[1] = 'bar'
             if (isset($filterAndOperator[1])) {
-                if ('list' == $filterAndOperator[1]) {
-                    $whereCondition = $this->entityAlias.'.'.$fieldName.' '.$operator['meta'].' (:field_'.$fieldName . $salt . ')';
+                if ($op->isListOrNlist()) {
+                    $whereCondition = $this->entityAlias . '.' . $fieldName . ' '
+                        . $operator['meta']
+                        . ' (:field_' . $fieldName . $salt . ')';
                 } else if ('field_eq' == $filterAndOperator[1]) {
                     $whereCondition =
                         $this->entityAlias . '.' . $fieldName . ' '.
@@ -367,7 +380,9 @@ class QueryBuilderFactory extends AbstractQuery
                     //'Oops! Eccezzione'
                     //);
                 } else {
-                    $whereCondition = $this->entityAlias.'.'.$fieldName.' '.$operator['meta'].' :field_'.$fieldName . $salt;
+                    $whereCondition = $this->entityAlias . '.' . $fieldName . ' '
+                        . $operator['meta']
+                        . ' :field_' . $fieldName . $salt;
                 }
             } else {
                 $whereCondition = $this->entityAlias.'.'.$fieldName.' = :field_'.$fieldName . $salt;
@@ -380,7 +395,7 @@ class QueryBuilderFactory extends AbstractQuery
             }
 
             if (isset($operator['substitution_pattern'])) {
-                if (isset($filterAndOperator[1]) && 'list' == $filterAndOperator[1]) {
+                if (isset($filterAndOperator[1]) && $op->isListOrNlist()) {
                     $value = explode(',', $value);
                 } else {
                     $value = str_replace(
@@ -428,7 +443,7 @@ class QueryBuilderFactory extends AbstractQuery
                 $salt = '_' . rand(111, 999);
             }
 
-            if (isset($filterAndOperator[1]) && 'list' == $filterAndOperator[1]) {
+            if (isset($filterAndOperator[1]) && $op->isListOrNlist()) {
                 $whereCondition = $relationEntityAlias.'.'.$fieldName.' '.$operator['meta'].' (:field_'.$fieldName . $salt . ')';
             } else {
                 $whereCondition = $relationEntityAlias.'.'.$fieldName.' '.$operator['meta'].' :field_'.$fieldName . $salt;
@@ -441,7 +456,7 @@ class QueryBuilderFactory extends AbstractQuery
             }
 
             if (isset($operator['substitution_pattern'])) {
-                if (isset($filterAndOperator[1]) && 'list' == $filterAndOperator[1]) {
+                if (isset($filterAndOperator[1]) && $op->isListOrNlist()) {
                     $value = explode(',', $value);
                 } else {
                     $value = str_replace(
