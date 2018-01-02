@@ -204,7 +204,10 @@ class QueryBuilderFactory extends AbstractQuery
                 $this->qBuilder->andWhere($orFilter['orCondition']);
                 /** @var Parameter $parameter */
                 foreach ($orFilter['parameters'] as $parameter) {
-                    $this->qBuilder->setParameter($parameter->getKey(), $parameter->getValue());
+                    $this->qBuilder->setParameter(
+                        $parameter->getKey(),
+                        $parameter->getValue()
+                    );
                 }
             }
         }
@@ -273,24 +276,19 @@ class QueryBuilderFactory extends AbstractQuery
 
             $this->qBuilder->andWhere($whereCondition);
 
-            if (isset($operator['substitution_pattern'])) {
-                if (isset($filterAndOperator[1]) && $op->isListOrNlist()) {
-                    $value = explode(',', $value);
-                } else {
-                    $value = str_replace(
-                        '{string}',
-                        $value,
-                        $operator['substitution_pattern']
-                    );
-                }
-            }
+            $parameter = Parameter::box([
+                'fieldName'         => $fieldName,
+                'filterAndOperator' => $filterAndOperator,
+                'op'                => $op,
+                'operator'          => $operator,
+                'salt'              => $salt,
+                'value'             => $value,
+            ]);
 
-            $parameter = Parameter::withKeyAndValue(
-                'field_' . $fieldName . $salt,
-                $value
+            $this->qBuilder->setParameter(
+                $parameter->getKey(),
+                $parameter->getValue()
             );
-
-            $this->qBuilder->setParameter($parameter->getKey(), $parameter->getValue());
         } else {
             $isNotARelation = 0 !== strpos($fieldName, 'Embedded.');
             if ($isNotARelation) {
@@ -346,7 +344,10 @@ class QueryBuilderFactory extends AbstractQuery
                 $value
             );
 
-            $this->qBuilder->setParameter($parameter->getKey(), $parameter->getValue());
+            $this->qBuilder->setParameter(
+                $parameter->getKey(),
+                $parameter->getValue()
+            );
         }
     }
 
