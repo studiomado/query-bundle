@@ -1,9 +1,8 @@
 <?php
 
-namespace Mado\QueryBundle\Dictionary;
+namespace Mado\QueryBundle;
 
-/** @deprecated will be removed in version 2.3 */
-class Operators
+class Dictionary
 {
     private static $operatorMap = [
         'eq' => [

@@ -3,7 +3,6 @@
 namespace Mado\QueryBundle\Tests\Objects;
 
 use Mado\QueryBundle\Queries\QueryBuilderFactory;
-use Mado\QueryBundle\Vocabulary\Operators;
 use PHPUnit\Framework\TestCase;
 
 class QueryBuilderFactoryTest extends TestCase
@@ -82,6 +81,32 @@ class QueryBuilderFactoryTest extends TestCase
             "AND g1_.name LIKE ? " .
             "AND g1_.name LIKE ?",
             $queryBuilderFactory->getQueryBuilder()->getQuery()->getSql()
+        );
+    }
+
+    public function testFiltersMustContainsAlsoFieldEquality()
+    {
+        $factory = new QueryBuilderFactory($this->manager);
+
+        $validFilters = [
+            'eq',
+            'neq',
+            'gt',
+            'gte',
+            'lt',
+            'lte',
+            'startswith',
+            'contains',
+            'notcontains',
+            'endswith',
+            'list',
+            'nlist',
+            'field_eq',
+        ];
+
+        $this->assertEquals(
+            $validFilters,
+            $factory->getAvailableFilters()
         );
     }
 }
