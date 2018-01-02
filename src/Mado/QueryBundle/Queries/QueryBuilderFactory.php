@@ -202,17 +202,9 @@ class QueryBuilderFactory extends AbstractQuery
 
             if ((count($orFilter) > 0) && ($orFilter['orCondition'] != null)) {
                 $this->qBuilder->andWhere($orFilter['orCondition']);
-
+                /** @var Parameter $parameter */
                 foreach ($orFilter['parameters'] as $parameter) {
-                    $paramObject = Parameter::withKeyAndValue(
-                        $parameter['field'],
-                        $parameter['value']
-                    );
-
-                    $this->qBuilder->setParameter(
-                        $paramObject->getKey(),
-                        $paramObject->getValue()
-                    );
+                    $this->qBuilder->setParameter($parameter->getKey(), $parameter->getValue());
                 }
             }
         }
@@ -293,15 +285,12 @@ class QueryBuilderFactory extends AbstractQuery
                 }
             }
 
-            $paramObject = Parameter::withKeyAndValue(
+            $parameter = Parameter::withKeyAndValue(
                 'field_' . $fieldName . $salt,
                 $value
             );
 
-            $this->qBuilder->setParameter(
-                $paramObject->getKey(),
-                $paramObject->getValue()
-            );
+            $this->qBuilder->setParameter($parameter->getKey(), $parameter->getValue());
         } else {
             $isNotARelation = 0 !== strpos($fieldName, 'Embedded.');
             if ($isNotARelation) {
@@ -352,15 +341,12 @@ class QueryBuilderFactory extends AbstractQuery
                 }
             }
 
-            $paramObject = Parameter::withKeyAndValue(
+            $parameter = Parameter::withKeyAndValue(
                 'field_' . $fieldName . $salt,
                 $value
             );
 
-            $this->qBuilder->setParameter(
-                $paramObject->getKey(),
-                $paramObject->getValue()
-            );
+            $this->qBuilder->setParameter($parameter->getKey(), $parameter->getValue());
         }
     }
 
@@ -440,10 +426,12 @@ class QueryBuilderFactory extends AbstractQuery
                 }
             }
 
-            $orCondition['parameters'][] = [
-                'field' => 'field_' . $fieldName . $salt,
-                'value' => $value
-            ];
+            $parameter = Parameter::withKeyAndValue(
+                'field_' . $fieldName . $salt,
+                $value
+            );
+
+            $orCondition['parameters'][] = $parameter;
         } else {
             $isNotARelation = 0 !== strpos($fieldName, 'Embedded.');
             if ($isNotARelation) {
@@ -507,10 +495,12 @@ class QueryBuilderFactory extends AbstractQuery
                 }
             }
 
-            $orCondition['parameters'][] = [
-                'field' => 'field_' . $fieldName . $salt,
-                'value' => $value
-            ];
+            $parameter = Parameter::withKeyAndValue(
+                'field_' . $fieldName . $salt,
+                $value
+            );
+
+            $orCondition['parameters'][] = $parameter;
         }
 
         return $orCondition;
