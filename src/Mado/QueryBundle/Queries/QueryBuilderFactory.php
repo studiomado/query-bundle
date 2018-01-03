@@ -232,7 +232,7 @@ class QueryBuilderFactory extends AbstractQuery
                 $whereCondition = $this->entityAlias . '.' . $filterObject->getFieldName() . ' '
                     . $filterObject->getOperatorMeta()
                     . ' (:field_' . $filterObject->getFieldName() . $salt . ')';
-            } else if ('field_eq' == $filterObject->getOperatorName()) {
+            } else if ($filterObject->isFieldEqualityType()) {
                 $whereCondition =
                     $this->entityAlias . '.' . $filterObject->getFieldName() . ' '
                     . $filterObject->getOperatorMeta()
@@ -349,7 +349,7 @@ class QueryBuilderFactory extends AbstractQuery
                     $whereCondition = $this->entityAlias . '.' . $fieldName . ' '
                         . $operator['meta']
                         . ' (:field_' . $fieldName . $salt . ')';
-                } else if ('field_eq' == $filterAndOperator[1]) {
+                } else if ($filterObject->isFieldEqualityType()) {
                     $whereCondition =
                         $this->entityAlias . '.' . $fieldName . ' '.
                         $operator['meta'] . '' .

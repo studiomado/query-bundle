@@ -46,6 +46,11 @@ final class FilterObject
             || $this->getOperatorName() == 'nlist';
     }
 
+    public function isFieldEqualityType()
+    {
+        return $this->getOperatorName() == 'field_eq';
+    }
+
     public function getOperatorMeta() : string
     {
         return Dictionary::getOperators()[$this->getOperatorName()]['meta'];
