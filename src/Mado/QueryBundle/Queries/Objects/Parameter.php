@@ -17,15 +17,17 @@ final class Parameter
 
     public static function box(array $params) : Parameter
     {
-        $fieldName          = $params['fieldName'];
-        $filterAndOperator  = $params['filterAndOperator'];
-        $op                 = $params['op'];
-        $operator           = $params['operator'];
-        $salt               = $params['salt'];
-        $value              = $params['value'];
+        $fieldName                    = $params['fieldName'];
+        $explodedQueryStringRawFilter = $params['explodedQueryStringRawFilter'];
+        $salt                         = $params['salt'];
+        $value                        = $params['value'];
+
+        $op = Filter::fromQueryStringRawFilterExploded($explodedQueryStringRawFilter);
+
+        $operator = $op->getRawOperator();
 
         if (isset($operator['substitution_pattern'])) {
-            $isSingleValue = isset($filterAndOperator[1])
+            $isSingleValue = isset($explodedQueryStringRawFilter[1])
                 && $op->isListOrNlist();
 
             if ($isSingleValue) {
@@ -58,6 +60,10 @@ final class Parameter
 
     public function getValue() : string
     {
+        if (is_array($this->value)) {
+            return current($this->value);
+        }
+
         return $this->value;
     }
 }

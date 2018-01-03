@@ -5,7 +5,7 @@ namespace Mado\QueryBundle\Queries;
 use Doctrine\ORM\QueryBuilder;
 use Mado\QueryBundle\Dictionary;
 use Mado\QueryBundle\Queries\Objects\Value;
-use Mado\QueryBundle\Queries\Objects\Operator;
+use Mado\QueryBundle\Queries\Objects\Filter;
 use Mado\QueryBundle\Queries\Objects\Parameter;
 
 class QueryBuilderFactory extends AbstractQuery
@@ -42,9 +42,10 @@ class QueryBuilderFactory extends AbstractQuery
 
     public function getAvailableFilters()
     {
-        return array_keys($this->getValueAvailableFilters());
+        return array_keys(Dictionary::getOperators());
     }
 
+    /** @deprecated since version 2.3 will be removed in version 2.4 */
     public function getValueAvailableFilters()
     {
         return Dictionary::getOperators();
@@ -216,29 +217,19 @@ class QueryBuilderFactory extends AbstractQuery
     }
 
     private function applyFilterAnd(
-        $filter,
+        $rawFilter,
         $value,
         Value $filterValue
     ) {
         $whereCondition = null;
-        $filterAndOperator = explode('|',$filter);
 
-        if (!isset($filterAndOperator[1])) {
-            $filterAndOperator[1] = 'eq';
-        }
-        $op = Operator::fromString($filterAndOperator[1]);
+        $filter = Filter::fromRawFilter($rawFilter);
 
-        $fieldName = $filterAndOperator[0];
-        $fieldName = $this->parser->camelize($fieldName);
-
-        $operator = $this->getValueAvailableFilters()[self::DEFAULT_OPERATOR];
-        if(isset($filterAndOperator[1])){
-            $operator = $this->getValueAvailableFilters()[$filterAndOperator[1]];
-        }
+        $operator = $filter->getRawOperator();
 
         // controllo se il filtro che mi arriva dalla richiesta è una proprietà di questa entità
         // esempio per users: filtering[username|contains]=mado
-        if (in_array($fieldName, $this->fields)) {
+        if (in_array($filter->getFieldName(), $this->fields)) {
             $salt = '';
             foreach ($this->qBuilder->getParameters() as $parameter) {
                 if ($parameter->getName() == 'field_' . $fieldName) {
@@ -247,14 +238,14 @@ class QueryBuilderFactory extends AbstractQuery
             }
 
             // filtering[foo|bar]
-            // $filterAndOperator[0] = 'foo'
-            // $filterAndOperator[1] = 'bar'
-            if (isset($filterAndOperator[1])) {
+            // $explodedQueryStringRawFilter[0] = 'foo'
+            // $explodedQueryStringRawFilter[1] = 'bar'
+            if (isset($explodedQueryStringRawFilter[1])) {
                 if ($op->isListOrNlist()) {
                     $whereCondition = $this->entityAlias . '.' . $fieldName . ' '
                         . $operator['meta']
                         . ' (:field_' . $fieldName . $salt . ')';
-                } else if ('field_eq' == $filterAndOperator[1]) {
+                } else if ('field_eq' == $explodedQueryStringRawFilter[1]) {
                     $whereCondition =
                         $this->entityAlias . '.' . $fieldName . ' '.
                         $operator['meta'] . '' .
@@ -264,25 +255,23 @@ class QueryBuilderFactory extends AbstractQuery
                     //'Oops! Eccezzione'
                     //);
                 } else {
-                    $whereCondition = $this->entityAlias . '.' . $fieldName . ' '
+                    $whereCondition = $this->entityAlias . '.' . $filter->getFieldName() . ' '
                         . $operator['meta']
-                        . ' :field_' . $fieldName . $salt;
+                        . ' :field_' . $filter->getFieldName() . $salt;
                 }
             } else {
-                $whereCondition = $this->entityAlias . '.' . $fieldName . ' '
+                $whereCondition = $this->entityAlias . '.' . $filter->getFieldName() . ' '
                     . '='
-                    . ' :field_' . $fieldName . $salt;
+                    . ' :field_' . $filter->getFieldName() . $salt;
             }
 
             $this->qBuilder->andWhere($whereCondition);
 
             $parameter = Parameter::box([
-                'fieldName'         => $fieldName,
-                'filterAndOperator' => $filterAndOperator,
-                'op'                => $op,
-                'operator'          => $operator,
-                'salt'              => $salt,
-                'value'             => $value,
+                'fieldName'                    => $filter->getFieldName(),
+                'explodedQueryStringRawFilter' => $filter->getExplodedRawFilter(),
+                'salt'                         => $salt,
+                'value'                        => $value,
             ]);
 
             $this->qBuilder->setParameter(
@@ -290,9 +279,9 @@ class QueryBuilderFactory extends AbstractQuery
                 $parameter->getValue()
             );
         } else {
-            $isNotARelation = 0 !== strpos($fieldName, 'Embedded.');
+            $isNotARelation = 0 !== strpos($filter->getFieldName(), 'Embedded.');
             if ($isNotARelation) {
-                $whereCondition = $this->entityAlias . '.' . $fieldName . ' '
+                $whereCondition = $this->entityAlias . '.' . $filter->getFieldName() . ' '
                     . $operator['meta']
                     . ' ' . $this->entityAlias . '.' . $value;
                 $this->qBuilder->andWhere($whereCondition);
@@ -301,48 +290,39 @@ class QueryBuilderFactory extends AbstractQuery
 
         // controllo se il filtro si riferisce ad una relazione dell'entità quindi devo fare dei join
         // esempio per users: filtering[_embedded.groups.name|eq]=admin
-        if (strstr($filter, '_embedded.')) {
+        if (strstr($rawFilter, '_embedded.')) {
 
-            $this->join($filter);
+            $this->join($rawFilter);
             $relationEntityAlias = $this->getRelationEntityAlias();
 
-            $embeddedFields = explode('.', $fieldName);
-            $fieldName = $this->parser->camelize($embeddedFields[count($embeddedFields)-1]);
+            $embeddedFields = explode('.', $filter->getFieldName());
+            $embeddedFieldName = $this->parser->camelize($embeddedFields[count($embeddedFields)-1]);
 
             $salt = '';
             foreach ($this->qBuilder->getParameters() as $parameter) {
-                if ($parameter->getName() == 'field_' . $fieldName) {
+                if ($parameter->getName() == 'field_' . $embeddedFieldName) {
                     $salt = '_' . rand(111, 999);
                 }
             }
 
-            if (isset($filterAndOperator[1]) && $op->isListOrNlist()) {
-                $whereCondition = $relationEntityAlias . '.' . $fieldName . ' '
+            if (isset($explodedQueryStringRawFilter[1]) && $op->isListOrNlist()) {
+                $whereCondition = $relationEntityAlias . '.' . $embeddedFieldName . ' '
                     . $operator['meta']
-                    . ' (:field_' . $fieldName . $salt . ')';
+                    . ' (:field_' . $embeddedFieldName . $salt . ')';
             } else {
-                $whereCondition = $relationEntityAlias . '.' . $fieldName . ' '
+                $whereCondition = $relationEntityAlias . '.' . $embeddedFieldName . ' '
                     . $operator['meta']
-                    . ' :field_' . $fieldName . $salt;
+                    . ' :field_' . $embeddedFieldName . $salt;
             }
 
             $this->qBuilder->andWhere($whereCondition);
-            if (isset($operator['substitution_pattern'])) {
-                if (isset($filterAndOperator[1]) && $op->isListOrNlist()) {
-                    $value = explode(',', $filterValue->getFilter());
-                } else {
-                    $value = str_replace(
-                        '{string}',
-                        $value,
-                        $operator['substitution_pattern']
-                    );
-                }
-            }
 
-            $parameter = Parameter::withKeyAndValue(
-                'field_' . $fieldName . $salt,
-                $value
-            );
+            $parameter = Parameter::box([
+                'fieldName'                    => $filter->getFieldName(),
+                'explodedQueryStringRawFilter' => $filter->getExplodedRawFilter(),
+                'salt'                         => $salt,
+                'value'                        => $filterValue->getFilter(),
+            ]);
 
             $this->qBuilder->setParameter(
                 $parameter->getKey(),
@@ -354,15 +334,15 @@ class QueryBuilderFactory extends AbstractQuery
     private function applyFilterOr($filter, $value, $orCondition)
     {
         $whereCondition = null;
-        $filterAndOperator = explode('|',$filter);
-        $op = Operator::fromString($filterAndOperator[1]);
+        $explodedQueryStringRawFilter = explode('|',$filter);
+        $op = Operator::fromString($explodedQueryStringRawFilter[1]);
 
-        $fieldName = $filterAndOperator[0];
+        $fieldName = $explodedQueryStringRawFilter[0];
         $fieldName = $this->parser->camelize($fieldName);
 
         $operator = $this->getValueAvailableFilters()[self::DEFAULT_OPERATOR];
-        if(isset($filterAndOperator[1])){
-            $operator = $this->getValueAvailableFilters()[$filterAndOperator[1]];
+        if(isset($explodedQueryStringRawFilter[1])){
+            $operator = $this->getValueAvailableFilters()[$explodedQueryStringRawFilter[1]];
         }
 
         // controllo se il filtro che mi arriva dalla richiesta è una proprietà di questa entità
@@ -381,14 +361,14 @@ class QueryBuilderFactory extends AbstractQuery
             }
 
             // filtering[foo|bar]
-            // $filterAndOperator[0] = 'foo'
-            // $filterAndOperator[1] = 'bar'
-            if (isset($filterAndOperator[1])) {
+            // $explodedQueryStringRawFilter[0] = 'foo'
+            // $explodedQueryStringRawFilter[1] = 'bar'
+            if (isset($explodedQueryStringRawFilter[1])) {
                 if ($op->isListOrNlist()) {
                     $whereCondition = $this->entityAlias . '.' . $fieldName . ' '
                         . $operator['meta']
                         . ' (:field_' . $fieldName . $salt . ')';
-                } else if ('field_eq' == $filterAndOperator[1]) {
+                } else if ('field_eq' == $explodedQueryStringRawFilter[1]) {
                     $whereCondition =
                         $this->entityAlias . '.' . $fieldName . ' '.
                         $operator['meta'] . '' .
@@ -416,7 +396,7 @@ class QueryBuilderFactory extends AbstractQuery
             }
 
             if (isset($operator['substitution_pattern'])) {
-                if (isset($filterAndOperator[1]) && $op->isListOrNlist()) {
+                if (isset($explodedQueryStringRawFilter[1]) && $op->isListOrNlist()) {
                     $value = explode(',', $value);
                 } else {
                     $value = str_replace(
@@ -468,7 +448,7 @@ class QueryBuilderFactory extends AbstractQuery
                 $salt = '_' . rand(111, 999);
             }
 
-            if (isset($filterAndOperator[1]) && $op->isListOrNlist()) {
+            if (isset($explodedQueryStringRawFilter[1]) && $op->isListOrNlist()) {
                 $whereCondition = $relationEntityAlias . '.' . $fieldName . ' '
                     . $operator['meta']
                     . ' (:field_' . $fieldName . $salt . ')';
@@ -485,7 +465,7 @@ class QueryBuilderFactory extends AbstractQuery
             }
 
             if (isset($operator['substitution_pattern'])) {
-                if (isset($filterAndOperator[1]) && $op->isListOrNlist()) {
+                if (isset($explodedQueryStringRawFilter[1]) && $op->isListOrNlist()) {
                     $value = explode(',', $value);
                 } else {
                     $value = str_replace(
