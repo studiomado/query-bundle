@@ -3,6 +3,7 @@
 namespace Mado\QueryBundle\Repositories;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Hateoas\Configuration\Route;
 use Hateoas\Representation\Factory\PagerfantaFactory;
 use Mado\QueryBundle\Queries\QueryBuilderFactory;
@@ -112,7 +113,6 @@ class BaseRepository extends EntityRepository
         $rel         = $request->query->get('rel', '');
         $page        = $request->query->get('page', '');
         $select      = $request->query->get('select', $this->entityAlias);
-        $pageLength  = $request->query->get('limit', 666);
         $filtering   = $request->query->get('filtering', '');
         $limit       = $request->query->get('limit', '');
 
@@ -123,7 +123,7 @@ class BaseRepository extends EntityRepository
             if (is_array($filter)) {
                 foreach ($filter as $keyInternal => $internal) {
                     $filterOrCorrected[$keyInternal .'|' . $count] = $internal;
-                    $count = $count + 1;
+                    $count += 1;
                 }
             } else {
                 $filterOrCorrected[$key] = $filter;
@@ -162,7 +162,6 @@ class BaseRepository extends EntityRepository
         $rel = $request->query->get('rel', '');
         $page = $request->query->get('page', '');
         $select = $request->query->get('select', $this->entityAlias);
-        $pageLength = $request->query->get('limit', 666);
         $filtering = $request->query->get('filtering', '');
         $limit = $request->query->get('limit', '');
 
@@ -171,14 +170,14 @@ class BaseRepository extends EntityRepository
         $filterOrCorrected = [];
 
         $count = 0;
-        foreach ($orFilters as $key => $filter) {
-            if (is_array($filter)) {
-                foreach ($filter as $keyInternal => $internal) {
+        foreach ($orFilters as $key => $filterValue) {
+            if (is_array($filterValue)) {
+                foreach ($filterValue as $keyInternal => $internal) {
                     $filterOrCorrected[$keyInternal .'|' . $count] = $internal;
-                    $count = $count + 1;
+                    $count += 1;
                 }
             } else {
-                $filterOrCorrected[$key] = $filter;
+                $filterOrCorrected[$key] = $filterValue;
             }
         }
 
@@ -209,7 +208,6 @@ class BaseRepository extends EntityRepository
         $rel = $request->query->get('rel', '');
         $page = $request->query->get('page', '');
         $select = $request->query->get('select', $this->entityAlias);
-        $pageLength = $request->query->get('limit', 666);
         $filtering = $request->query->get('filtering', '');
         $limit = $request->query->get('limit', '');
 
@@ -222,7 +220,7 @@ class BaseRepository extends EntityRepository
             if (is_array($filter)) {
                 foreach ($filter as $keyInternal => $internal) {
                     $filterOrCorrected[$keyInternal .'|' . $count] = $internal;
-                    $count = $count + 1;
+                    $count += 1;
                 }
             } else {
                 $filterOrCorrected[$key] = $filter;
@@ -268,17 +266,14 @@ class BaseRepository extends EntityRepository
         return $this->paginateResults($this->queryBuilderFactory->getQueryBuilder());
     }
 
-    protected function paginateResults(
-        \Doctrine\ORM\QueryBuilder $queryBuilder
-    ) {
+    protected function paginateResults(QueryBuilder $queryBuilder) {
         $limit = $this->queryOptions->get('limit', 10);
         $page = $this->queryOptions->get('page', 1);
-
 
         $pagerAdapter = new DoctrineORMAdapter($queryBuilder);
 
         $query = $pagerAdapter->getQuery();
-        if(isset($this->use_result_cache) and $this->use_result_cache){
+        if(null != $this->use_result_cache && $this->use_result_cache){
             $query->useResultCache(true, 600);
         }
 
@@ -291,9 +286,7 @@ class BaseRepository extends EntityRepository
 
         $router = $this->createRouter();
 
-        $results = $pagerFactory->createRepresentation($pager, $router);
-
-        return $results;
+        return $pagerFactory->createRepresentation($pager, $router);
     }
 
     protected function customQueryStringValues()
@@ -303,7 +296,6 @@ class BaseRepository extends EntityRepository
 
     protected function createRouter()
     {
-        $request = $this->getRequest();
         $params = [];
 
         $list = array_merge([
