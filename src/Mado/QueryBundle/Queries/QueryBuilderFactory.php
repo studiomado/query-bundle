@@ -4,6 +4,8 @@ namespace Mado\QueryBundle\Queries;
 
 use Doctrine\ORM\QueryBuilder;
 use Mado\QueryBundle\Dictionary;
+use Mado\QueryBundle\Queries\Objects\FilterObject;
+use Mado\QueryBundle\Queries\Objects\Operator;
 
 class QueryBuilderFactory extends AbstractQuery
 {
@@ -214,76 +216,54 @@ class QueryBuilderFactory extends AbstractQuery
         $value,
         Objects\Value $filterValue
     ) {
+        $filterObject = Objects\FilterObject::fromRawFilter($filter);
+
         $whereCondition = null;
-        $filterAndOperator = explode('|',$filter);
 
-        if (!isset($filterAndOperator[1])) {
-            $filterAndOperator[1] = 'eq';
-        }
-        $op = Objects\Operator::fromString($filterAndOperator[1]);
-
-        $fieldName = $filterAndOperator[0];
-        $fieldName = $this->parser->camelize($fieldName);
-
-        $operator = $this->getValueAvailableFilters()[self::DEFAULT_OPERATOR];
-        if(isset($filterAndOperator[1])){
-            $operator = $this->getValueAvailableFilters()[$filterAndOperator[1]];
-        }
-
-        // controllo se il filtro che mi arriva dalla richiesta è una proprietà di questa entità
-        // esempio per users: filtering[username|contains]=mado
-        if (in_array($fieldName, $this->fields)) {
+        if (in_array($filterObject->getFieldName(), $this->fields)) {
             $salt = '';
             foreach ($this->qBuilder->getParameters() as $parameter) {
-                if ($parameter->getName() == 'field_' . $fieldName) {
+                if ($parameter->getName() == 'field_' . $filterObject->getFieldName()) {
                     $salt = '_' . rand(111, 999);
                 }
             }
 
-            // filtering[foo|bar]
-            // $filterAndOperator[0] = 'foo'
-            // $filterAndOperator[1] = 'bar'
-            if (isset($filterAndOperator[1])) {
-                if ($op->isListOrNlist()) {
-                    $whereCondition = $this->entityAlias . '.' . $fieldName . ' '
-                        . $operator['meta']
-                        . ' (:field_' . $fieldName . $salt . ')';
-                } else if ('field_eq' == $filterAndOperator[1]) {
-                    $whereCondition =
-                        $this->entityAlias . '.' . $fieldName . ' '.
-                        $operator['meta'] . '' .
-                        $this->entityAlias . '.' . $value
-                        ;
-                    //} else {
-                    //throw new \RuntimeException(
-                    //'Oops! Eccezzione'
-                    //);
-                } else {
-                    $whereCondition = $this->entityAlias.'.'.$fieldName.' '.$operator['meta'].' :field_'.$fieldName . $salt;
-                }
+            if ($filterObject->isListType()) {
+                $whereCondition = $this->entityAlias . '.' . $filterObject->getFieldName() . ' '
+                    . $filterObject->getOperatorMeta()
+                    . ' (:field_' . $filterObject->getFieldName() . $salt . ')';
+            } else if ('field_eq' == $filterObject->getOperatorName()) {
+                $whereCondition =
+                    $this->entityAlias . '.' . $filterObject->getFieldName() . ' '
+                    . $filterObject->getOperatorMeta()
+                    . ' ' . $this->entityAlias . '.' . $value;
             } else {
-                $whereCondition = $this->entityAlias.'.'.$fieldName.' = :field_'.$fieldName . $salt;
+                $whereCondition = $this->entityAlias . '.' . $filterObject->getFieldName() . ' '
+                    . $filterObject->getOperatorMeta()
+                    . ' :field_' . $filterObject->getFieldName() . $salt;
             }
 
             $this->qBuilder->andWhere($whereCondition);
 
-            if (isset($operator['substitution_pattern'])) {
-                if (isset($filterAndOperator[1]) && $op->isListOrNlist()) {
+            if ($filterObject->haveOperatorSubstitutionPattern()) {
+                if ($filterObject->isListType()) {
                     $value = explode(',', $value);
                 } else {
                     $value = str_replace(
                         '{string}',
                         $value,
-                        $operator['substitution_pattern']
+                        $filterObject->getOperatorsSubstitutionPattern()
                     );
                 }
             }
 
-            $this->qBuilder->setParameter('field_' . $fieldName . $salt, $value);
+            $this->qBuilder->setParameter('field_' . $filterObject->getFieldName() . $salt, $value);
         } else {
-            $isNotARelation = 0 !== strpos($fieldName, 'Embedded.');
+            $isNotARelation = 0 !== strpos($filterObject->getFieldName(), 'Embedded.');
             if ($isNotARelation) {
-                $whereCondition = $this->entityAlias . '.' . $fieldName . ' ' . $operator['meta'] . ' ' . $this->entityAlias . '.' . $value;
+                $whereCondition = $this->entityAlias . '.' . $filterObject->getFieldName() . ' '
+                    . $filterObject->getOperatorMeta()
+                    . ' ' . $this->entityAlias . '.' . $value;
                 $this->qBuilder->andWhere($whereCondition);
             }
         }
@@ -295,40 +275,40 @@ class QueryBuilderFactory extends AbstractQuery
             $this->join($filter);
             $relationEntityAlias = $this->getRelationEntityAlias();
 
-            $embeddedFields = explode('.', $fieldName);
-            $fieldName = $this->parser->camelize($embeddedFields[count($embeddedFields)-1]);
+            $embeddedFields = explode('.', $filterObject->getFieldName());
+            $embeddedFieldName = $this->parser->camelize($embeddedFields[count($embeddedFields)-1]);
 
             $salt = '';
             foreach ($this->qBuilder->getParameters() as $parameter) {
-                if ($parameter->getName() == 'field_' . $fieldName) {
+                if ($parameter->getName() == 'field_' . $embeddedFieldName) {
                     $salt = '_' . rand(111, 999);
                 }
             }
 
-            if (isset($filterAndOperator[1]) && $op->isListOrNlist()) {
-                $whereCondition = $relationEntityAlias . '.' . $fieldName . ' '
-                    . $operator['meta']
-                    . ' (:field_' . $fieldName . $salt . ')';
+            if ($filterObject->isListType()) {
+                $whereCondition = $relationEntityAlias . '.' . $embeddedFieldName . ' '
+                    . $filterObject->getOperatorMeta()
+                    . ' (:field_' . $embeddedFieldName . $salt . ')';
             } else {
-                $whereCondition = $relationEntityAlias . '.' . $fieldName . ' '
-                    . $operator['meta']
-                    . ' :field_' . $fieldName . $salt;
+                $whereCondition = $relationEntityAlias . '.' . $embeddedFieldName . ' '
+                    . $filterObject->getOperatorMeta()
+                    . ' :field_' . $embeddedFieldName . $salt;
             }
 
             $this->qBuilder->andWhere($whereCondition);
-            if (isset($operator['substitution_pattern'])) {
-                if (isset($filterAndOperator[1]) && $op->isListOrNlist()) {
+            if ($filterObject->haveOperatorSubstitutionPattern()) {
+                if ($filterObject->isListType()) {
                     $value = explode(',', $filterValue->getFilter());
                 } else {
                     $value = str_replace(
                         '{string}',
                         $value,
-                        $operator['substitution_pattern']
+                        $filterObject->getOperatorsSubstitutionPattern()
                     );
                 }
             }
 
-            $this->qBuilder->setParameter('field_' . $fieldName . $salt, $value);
+            $this->qBuilder->setParameter('field_' . $embeddedFieldName . $salt, $value);
         }
     }
 
