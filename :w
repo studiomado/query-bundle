@@ -73,6 +73,5 @@ final class FilterObject
 
     public function getOperator()
     {
-        return $this->operatorName;
     }
 }
