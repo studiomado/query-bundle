@@ -5,6 +5,7 @@ namespace Mado\QueryBundle\Queries\Objects;
 use Mado\QueryBundle\Services\StringParser;
 use Mado\QueryBundle\Dictionary;
 
+/** @since class available since release 2.2.1 */
 final class FilterObject
 {
     private $fieldName;
