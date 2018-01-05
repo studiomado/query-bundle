@@ -196,7 +196,11 @@ class QueryBuilderFactory extends AbstractQuery
             $orFilter['parameters'] = [];
 
             foreach ($this->orFiltering as $filter => $value) {
-                $orFilter = $this->applyFilterOr($filter, $value, $orFilter);
+                $orFilter = $this->applyFilterOr(
+                    Objects\FilterObject::fromRawFilter($filter),
+                    $value,
+                    $orFilter
+                );
             }
 
             if ((count($orFilter) > 0) && ($orFilter['orCondition'] != null)) {
@@ -216,8 +220,6 @@ class QueryBuilderFactory extends AbstractQuery
         $value,
         Objects\Value $filterValue
     ) {
-        $whereCondition = null;
-
         if (in_array($filterObject->getFieldName(), $this->fields)) {
             $salt = '';
             foreach ($this->qBuilder->getParameters() as $parameter) {
@@ -226,19 +228,15 @@ class QueryBuilderFactory extends AbstractQuery
                 }
             }
 
+            $whereCondition = $this->entityAlias . '.' . $filterObject->getFieldName() . ' '
+                . $filterObject->getOperatorMeta();
+
             if ($filterObject->isListType()) {
-                $whereCondition = $this->entityAlias . '.' . $filterObject->getFieldName() . ' '
-                    . $filterObject->getOperatorMeta()
-                    . ' (:field_' . $filterObject->getFieldName() . $salt . ')';
-            } else if ($filterObject->isFieldEqualityType()) {
-                $whereCondition =
-                    $this->entityAlias . '.' . $filterObject->getFieldName() . ' '
-                    . $filterObject->getOperatorMeta()
-                    . ' ' . $this->entityAlias . '.' . $value;
+                $whereCondition .= ' (:field_' . $filterObject->getFieldName() . $salt . ')';
+            } elseif ($filterObject->isFieldEqualityType()) {
+                $whereCondition .= ' ' . $this->entityAlias . '.' . $value;
             } else {
-                $whereCondition = $this->entityAlias . '.' . $filterObject->getFieldName() . ' '
-                    . $filterObject->getOperatorMeta()
-                    . ' :field_' . $filterObject->getFieldName() . $salt;
+                $whereCondition .= ' :field_' . $filterObject->getFieldName() . $salt;
             }
 
             $this->qBuilder->andWhere($whereCondition);
@@ -259,9 +257,7 @@ class QueryBuilderFactory extends AbstractQuery
         } else {
             $isNotARelation = 0 !== strpos($filterObject->getFieldName(), 'Embedded.');
             if ($isNotARelation) {
-                $whereCondition = $this->entityAlias . '.' . $filterObject->getFieldName() . ' '
-                    . $filterObject->getOperatorMeta()
-                    . ' ' . $this->entityAlias . '.' . $value;
+                    $whereCondition .= ' ' . $this->entityAlias . '.' . $value;
                 $this->qBuilder->andWhere($whereCondition);
             }
         }
@@ -283,14 +279,13 @@ class QueryBuilderFactory extends AbstractQuery
                 }
             }
 
+            $whereCondition = $relationEntityAlias . '.' . $embeddedFieldName . ' '
+                . $filterObject->getOperatorMeta();
+
             if ($filterObject->isListType()) {
-                $whereCondition = $relationEntityAlias . '.' . $embeddedFieldName . ' '
-                    . $filterObject->getOperatorMeta()
-                    . ' (:field_' . $embeddedFieldName . $salt . ')';
+                $whereCondition .= ' (:field_' . $embeddedFieldName . $salt . ')';
             } else {
-                $whereCondition = $relationEntityAlias . '.' . $embeddedFieldName . ' '
-                    . $filterObject->getOperatorMeta()
-                    . ' :field_' . $embeddedFieldName . $salt;
+                $whereCondition .= ' :field_' . $embeddedFieldName . $salt;
             }
 
             $this->qBuilder->andWhere($whereCondition);
@@ -311,13 +306,12 @@ class QueryBuilderFactory extends AbstractQuery
     }
 
     private function applyFilterOr(
-        $filter,
+        Objects\FilterObject $filterObject,
         $value,
         $orCondition
     ) {
-        $filterObject = Objects\FilterObject::fromRawFilter($filter);
-
-        $whereCondition = null;
+        $whereCondition = $this->entityAlias . '.' . $filterObject->getFieldName() . ' '
+            . $filterObject->getOperatorMeta();
 
         // controllo se il filtro che mi arriva dalla richiesta è una proprietà di questa entità
         // esempio per users: filtering[username|contains]=mado
@@ -334,19 +328,11 @@ class QueryBuilderFactory extends AbstractQuery
             }
 
             if ($filterObject->isListType()) {
-                $whereCondition = $this->entityAlias . '.' . $filterObject->getFieldName() . ' '
-                    . $filterObject->getOperatorMeta()
-                    . ' (:field_' . $filterObject->getFieldName() . $salt . ')';
+                $whereCondition .= ' (:field_' . $filterObject->getFieldName() . $salt . ')';
             } else if ($filterObject->isFieldEqualityType()) {
-                $whereCondition =
-                    $this->entityAlias . '.' . $filterObject->getFieldName() . ' '
-                    . $filterObject->getOperatorMeta()
-                    . $this->entityAlias . '.' . $value
-                    ;
+                $whereCondition .= $this->entityAlias . '.' . $value;
             } else {
-                $whereCondition = $this->entityAlias . '.' . $filterObject->getFieldName() . ' '
-                    . $filterObject->getOperatorMeta()
-                    . ' :field_' . $filterObject->getFieldName() . $salt;
+                $whereCondition .= ' :field_' . $filterObject->getFieldName() . $salt;
             }
 
             if ($orCondition['orCondition'] != null) {
@@ -374,9 +360,7 @@ class QueryBuilderFactory extends AbstractQuery
         } else {
             $isNotARelation = 0 !== strpos($filterObject->getFieldName(), 'Embedded.');
             if ($isNotARelation) {
-                $whereCondition = $this->entityAlias . '.' . $filterObject->getFieldName() . ' '
-                    . $filterObject->getOperatorMeta()
-                    . ' ' . $this->entityAlias . '.' . $value;
+                    $whereCondition .= ' ' . $this->entityAlias . '.' . $value;
                 if ($orCondition['orCondition'] != null) {
                     $orCondition['orCondition'] .= ' OR ' . $whereCondition;
                 } else {
@@ -406,14 +390,13 @@ class QueryBuilderFactory extends AbstractQuery
                 $salt = '_' . rand(111, 999);
             }
 
+            $whereCondition = $relationEntityAlias . '.' . $embeddableFieldName . ' '
+                . $filterObject->getOperatorMeta();
+
             if (isset($filterAndOperator[1]) && $op->isListOrNlist()) {
-                $whereCondition = $relationEntityAlias . '.' . $embeddableFieldName . ' '
-                    . $filterObject->getOperatorMeta()
-                    . ' (:field_' . $embeddableFieldName . $salt . ')';
+                $whereCondition .= ' (:field_' . $embeddableFieldName . $salt . ')';
             } else {
-                $whereCondition = $relationEntityAlias . '.' . $embeddableFieldName . ' '
-                    . $filterObject->getOperatorMeta()
-                    . ' :field_' . $embeddableFieldName . $salt;
+                $whereCondition .=' :field_' . $embeddableFieldName . $salt;
             }
 
             if ($orCondition['orCondition'] != null) {
