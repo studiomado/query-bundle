@@ -15,19 +15,35 @@ final class Value
 
     public function getFilter()
     {
-        $filterCameFromQueryString = is_string($this->filter);
-
-        $isAdditionalFilter = !$filterCameFromQueryString;
-
-        if ($isAdditionalFilter) {
-            return $this->filter['list'][0];
+        if ($this->camesFromAdditionalFilters()) {
+            return $this->filter[$this->getOperator()][0];
         }
 
         return $this->filter;
     }
 
+    public function getValues()
+    {
+        return $this->filter[$this->getOperator()];
+    }
+
+    public function getOperator()
+    {
+        return key($this->filter);
+    }
+
     public static function fromFilter($filter)
     {
         return new self($filter);
+    }
+
+    public function camesFromQueryString()
+    {
+        return is_string($this->filter);
+    }
+
+    public function camesFromAdditionalFilters()
+    {
+        return !$this->camesFromQueryString();
     }
 }
