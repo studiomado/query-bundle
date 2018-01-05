@@ -1,11 +1,10 @@
 <?php
 
-namespace Mado\QueryBundle;
+namespace Mado\QueryBundle\Dictionary;
 
-class Dictionary
+/** @deprecated will be removed in version 2.3 */
+class Operators
 {
-    const DEFAULT_OPERATOR = 'eq';
-
     private static $operatorMap = [
         'eq' => [
             'meta' => '=',
