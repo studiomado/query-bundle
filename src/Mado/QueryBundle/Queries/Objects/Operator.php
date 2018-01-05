@@ -2,6 +2,7 @@
 
 namespace Mado\QueryBundle\Queries\Objects;
 
+/** @deprecated since version 2.2 will be removed in version 2.3 */
 final class Operator
 {
     public static function fromString(string $operatorName)
