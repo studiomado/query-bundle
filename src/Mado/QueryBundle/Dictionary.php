@@ -4,6 +4,8 @@ namespace Mado\QueryBundle;
 
 class Dictionary
 {
+    const DEFAULT_OPERATOR = 'eq';
+
     private static $operatorMap = [
         'eq' => [
             'meta' => '=',

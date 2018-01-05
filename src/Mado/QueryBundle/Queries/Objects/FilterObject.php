@@ -8,6 +8,10 @@ use Mado\QueryBundle\Dictionary;
 /** @since class available since release 2.2.1 */
 final class FilterObject
 {
+    const FIELD = 0;
+
+    const OPERATOR = 1;
+
     private $rawFilter;
 
     private $fieldName;
@@ -18,16 +22,16 @@ final class FilterObject
     {
         $this->setRawFilter($rawFilter);
 
-        $explodedFilter = explode('|', $rawFilter);
-        if (!isset($explodedFilter[1])) {
-            $explodedFilter[1] = 'eq';
+        $explodedRawFilter = explode('|', $rawFilter);
+        if (!isset($explodedRawFilter[self::OPERATOR])) {
+            $explodedRawFilter[self::OPERATOR] = Dictionary::DEFAULT_OPERATOR;
         }
 
-        $fieldName = $explodedFilter[0];
+        $fieldName = $explodedRawFilter[self::FIELD];
         $parser = new StringParser();
         $this->fieldName = $parser->camelize($fieldName);
 
-        $this->operatorName = $explodedFilter[1];
+        $this->operatorName = $explodedRawFilter[self::OPERATOR];
     }
 
     public static function fromRawFilter(string $filter) : FilterObject
