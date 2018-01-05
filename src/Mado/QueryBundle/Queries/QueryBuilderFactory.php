@@ -184,7 +184,7 @@ class QueryBuilderFactory extends AbstractQuery
 
         foreach ($this->filtering as $filter => $value) {
             $this->applyFilterAnd(
-                $filter,
+                Objects\FilterObject::fromRawFilter($filter),
                 $value,
                 Objects\Value::fromFilter($value)
             );
@@ -212,12 +212,10 @@ class QueryBuilderFactory extends AbstractQuery
     }
 
     private function applyFilterAnd(
-        $filter,
+        Objects\FilterObject $filterObject,
         $value,
         Objects\Value $filterValue
     ) {
-        $filterObject = Objects\FilterObject::fromRawFilter($filter);
-
         $whereCondition = null;
 
         if (in_array($filterObject->getFieldName(), $this->fields)) {
@@ -270,9 +268,9 @@ class QueryBuilderFactory extends AbstractQuery
 
         // controllo se il filtro si riferisce ad una relazione dell'entità quindi devo fare dei join
         // esempio per users: filtering[_embedded.groups.name|eq]=admin
-        if (strstr($filter, '_embedded.')) {
+        if (strstr($filterObject->getRawFilter(), '_embedded.')) {
 
-            $this->join($filter);
+            $this->join($filterObject->getRawFilter());
             $relationEntityAlias = $this->getRelationEntityAlias();
 
             $embeddedFields = explode('.', $filterObject->getFieldName());
