@@ -8,17 +8,13 @@ use Mado\QueryBundle\Dictionary;
 /** @since class available since release 2.2.1 */
 final class FilterObject
 {
-    private $rawFilter;
-
     private $fieldName;
 
     private $operatorName;
 
-    private function __construct(string $rawFilter)
+    private function __construct(string $filter)
     {
-        $this->setRawFilter($rawFilter);
-
-        $explodedFilter = explode('|', $rawFilter);
+        $explodedFilter = explode('|', $filter);
         if (!isset($explodedFilter[1])) {
             $explodedFilter[1] = 'eq';
         }
@@ -75,18 +71,7 @@ final class FilterObject
         return $operator['substitution_pattern'];
     }
 
-    public function setRawFilter(string $rawFilter)
-    {
-        $this->rawFilter = $rawFilter;
-    }
-
-    public function getRawFilter() : string
-    {
-        return $this->rawFilter;
-    }
-
     public function getOperator()
     {
-        return $this->operatorName;
     }
 }
