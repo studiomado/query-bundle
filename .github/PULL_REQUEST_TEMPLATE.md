@@ -1,7 +1,8 @@
 | Q             | A
 | ------------- | ---
 | Branch?       | master for features / x.y for bug fixes <!-- see below -->
-| Bug fix?      | yes/no
+| Bug/Hotfix?   | yes/no
+| Refactoring?  | yes/no
 | New feature?  | yes/no <!-- don't forget to update src/**/CHANGELOG.md files -->
 | BC breaks?    | yes/no
 | Deprecations? | yes/no <!-- don't forget to update UPGRADE-*.md files -->
