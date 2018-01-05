@@ -387,9 +387,9 @@ class QueryBuilderFactory extends AbstractQuery
 
         // controllo se il filtro si riferisce ad una relazione dell'entità quindi devo fare dei join
         // esempio per users: filtering[_embedded.groups.name|eq]=admin
-        if (strstr($filter, '_embedded.')) {
+        if (strstr($filterObject->getRawFilter(), '_embedded.')) {
 
-            $this->join($filter);
+            $this->join($filterObject->getRawFilter());
             $relationEntityAlias = $this->getRelationEntityAlias();
 
             $embeddedFields = explode('.', $filterObject->getFieldName());
