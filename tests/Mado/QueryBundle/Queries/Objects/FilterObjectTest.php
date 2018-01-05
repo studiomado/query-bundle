@@ -19,6 +19,6 @@ class FilterObjectTest extends TestCase
     {
         $filter = FilterObject::fromRawFilter('foo');
         $operator = $filter->getOperator();
-        $this->assertEquals('eq', $operator);
+        $this->assertEquals(Dictionary::DEFAULT_OPERATOR, $operator);
     }
 }
