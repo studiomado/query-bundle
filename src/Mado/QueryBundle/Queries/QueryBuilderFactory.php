@@ -220,6 +220,9 @@ class QueryBuilderFactory extends AbstractQuery
         $value,
         Objects\Value $filterValue
     ) {
+        $whereCondition = $this->entityAlias . '.' . $filterObject->getFieldName() . ' '
+            . $filterObject->getOperatorMeta();
+
         if (in_array($filterObject->getFieldName(), $this->fields)) {
             $salt = '';
             foreach ($this->qBuilder->getParameters() as $parameter) {
@@ -227,9 +230,6 @@ class QueryBuilderFactory extends AbstractQuery
                     $salt = '_' . rand(111, 999);
                 }
             }
-
-            $whereCondition = $this->entityAlias . '.' . $filterObject->getFieldName() . ' '
-                . $filterObject->getOperatorMeta();
 
             if ($filterObject->isListType()) {
                 $whereCondition .= ' (:field_' . $filterObject->getFieldName() . $salt . ')';
@@ -257,7 +257,7 @@ class QueryBuilderFactory extends AbstractQuery
         } else {
             $isNotARelation = 0 !== strpos($filterObject->getFieldName(), 'Embedded.');
             if ($isNotARelation) {
-                    $whereCondition .= ' ' . $this->entityAlias . '.' . $value;
+                $whereCondition .= ' ' . $this->entityAlias . '.' . $value;
                 $this->qBuilder->andWhere($whereCondition);
             }
         }
