@@ -96,7 +96,7 @@ class QueryBuilderFactory extends AbstractQuery
         return $this;
     }
 
-    public function getFilters()
+    public function getAndFilters()
     {
         return $this->andFilters;
     }
