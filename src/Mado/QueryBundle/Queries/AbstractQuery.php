@@ -14,8 +14,8 @@ class AbstractQuery
     protected $entityAlias;
 
     protected $parser;
-    
-    private $qBuilder;
+
+    protected $qBuilder;
 
     public function __construct(EntityManager $manager)
     {
