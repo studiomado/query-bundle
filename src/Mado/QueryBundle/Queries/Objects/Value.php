@@ -3,7 +3,7 @@
 namespace Mado\QueryBundle\Queries\Objects;
 
 /**
- * @since Interface available since Release 2.1.3
+ * @since class available since release 2.1.3
  */
 final class Value
 {
