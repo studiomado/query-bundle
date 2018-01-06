@@ -109,6 +109,177 @@ class QueryBuilderFactoryTest extends TestCase
             $factory->getAvailableFilters()
         );
     }
+
+    public function testGetFields()
+    {
+        $fields = ['id'];
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setFields($fields);
+        $fieldsReturned = $queryBuilderFactory->getFields();
+
+        $this->assertEquals($fields, $fieldsReturned);
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testGetFieldsThrowExceptionIfNull()
+    {
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->getFields();
+    }
+
+    public function testSetOrFilters()
+    {
+        $fields = ['id'];
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setOrFilters($fields);
+
+        $this->assertAttributeEquals($fields, 'orFiltering', $queryBuilderFactory);
+    }
+
+    public function testGetOrFilters()
+    {
+        $fields = ['id'];
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setOrFilters($fields);
+
+        $fieldsReturned = $queryBuilderFactory->getOrFilters();
+
+        $this->assertEquals($fields, $fieldsReturned);
+    }
+
+    public function testSetSorting()
+    {
+        $fields = ['id'];
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setSorting($fields);
+
+        $this->assertAttributeEquals($fields, 'sorting', $queryBuilderFactory);
+    }
+
+    public function testGetFilters()
+    {
+        $fields = ['id'];
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setFilters($fields);
+        $fieldsReturned = $queryBuilderFactory->getFilters();
+
+        $this->assertEquals($fields, $fieldsReturned);
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testGetQueryBuilderThrowExceptionIfNull()
+    {
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->getQueryBuilder();
+    }
+
+    public function testGetQueryBuilder()
+    {
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->createQueryBuilder('foo', 'bar');
+        $qb = $queryBuilderFactory->getQueryBuilder();
+
+        $this->assertInstanceOf('Doctrine\ORM\QueryBuilder', $qb);
+    }
+
+    public function testGetRel()
+    {
+        $rel = 'foo';
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setRel($rel);
+        $relReturned = $queryBuilderFactory->getRel();
+
+        $this->assertEquals($rel, $relReturned);
+    }
+
+    public function testSetPrinting()
+    {
+        $print = 'foo';
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setPrinting($print);
+
+        $this->assertAttributeEquals($print, 'printing', $queryBuilderFactory);
+    }
+
+    public function testGetPrinting()
+    {
+        $print = 'foo';
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setPrinting($print);
+        $printReturned = $queryBuilderFactory->getPrinting();
+
+        $this->assertEquals($print, $printReturned);
+    }
+
+    public function testSetPage()
+    {
+        $page = 'foo';
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setPage($page);
+
+        $this->assertAttributeEquals($page, 'page', $queryBuilderFactory);
+    }
+
+    public function testGetPage()
+    {
+        $page = 'foo';
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setPage($page);
+        $pageReturned = $queryBuilderFactory->getPage();
+
+        $this->assertEquals($page, $pageReturned);
+    }
+
+    public function testSetPageLength()
+    {
+        $pageLength = 100;
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setPageLength($pageLength);
+
+        $this->assertAttributeEquals($pageLength, 'pageLength', $queryBuilderFactory);
+    }
+
+    public function testGetPageLength()
+    {
+        $pageLength = 100;
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setPageLength($pageLength);
+        $pageLengthReturned = $queryBuilderFactory->getPageLength();
+
+        $this->assertEquals($pageLength, $pageLengthReturned);
+    }
+
+    public function testSetSelect()
+    {
+        $select = 'foo';
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setSelect($select);
+
+        $this->assertAttributeEquals($select, 'select', $queryBuilderFactory);
+    }
+
+    public function testGetSelect()
+    {
+        $select = 'foo';
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setSelect($select);
+        $selectReturned = $queryBuilderFactory->getSelect();
+
+        $this->assertEquals($select, $selectReturned);
+    }
+
+    public function testGetEntityManager()
+    {
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $emReturned = $queryBuilderFactory->getEntityManager();
+
+        $this->assertEquals($this->manager, $emReturned);
+    }
+
 }
 
 /** @Entity() */
