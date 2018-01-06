@@ -23,11 +23,11 @@ class QueryBuilderFactory extends AbstractQuery
 
     protected $orFiltering;
 
-    protected $relationEntityAlias;
+    private $relationEntityAlias;
 
     protected $sorting;
 
-    protected $joins;
+    private $joins;
 
     protected $rel;
 
@@ -104,14 +104,14 @@ class QueryBuilderFactory extends AbstractQuery
             $this->joins = [];
         }
 
-        $needle = $prevEntityAlias . "_" . $currentEntityAlias;
+        $needle = $prevEntityAlias . '_' . $currentEntityAlias;
 
         return ! in_array($needle, $this->joins);
     }
 
     private function storeJoin($prevEntityAlias, $currentEntityAlias)
     {
-        $needle = $prevEntityAlias . "_" . $currentEntityAlias;
+        $needle = $prevEntityAlias . '_' . $currentEntityAlias;
         $this->joins[$needle] = $needle;
     }
 
@@ -141,7 +141,6 @@ class QueryBuilderFactory extends AbstractQuery
         $entityAlias = $this->entityAlias;
 
         foreach ($relations as $relation) {
-
             $relation = $this->parser->camelize($relation);
             $relationEntityAlias = 'table_' . $relation;
 
@@ -203,7 +202,7 @@ class QueryBuilderFactory extends AbstractQuery
                 );
             }
 
-            if ((count($orFilter) > 0) && ($orFilter['orCondition'] != null)) {
+            if ((count($orFilter) > 0) && (null !== $orFilter['orCondition'])) {
                 $this->qBuilder->andWhere($orFilter['orCondition']);
 
                 foreach ($orFilter['parameters'] as $parameter) {
@@ -319,12 +318,12 @@ class QueryBuilderFactory extends AbstractQuery
             $salt = '';
             foreach ($this->qBuilder->getParameters() as $parameter) {
                 if ($parameter->getName() == 'field_' . $filterObject->getFieldName()) {
-                    $salt = '_' . rand(111, 999);
+                    $salt = '_' . random_int(111, 999);
                 }
             }
 
-            if ($salt == '') {
-                $salt = '_' . rand(111, 999);
+            if ('' == $salt) {
+                $salt = '_' . random_int(111, 999);
             }
 
             if ($filterObject->isListType()) {
@@ -335,7 +334,7 @@ class QueryBuilderFactory extends AbstractQuery
                 $whereCondition .= ' :field_' . $filterObject->getFieldName() . $salt;
             }
 
-            if ($orCondition['orCondition'] != null) {
+            if (null != $orCondition['orCondition']) {
                 $orCondition['orCondition'] .= ' OR ' . $whereCondition;
             } else {
                 $orCondition['orCondition'] = $whereCondition;
@@ -361,7 +360,7 @@ class QueryBuilderFactory extends AbstractQuery
             $isNotARelation = 0 !== strpos($filterObject->getFieldName(), 'Embedded.');
             if ($isNotARelation) {
                     $whereCondition .= ' ' . $this->entityAlias . '.' . $value;
-                if ($orCondition['orCondition'] != null) {
+                if (null != $orCondition['orCondition']) {
                     $orCondition['orCondition'] .= ' OR ' . $whereCondition;
                 } else {
                     $orCondition['orCondition'] = $whereCondition;
@@ -386,7 +385,7 @@ class QueryBuilderFactory extends AbstractQuery
                 }
             }
 
-            if ($salt == '') {
+            if ('' == $salt) {
                 $salt = '_' . rand(111, 999);
             }
 
