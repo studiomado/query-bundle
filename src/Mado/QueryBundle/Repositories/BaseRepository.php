@@ -55,7 +55,7 @@ class BaseRepository extends EntityRepository
         $this->fields = array_keys($fieldMappings);
 
         $this->queryBuilderFactory->setFields($this->fields ?? []);
-        $this->queryBuilderFactory->setFilters($options->getFilters());
+        $this->queryBuilderFactory->setAndFilters($options->getAndFilters());
         $this->queryBuilderFactory->setOrFilters($options->getOrFilters());
         $this->queryBuilderFactory->setSorting($options->getSorting());
         $this->queryBuilderFactory->setRel($options->getRel());

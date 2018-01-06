@@ -6,24 +6,8 @@ class QueryBuilderOptions
 {
     private $options;
 
-    private static $fields = [
-        'filters',
-        'sorting',
-        'rel',
-        'printing',
-        'select',
-    ];
-
     private function __construct(array $options)
     {
-        //foreach (self::$fields as $field) {
-            //if (!in_array($field, $options)) {
-                //throw new \RuntimeException(
-                    //'Oops! Field ' . $field . ' is missing.'
-                //);
-            //}
-        //}
-
         $this->options = $options;
     }
 
@@ -34,14 +18,17 @@ class QueryBuilderOptions
 
     public function get($option, $defaultValue = null)
     {
-        if (!isset($this->options[$option]) || empty($this->options[$option])) {
+        if (
+            !isset($this->options[$option])
+            || empty($this->options[$option])
+        ) {
             return $defaultValue;
         }
 
         return $this->options[$option];
     }
 
-    public function getFilters()
+    public function getAndFilters()
     {
         return $this->get('filters', []);
     }

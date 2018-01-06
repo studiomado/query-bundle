@@ -5,3 +5,8 @@ Dictionary\Operators
 --------------------
 
  * The `componet` was removed.
+
+Queries\QueryBuilderFactory
+---------------------------
+
+ * Use `setAndFilters` instead of `setFilters`
