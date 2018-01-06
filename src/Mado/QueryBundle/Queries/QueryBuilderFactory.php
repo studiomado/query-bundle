@@ -188,7 +188,7 @@ class QueryBuilderFactory extends AbstractQuery
             );
         }
 
-        if ($this->andFilters !== null) {
+        if (null !== $this->andFilters) {
             foreach ($this->andFilters as $filter => $value) {
                 $this->applyFilterAnd(
                     Objects\FilterObject::fromRawFilter($filter),
