@@ -23,7 +23,7 @@ class QueryBuilderFactoryTest extends TestCase
     {
         $queryBuilderFactory = new QueryBuilderFactory($this->manager);
         $queryBuilderFactory->setFields([ 'id' ]);
-        $queryBuilderFactory->setFilters([ 'id|eq' => 33 ]);
+        $queryBuilderFactory->setAndFilters([ 'id|eq' => 33 ]);
         $queryBuilderFactory->createQueryBuilder(MySimpleEntity::class, 'e');
         $queryBuilderFactory->filter();
 
@@ -40,7 +40,7 @@ class QueryBuilderFactoryTest extends TestCase
     {
         $queryBuilderFactory = new QueryBuilderFactory($this->manager);
         $queryBuilderFactory->setFields([ 'id' ]);
-        $queryBuilderFactory->setFilters([ 'id|eq' => 33 ]);
+        $queryBuilderFactory->setAndFilters([ 'id|eq' => 33 ]);
         $queryBuilderFactory->createQueryBuilder(MySimpleEntity::class, 'e');
         $queryBuilderFactory->filter();
 
@@ -60,7 +60,7 @@ class QueryBuilderFactoryTest extends TestCase
         $queryBuilderFactory = new QueryBuilderFactory($this->manager);
         $queryBuilderFactory->setFields([ 'id' ]);
         $queryBuilderFactory->setRel([ 'group' ]);
-        $queryBuilderFactory->setFilters([
+        $queryBuilderFactory->setAndFilters([
             '_embedded.group.name|contains|1' => 'ad',
             '_embedded.group.name|contains|2' => 'ns',
             '_embedded.group.name|contains|3' => 'dm',
@@ -262,6 +262,41 @@ class QueryBuilderFactoryTest extends TestCase
         $this->assertEquals($select, $selectReturned);
     }
 
+    public function testCanBuildQueriesUsingOrOperator()
+    {
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setFields([ 'id' ]);
+        $queryBuilderFactory->setRel([ 'group' ]);
+        $queryBuilderFactory->setOrFilters([
+            '_embedded.group.name|contains|1' => 'ad',
+            '_embedded.group.name|contains|2' => 'ns',
+            '_embedded.group.name|contains|3' => 'dm',
+            '_embedded.group.name|contains|4' => 'mi',
+        ]);
+        $queryBuilderFactory->createQueryBuilder(User::class, 'e');
+        $queryBuilderFactory->filter();
+
+        $this->assertEquals(
+            "SELECT" .
+            " u0_.id AS id_0," .
+            " u0_.username AS username_1," .
+            " u0_.group_id AS group_id_2 " .
+            "FROM User u0_ " .
+            "INNER JOIN Group g1_ ON u0_.group_id = g1_.id " .
+            "WHERE g1_.name LIKE ? " .
+            "OR g1_.name LIKE ? " .
+            "OR g1_.name LIKE ? " .
+            "OR g1_.name LIKE ?",
+            $queryBuilderFactory->getQueryBuilder()->getQuery()->getSql()
+        );
+    }
+
+    /** @expectedException \Mado\QueryBundle\Exceptions\MissingFiltersException */
+    public function testThrowMissingFiltersExceptionsWheneverFiltersAreMissing()
+    {
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->filter();
+    }
 }
 
 /** @Entity() */
