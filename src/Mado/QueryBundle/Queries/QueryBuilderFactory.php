@@ -232,7 +232,7 @@ class QueryBuilderFactory extends AbstractQuery
             . $filterObject->getOperatorMeta();
 
         if (in_array($filterObject->getFieldName(), $this->fields)) {
-            $salt = '_' . rand_int(111, 999);
+            $salt = '_' . random_int(111, 999);
 
             if ($filterObject->isListType()) {
                 $whereCondition .= ' (:field_' . $filterObject->getFieldName() . $salt . ')';
@@ -275,7 +275,7 @@ class QueryBuilderFactory extends AbstractQuery
             $embeddedFields = explode('.', $filterObject->getFieldName());
             $embeddedFieldName = $this->parser->camelize($embeddedFields[count($embeddedFields)-1]);
 
-            $salt = '_' . rand_int(111, 999);
+            $salt = '_' . random_int(111, 999);
 
             $whereCondition = $relationEntityAlias . '.' . $embeddedFieldName . ' '
                 . $filterObject->getOperatorMeta();
@@ -314,7 +314,7 @@ class QueryBuilderFactory extends AbstractQuery
         // controllo se il filtro che mi arriva dalla richiesta è una proprietà di questa entità
         // esempio per users: filtering[username|contains]=mado
         if (in_array($filterObject->getFieldName(), $this->fields)) {
-            $salt = '_' . rand_int(111, 999);
+            $salt = '_' . random_int(111, 999);
 
             if ($filterObject->isListType()) {
                 $whereCondition .= ' (:field_' . $filterObject->getFieldName() . $salt . ')';
@@ -368,7 +368,7 @@ class QueryBuilderFactory extends AbstractQuery
             $embeddedFields = explode('.', $filterObject->getFieldName());
             $embeddableFieldName = $this->parser->camelize($embeddedFields[count($embeddedFields)-1]);
 
-            $salt = '_' . rand_int(111, 999);
+            $salt = '_' . random_int(111, 999);
 
             $whereCondition = $relationEntityAlias . '.' . $embeddableFieldName . ' '
                 . $filterObject->getOperatorMeta();
