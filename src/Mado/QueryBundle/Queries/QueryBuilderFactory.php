@@ -477,17 +477,6 @@ class QueryBuilderFactory extends AbstractQuery
         return $this->qBuilder;
     }
 
-    public function buildSelectValue() : string
-    {
-        if ("" == $this->getSelect()) {
-            return $this->getEntityAlias(
-                $this->getEntityName()
-            );
-        }
-
-        return $this->getSelect();
-    }
-
     private function setRelationEntityAlias(string $relationEntityAlias)
     {
         $this->relationEntityAlias = $relationEntityAlias;
