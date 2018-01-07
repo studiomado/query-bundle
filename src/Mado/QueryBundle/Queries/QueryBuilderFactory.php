@@ -471,9 +471,7 @@ class QueryBuilderFactory extends AbstractQuery
     public function getQueryBuilder() :QueryBuilder
     {
         if (!$this->qBuilder) {
-            throw new UnInitializedQueryBuilderException(
-                "Oops! Query builder was never initialized! call ::createQueryBuilder('entityName', 'alias') to start."
-            );
+            throw new UnInitializedQueryBuilderException();
         }
 
         return $this->qBuilder;
