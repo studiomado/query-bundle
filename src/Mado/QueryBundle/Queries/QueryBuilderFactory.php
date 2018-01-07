@@ -4,6 +4,7 @@ namespace Mado\QueryBundle\Queries;
 
 use Doctrine\ORM\QueryBuilder;
 use Mado\QueryBundle\Dictionary;
+use Mado\QueryBundle\Exceptions;
 use Mado\QueryBundle\Queries\Objects\FilterObject;
 use Mado\QueryBundle\Queries\Objects\Operator;
 
@@ -19,9 +20,9 @@ class QueryBuilderFactory extends AbstractQuery
 
     protected $fields;
 
-    protected $filtering;
+    protected $andFilters;
 
-    protected $orFiltering;
+    protected $orFilters;
 
     protected $relationEntityAlias;
 
@@ -67,16 +68,23 @@ class QueryBuilderFactory extends AbstractQuery
         return $this->fields;
     }
 
-    public function setFilters(array $filtering = [])
+    /** @deprecated since version 2.2.2 will be removed in version 2.3 */
+    public function setFilters(array $andFilters = [])
     {
-        $this->filtering = $filtering;
+        $this->andFilters = $andFilters;
 
         return $this;
     }
 
-    public function setOrFilters(array $orFiltering = [])
+    /** @since version 2.2.2 */
+    public function setAndFilters(array $andFilters = [])
     {
-        $this->orFiltering = $orFiltering;
+        return $this->setFilters($andFilters);
+    }
+
+    public function setOrFilters(array $orFilters = [])
+    {
+        $this->orFilters = $orFilters;
 
         return $this;
     }
@@ -88,14 +96,14 @@ class QueryBuilderFactory extends AbstractQuery
         return $this;
     }
 
-    public function getFilters()
+    public function getAndFilters()
     {
-        return $this->filtering;
+        return $this->andFilters;
     }
 
     public function getOrFilters()
     {
-        return $this->orFiltering;
+        return $this->orFilters;
     }
 
     private function noExistsJoin($prevEntityAlias, $currentEntityAlias)
@@ -170,10 +178,8 @@ class QueryBuilderFactory extends AbstractQuery
 
     public function filter()
     {
-        if (null === $this->filtering) {
-            throw new \RuntimeException(
-                'Oops! Filtering is not defined'
-            );
+        if (null === $this->andFilters && null === $this->orFilters) {
+            throw new Exceptions\MissingFiltersException();
         }
 
         if (!$this->fields) {
@@ -182,20 +188,22 @@ class QueryBuilderFactory extends AbstractQuery
             );
         }
 
-        foreach ($this->filtering as $filter => $value) {
-            $this->applyFilterAnd(
-                Objects\FilterObject::fromRawFilter($filter),
-                $value,
-                Objects\Value::fromFilter($value)
-            );
+        if (null !== $this->andFilters) {
+            foreach ($this->andFilters as $filter => $value) {
+                $this->applyFilterAnd(
+                    Objects\FilterObject::fromRawFilter($filter),
+                    $value,
+                    Objects\Value::fromFilter($value)
+                );
+            }
         }
 
-        if (null !== $this->orFiltering) {
+        if (null !== $this->orFilters) {
             $orFilter = [];
             $orFilter['orCondition'] = null;
             $orFilter['parameters'] = [];
 
-            foreach ($this->orFiltering as $filter => $value) {
+            foreach ($this->orFilters as $filter => $value) {
                 $orFilter = $this->applyFilterOr(
                     Objects\FilterObject::fromRawFilter($filter),
                     $value,
@@ -475,17 +483,6 @@ class QueryBuilderFactory extends AbstractQuery
         }
 
         return $this->qBuilder;
-    }
-
-    public function buildSelectValue() : string
-    {
-        if ("" == $this->getSelect()) {
-            return $this->getEntityAlias(
-                $this->getEntityName()
-            );
-        }
-
-        return $this->getSelect();
     }
 
     private function setRelationEntityAlias(string $relationEntityAlias)
