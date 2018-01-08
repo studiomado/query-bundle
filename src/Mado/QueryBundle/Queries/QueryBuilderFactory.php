@@ -2,7 +2,9 @@
 
 namespace Mado\QueryBundle\Queries;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
+use Mado\QueryBundle\Component\Meta\Exceptions\UnInitializedQueryBuilderException;
 use Mado\QueryBundle\Dictionary;
 use Mado\QueryBundle\Exceptions;
 use Mado\QueryBundle\Queries\Objects\FilterObject;
@@ -24,11 +26,11 @@ class QueryBuilderFactory extends AbstractQuery
 
     protected $orFilters;
 
-    protected $relationEntityAlias;
+    private $relationEntityAlias;
 
     protected $sorting;
 
-    protected $joins;
+    private $joins;
 
     protected $rel;
 
@@ -112,14 +114,14 @@ class QueryBuilderFactory extends AbstractQuery
             $this->joins = [];
         }
 
-        $needle = $prevEntityAlias . "_" . $currentEntityAlias;
+        $needle = $prevEntityAlias . '_' . $currentEntityAlias;
 
         return ! in_array($needle, $this->joins);
     }
 
     private function storeJoin($prevEntityAlias, $currentEntityAlias)
     {
-        $needle = $prevEntityAlias . "_" . $currentEntityAlias;
+        $needle = $prevEntityAlias . '_' . $currentEntityAlias;
         $this->joins[$needle] = $needle;
     }
 
@@ -211,7 +213,7 @@ class QueryBuilderFactory extends AbstractQuery
                 );
             }
 
-            if ((count($orFilter) > 0) && ($orFilter['orCondition'] != null)) {
+            if ((count($orFilter) > 0) && (null != $orFilter['orCondition'])) {
                 $this->qBuilder->andWhere($orFilter['orCondition']);
 
                 foreach ($orFilter['parameters'] as $parameter) {
@@ -324,7 +326,7 @@ class QueryBuilderFactory extends AbstractQuery
                 $whereCondition .= ' :field_' . $filterObject->getFieldName() . $salt;
             }
 
-            if ($orCondition['orCondition'] != null) {
+            if (null != $orCondition['orCondition']) {
                 $orCondition['orCondition'] .= ' OR ' . $whereCondition;
             } else {
                 $orCondition['orCondition'] = $whereCondition;
@@ -350,7 +352,7 @@ class QueryBuilderFactory extends AbstractQuery
             $isNotARelation = 0 !== strpos($filterObject->getFieldName(), 'Embedded.');
             if ($isNotARelation) {
                     $whereCondition .= ' ' . $this->entityAlias . '.' . $value;
-                if ($orCondition['orCondition'] != null) {
+                if (null != $orCondition['orCondition']) {
                     $orCondition['orCondition'] .= ' OR ' . $whereCondition;
                 } else {
                     $orCondition['orCondition'] = $whereCondition;
@@ -379,7 +381,7 @@ class QueryBuilderFactory extends AbstractQuery
                 $whereCondition .=' :field_' . $embeddableFieldName . $salt;
             }
 
-            if ($orCondition['orCondition'] != null) {
+            if (null != $orCondition['orCondition']) {
                 $orCondition['orCondition'] .= ' OR ' . $whereCondition;
             } else {
                 $orCondition['orCondition'] = $whereCondition;
@@ -446,12 +448,10 @@ class QueryBuilderFactory extends AbstractQuery
         return $this;
     }
 
-    public function getQueryBuilder()
+    public function getQueryBuilder() :QueryBuilder
     {
         if (!$this->qBuilder) {
-            throw new \RuntimeException(
-                "Oops! Query builder was never initialized! call ::createQueryBuilder('entityName', 'alias') to start."
-            );
+            throw new UnInitializedQueryBuilderException();
         }
 
         return $this->qBuilder;
@@ -491,14 +491,14 @@ class QueryBuilderFactory extends AbstractQuery
         return $this->printing;
     }
 
-    public function setPage($page)
+    public function setPage(int $page)
     {
         $this->page = $page;
 
         return $this;
     }
 
-    public function getPage()
+    public function getPage() :int
     {
         return $this->page;
     }
@@ -527,7 +527,7 @@ class QueryBuilderFactory extends AbstractQuery
         return $this->select;
     }
 
-    public function getEntityManager()
+    public function getEntityManager() : EntityManager
     {
         return $this->manager;
     }
