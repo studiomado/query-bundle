@@ -49,7 +49,7 @@ class QueryBuilderFactoryTest extends TestCase
             $queryBuilderFactory->getQueryBuilder()->getQuery()->getSql()
         );
 
-        $this->assertEquals(
+        $this->assertContains(
             "SELECT e FROM Mado\QueryBundle\Tests\Objects\MySimpleEntity e WHERE e.id = :field_id",
             $queryBuilderFactory->getQueryBuilder()->getQuery()->getDql()
         );
