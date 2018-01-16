@@ -15,6 +15,8 @@ class AbstractQuery
 
     protected $parser;
 
+    protected $qBuilder;
+
     public function __construct(EntityManager $manager)
     {
         $this->manager = $manager;
