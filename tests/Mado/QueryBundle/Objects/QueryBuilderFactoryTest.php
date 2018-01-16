@@ -135,7 +135,7 @@ class QueryBuilderFactoryTest extends TestCase
         $queryBuilderFactory = new QueryBuilderFactory($this->manager);
         $queryBuilderFactory->setOrFilters($filters);
 
-        $this->assertAttributeEquals($filters, 'orFiltering', $queryBuilderFactory);
+        $this->assertAttributeEquals($filters, 'orFilters', $queryBuilderFactory);
     }
 
     public function testGetOrFilters()
@@ -161,8 +161,8 @@ class QueryBuilderFactoryTest extends TestCase
     {
         $filters = ['id'];
         $queryBuilderFactory = new QueryBuilderFactory($this->manager);
-        $queryBuilderFactory->setFilters($filters);
-        $fieldsReturned = $queryBuilderFactory->getFilters();
+        $queryBuilderFactory->setAndFilters($filters);
+        $fieldsReturned = $queryBuilderFactory->getAndFilters();
 
         $this->assertEquals($filters, $fieldsReturned);
     }
