@@ -11,6 +11,10 @@ work.
    be opened against latest minor release branch. If latest stable version is
    v2.2.3, pull request must be opened starting from branch 2.2.
 
+   * every time new version is released, that version must be merged to the
+     upper minor branch (if exists) until master branch. This allow to keep all
+     version fixed and also the next one.
+
  * if it contains new features must be opened against master branch.
 
 Coding Standards
