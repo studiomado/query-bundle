@@ -429,6 +429,7 @@ class QueryBuilderFactory extends AbstractQuery
 
             if (in_array($fieldName, $this->fields)) {
                 $direction = ($val === self::DIRECTION_AZ) ? self::DIRECTION_AZ : self::DIRECTION_ZA;
+                $this->ensureQueryBuilderIsDefined();
                 $this->qBuilder->addOrderBy($this->entityAlias .'.'. $fieldName, $direction);
             }
 
@@ -530,5 +531,16 @@ class QueryBuilderFactory extends AbstractQuery
     public function getEntityManager() : EntityManager
     {
         return $this->manager;
+    }
+
+    public function ensureQueryBuilderIsDefined()
+    {
+        if (!$this->qBuilder) {
+            throw new \RuntimeException(
+                'Oops! QueryBuilder was never initialized. '
+                . "\n" . 'QueryBuilderFactory::createQueryBuilder()'
+                . "\n" . 'QueryBuilderFactory::createSelectAndGroupBy()'
+            );
+        }
     }
 }
