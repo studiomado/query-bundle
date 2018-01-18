@@ -115,7 +115,7 @@ class QueryBuilderFactory extends AbstractQuery
 
         $needle = $prevEntityAlias . '_' . $currentEntityAlias;
 
-        return ! in_array($needle, $this->joins);
+        return !in_array($needle, $this->joins);
     }
 
     private function storeJoin($prevEntityAlias, $currentEntityAlias)
@@ -274,7 +274,7 @@ class QueryBuilderFactory extends AbstractQuery
             $relationEntityAlias = $this->getRelationEntityAlias();
 
             $embeddedFields = explode('.', $filterObject->getFieldName());
-            $embeddedFieldName = $this->parser->camelize($embeddedFields[count($embeddedFields)-1]);
+            $embeddedFieldName = $this->parser->camelize($embeddedFields[count($embeddedFields) - 1]);
 
             $salt = '_' . random_int(111, 999);
 
@@ -367,7 +367,7 @@ class QueryBuilderFactory extends AbstractQuery
             $relationEntityAlias = $this->getRelationEntityAlias();
 
             $embeddedFields = explode('.', $filterObject->getFieldName());
-            $embeddableFieldName = $this->parser->camelize($embeddedFields[count($embeddedFields)-1]);
+            $embeddableFieldName = $this->parser->camelize($embeddedFields[count($embeddedFields) - 1]);
 
             $salt = '_' . random_int(111, 999);
 
@@ -377,7 +377,7 @@ class QueryBuilderFactory extends AbstractQuery
             if ($filterObject->isListType()) {
                 $whereCondition .= ' (:field_' . $embeddableFieldName . $salt . ')';
             } else {
-                $whereCondition .=' :field_' . $embeddableFieldName . $salt;
+                $whereCondition .= ' :field_' . $embeddableFieldName . $salt;
             }
 
             if (null != $orCondition['orCondition']) {
@@ -440,7 +440,7 @@ class QueryBuilderFactory extends AbstractQuery
                 $fieldName = $this->parser->camelize($embeddedFields[2]);
                 $direction = ($val === self::DIRECTION_AZ) ? self::DIRECTION_AZ : self::DIRECTION_ZA;
 
-                $this->qBuilder->addOrderBy($relationEntityAlias.'.'.$fieldName, $direction);
+                $this->qBuilder->addOrderBy($relationEntityAlias . '.' . $fieldName, $direction);
             }
 
         }
@@ -515,7 +515,7 @@ class QueryBuilderFactory extends AbstractQuery
         return $this->pageLength;
     }
 
-    public function setSelect( $select) : QueryBuilderFactory
+    public function setSelect($select) : QueryBuilderFactory
     {
         $this->select = $select;
 

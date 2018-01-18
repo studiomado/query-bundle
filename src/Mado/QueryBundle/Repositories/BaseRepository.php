@@ -39,7 +39,7 @@ class BaseRepository extends EntityRepository
 
         $this->fields = array_keys($this->getClassMetadata()->fieldMappings);
 
-        $entityName = explode('\\', strtolower($this->getEntityName()) );
+        $entityName = explode('\\', strtolower($this->getEntityName()));
         $entityName = $entityName[count($entityName)-1];
         $entityAlias = $entityName[0];
         $this->entityAlias = $entityAlias;
@@ -122,7 +122,7 @@ class BaseRepository extends EntityRepository
         foreach ($orFilters as $key => $filter) {
             if (is_array($filter)) {
                 foreach ($filter as $keyInternal => $internal) {
-                    $filterOrCorrected[$keyInternal .'|' . $count] = $internal;
+                    $filterOrCorrected[$keyInternal . '|' . $count] = $internal;
                     $count = $count + 1;
                 }
             } else {
@@ -174,7 +174,7 @@ class BaseRepository extends EntityRepository
         foreach ($orFilters as $key => $filter) {
             if (is_array($filter)) {
                 foreach ($filter as $keyInternal => $internal) {
-                    $filterOrCorrected[$keyInternal .'|' . $count] = $internal;
+                    $filterOrCorrected[$keyInternal . '|' . $count] = $internal;
                     $count = $count + 1;
                 }
             } else {
@@ -221,7 +221,7 @@ class BaseRepository extends EntityRepository
         foreach ($orFilters as $key => $filter) {
             if (is_array($filter)) {
                 foreach ($filter as $keyInternal => $internal) {
-                    $filterOrCorrected[$keyInternal .'|' . $count] = $internal;
+                    $filterOrCorrected[$keyInternal . '|' . $count] = $internal;
                     $count = $count + 1;
                 }
             } else {
@@ -278,7 +278,7 @@ class BaseRepository extends EntityRepository
         $pagerAdapter = new DoctrineORMAdapter($queryBuilder);
 
         $query = $pagerAdapter->getQuery();
-        if(isset($this->use_result_cache) and $this->use_result_cache){
+        if (isset($this->use_result_cache) and $this->use_result_cache){
             $query->useResultCache(true, 600);
         }
 
@@ -317,7 +317,7 @@ class BaseRepository extends EntityRepository
             $params[$itemValue] = $this->queryOptions->get($itemValue);
         }
 
-        if(!isset($this->route_name)){
+        if (!isset($this->route_name)){
             $this->route_name = $this->queryOptions->get('_route');
         }
 
@@ -346,8 +346,8 @@ class BaseRepository extends EntityRepository
 
     public function getEntityAlias(string $entityName) : string
     {
-        $arrayEntityName = explode('\\', strtolower($entityName) );
-        return $arrayEntityName[count($arrayEntityName)-1];
+        $arrayEntityName = explode('\\', strtolower($entityName));
+        return $arrayEntityName[count($arrayEntityName) - 1];
     }
 
     protected function relationship($queryBuilder)
