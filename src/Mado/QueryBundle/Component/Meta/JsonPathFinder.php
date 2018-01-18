@@ -46,7 +46,7 @@ class JsonPathFinder
         $this->mapper = $mapper;
         $this->logger = $logger;
 
-        $this->appendRootEntityToSubject =  function($subject, $rootEntity) {
+        $this->appendRootEntityToSubject = function($subject, $rootEntity) {
             $subject[] = $rootEntity;
             return $subject;
         };
@@ -276,7 +276,7 @@ class JsonPathFinder
                 $entities = $this->getEntitiesPath();
                 $lastEntityFound = end($entities);
                 $this->removeStep($lastEntityFound);
-            } catch(\Mado\QueryBundle\Component\Meta\Exceptions\UnexpectedValueException $e) {
+            } catch (\Mado\QueryBundle\Component\Meta\Exceptions\UnexpectedValueException $e) {
                 return;
             }
         }
