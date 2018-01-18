@@ -135,7 +135,7 @@ class QueryBuilderFactory extends AbstractQuery
 
         if (strstr($relation, '_embedded.')) {
             $embeddedFields = explode('.', $relation);
-            $relation = $this->parser->camelize($embeddedFields[1]);
+            $this->parser->camelize($embeddedFields[1]);
 
             // elimino l'ultimo elemento che dovrebbe essere il nome del campo
             unset($embeddedFields[count($embeddedFields) - 1]);
