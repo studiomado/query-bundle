@@ -297,6 +297,124 @@ class QueryBuilderFactoryTest extends TestCase
         $queryBuilderFactory = new QueryBuilderFactory($this->manager);
         $queryBuilderFactory->filter();
     }
+
+    /**
+     * @expectedException        \RuntimeException
+     * @expectedExceptionMessage Oops! Fields are not defined
+     */
+    public function testCantSortWithoutFields()
+    {
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->sort();
+    }
+
+    /**
+     * @expectedException        \RuntimeException
+     * @expectedExceptionMessage Oops! Sorting is not defined
+     */
+    public function testThrowExceptionWheneverSortIsRequestedWithoutSorting()
+    {
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setFields(['foo', 'bar']);
+        $queryBuilderFactory->sort();
+    }
+
+    /**
+     * @expectedException        \RuntimeException
+     * @expectedExceptionMessage Oops! QueryBuilder was never initialized
+     */
+    public function testThrowExceptionWhenQueryBuilderIsNotInitialized()
+    {
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setFields(['foo', 'bar']);
+        $queryBuilderFactory->setSorting(['foo' => 'bar']);
+        $queryBuilderFactory->sort();
+    }
+
+    public function testApplySortingJustForEntityFields()
+    {
+        $this->queryBuilder = $this
+            ->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->queryBuilder->expects($this->once())
+            ->method('select')
+            ->with('alias')
+            ->willReturn($this->queryBuilder);
+        $this->queryBuilder->expects($this->once())
+            ->method('from')
+            ->with('EntityName')
+            ->willReturn($this->queryBuilder);
+
+        $this->manager = $this
+            ->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->manager->expects($this->once())
+            ->method('createQueryBuilder')
+            ->with('EntityName')
+            ->willReturn($this->queryBuilder);
+
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setFields(['foo', 'bar']);
+        $queryBuilderFactory->setSorting(['foo' => 'bar']);
+        $queryBuilderFactory->createQueryBuilder('EntityName', 'alias');
+        $queryBuilderFactory->sort();
+    }
+
+    public function testApplySortingAlsoOnRelationsField()
+    {
+        $this->queryBuilder = $this
+            ->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->queryBuilder->expects($this->once())
+            ->method('select')
+            ->with('alias')
+            ->willReturn($this->queryBuilder);
+        $this->queryBuilder->expects($this->once())
+            ->method('from')
+            ->with('EntityName')
+            ->willReturn($this->queryBuilder);
+        $this->queryBuilder->expects($this->once())
+            ->method('join')
+            ->with('alias.ciao', 'table_fizz');
+
+        $this->metadata = $this
+            ->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->metadata->expects($this->once())
+            ->method('hasAssociation')
+            ->with('fizz')
+            ->willReturn(true);
+        $this->metadata->expects($this->once())
+            ->method('getAssociationMapping')
+            ->with('fizz')
+            ->willReturn([
+                'fieldName'    => 'ciao',
+                'targetEntity' => 'someEntityName',
+            ]);
+
+        $this->manager = $this
+            ->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->manager->expects($this->once())
+            ->method('createQueryBuilder')
+            ->with('EntityName')
+            ->willReturn($this->queryBuilder);
+        $this->manager->expects($this->once())
+            ->method('getClassMetadata')
+            ->with('EntityName')
+            ->willReturn($this->metadata);
+
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setFields(['foo', 'bar']);
+        $queryBuilderFactory->setSorting(['_embedded.fizz.buzz' => 'bar']);
+        $queryBuilderFactory->createQueryBuilder('EntityName', 'alias');
+        $queryBuilderFactory->sort();
+    }
 }
 
 /** @Entity() */
