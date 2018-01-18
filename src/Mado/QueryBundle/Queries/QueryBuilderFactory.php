@@ -8,7 +8,6 @@ use Mado\QueryBundle\Component\Meta\Exceptions\UnInitializedQueryBuilderExceptio
 use Mado\QueryBundle\Dictionary;
 use Mado\QueryBundle\Exceptions;
 use Mado\QueryBundle\Queries\Objects\FilterObject;
-use Mado\QueryBundle\Queries\Objects\Operator;
 
 class QueryBuilderFactory extends AbstractQuery
 {
@@ -375,7 +374,7 @@ class QueryBuilderFactory extends AbstractQuery
             $whereCondition = $relationEntityAlias . '.' . $embeddableFieldName . ' '
                 . $filterObject->getOperatorMeta();
 
-            if (isset($filterAndOperator[1]) && $op->isListOrNlist()) {
+            if ($filterObject->isListType()) {
                 $whereCondition .= ' (:field_' . $embeddableFieldName . $salt . ')';
             } else {
                 $whereCondition .=' :field_' . $embeddableFieldName . $salt;
