@@ -41,7 +41,7 @@ class BaseRepository extends EntityRepository
         $this->fields = array_keys($this->getClassMetadata()->fieldMappings);
 
         $entityName = explode('\\', strtolower($this->getEntityName()));
-        $entityName = $entityName[count($entityName)-1];
+        $entityName = $entityName[count($entityName) - 1];
         $entityAlias = $entityName[0];
         $this->entityAlias = $entityAlias;
 
@@ -273,7 +273,7 @@ class BaseRepository extends EntityRepository
         $pagerAdapter = new DoctrineORMAdapter($queryBuilder);
 
         $query = $pagerAdapter->getQuery();
-        if (null != $this->use_result_cache && $this->use_result_cache){
+        if (isset($this->use_result_cache) and $this->use_result_cache) {
             $query->useResultCache(true, 600);
         }
 
@@ -309,7 +309,7 @@ class BaseRepository extends EntityRepository
             $params[$itemValue] = $this->queryOptions->get($itemValue);
         }
 
-        if (!isset($this->route_name)){
+        if (!isset($this->route_name)) {
             $this->route_name = $this->queryOptions->get('_route');
         }
 

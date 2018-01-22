@@ -426,7 +426,7 @@ class QueryBuilderFactory extends AbstractQuery
             if (in_array($fieldName, $this->fields)) {
                 $direction = ($val === self::DIRECTION_AZ) ? self::DIRECTION_AZ : self::DIRECTION_ZA;
                 $this->ensureQueryBuilderIsDefined();
-                $this->qBuilder->addOrderBy($this->entityAlias .'.'. $fieldName, $direction);
+                $this->qBuilder->addOrderBy($this->entityAlias . '.' . $fieldName, $direction);
             }
 
             if (strstr($sort, '_embedded.')) {
