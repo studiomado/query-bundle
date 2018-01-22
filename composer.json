@@ -24,7 +24,13 @@
         "pagerfanta/pagerfanta": "^1.0",
         "doctrine/annotations": "v1.4.0",
         "doctrine/common": "v2.7.3",
-        "doctrine/dbal": "v2.5.13"
+        "doctrine/dbal": "v2.5.13",
+        "symfony/console": "v3.4.3",
+        "symfony/debug": "v3.4.3",
+        "symfony/event-dispatcher": "v3.4.3",
+        "symfony/filesystem": "v3.4.3",
+        "symfony/http-foundation": "v3.4.3",
+        "doctrine/cache": "v1.6.2"
     },
     "require-dev": {
         "phpunit/phpunit": "^6.3"
