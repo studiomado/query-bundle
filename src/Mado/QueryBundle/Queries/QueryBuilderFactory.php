@@ -184,9 +184,7 @@ class QueryBuilderFactory extends AbstractQuery
         }
 
         if (!$this->fields) {
-            throw new \RuntimeException(
-                'Oops! Fields are not defined'
-            );
+            throw new Exceptions\MissingFieldsException();
         }
 
         if (null !== $this->andFilters) {
@@ -259,8 +257,7 @@ class QueryBuilderFactory extends AbstractQuery
 
             $this->qBuilder->setParameter('field_' . $filterObject->getFieldName() . $salt, $value);
         } else {
-            $isNotARelation = 0 !== strpos($filterObject->getFieldName(), 'Embedded.');
-            if ($isNotARelation) {
+            if (strpos($filterObject->getFieldName(), 'Embedded.') === false) {
                 $whereCondition .= ' ' . $this->entityAlias . '.' . $value;
                 $this->qBuilder->andWhere($whereCondition);
             }
