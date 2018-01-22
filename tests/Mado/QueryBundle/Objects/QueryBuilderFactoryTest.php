@@ -19,6 +19,15 @@ class QueryBuilderFactoryTest extends TestCase
         ));
     }
 
+    public function testExposeEntityManager()
+    {
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $this->assertSame(
+            $this->manager,
+            $queryBuilderFactory->getEntityManager()
+        );
+    }
+
     public function testProvideOneSingleResult()
     {
         $queryBuilderFactory = new QueryBuilderFactory($this->manager);
@@ -52,6 +61,78 @@ class QueryBuilderFactoryTest extends TestCase
         $this->assertContains(
             "SELECT e FROM Mado\QueryBundle\Tests\Objects\MySimpleEntity e WHERE e.id = :field_id",
             $queryBuilderFactory->getQueryBuilder()->getQuery()->getDql()
+        );
+    }
+
+    public function testFilterWithListType()
+    {
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setFields([ 'id' ]);
+        $queryBuilderFactory->setAndFilters([ 'id|list' => '42, 33' ]);
+        $queryBuilderFactory->createQueryBuilder(MySimpleEntity::class, 'e');
+        $queryBuilderFactory->filter();
+
+        $this->assertEquals(
+            "SELECT m0_.id AS id_0 FROM MySimpleEntity m0_ WHERE m0_.id IN (?)",
+            $queryBuilderFactory->getQueryBuilder()->getQuery()->getSql()
+        );
+    }
+
+    public function testFilterWithListTypeOnEmbeddedField()
+    {
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setFields([ 'id' ]);
+        $queryBuilderFactory->setAndFilters([ '_embedded.group.id|list' => '42, 33' ]);
+        $queryBuilderFactory->createQueryBuilder(User::class, 'e');
+        $queryBuilderFactory->filter();
+
+        $this->assertEquals(
+            "SELECT "
+            . "u0_.id AS id_0, "
+            . "u0_.username AS username_1, "
+            . "u0_.group_id AS group_id_2 "
+            . "FROM User u0_ "
+            . "INNER JOIN Group g1_ ON u0_.group_id = g1_.id "
+            . "WHERE g1_.id IN (?)",
+            $queryBuilderFactory->getQueryBuilder()->getQuery()->getSql()
+        );
+    }
+
+    public function testFilterWithContainsOperator()
+    {
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setFields([ 'username', 'group' ]);
+        $queryBuilderFactory->setAndFilters([ 'username|contains' => 'orar' ]);
+        $queryBuilderFactory->createQueryBuilder(User::class, 'e');
+        $queryBuilderFactory->filter();
+
+        $this->assertEquals(
+            "SELECT "
+            . "u0_.id AS id_0, "
+            . "u0_.username AS username_1, "
+            . "u0_.group_id AS group_id_2 "
+            . "FROM User u0_ "
+            . "WHERE u0_.username LIKE ?",
+            $queryBuilderFactory->getQueryBuilder()->getQuery()->getSql()
+        );
+    }
+
+    public function testFilterWithFieldEqualityOperator()
+    {
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setFields([ 'username', 'group' ]);
+        $queryBuilderFactory->setAndFilters([ 'username|field_eq' => 'group' ]);
+        $queryBuilderFactory->createQueryBuilder(User::class, 'e');
+        $queryBuilderFactory->filter();
+
+        $this->assertEquals(
+            "SELECT "
+            . "u0_.id AS id_0, "
+            . "u0_.username AS username_1, "
+            . "u0_.group_id AS group_id_2 "
+            . "FROM User u0_ "
+            . "WHERE u0_.username = u0_.group_id",
+            $queryBuilderFactory->getQueryBuilder()->getQuery()->getSql()
         );
     }
 
@@ -295,6 +376,14 @@ class QueryBuilderFactoryTest extends TestCase
     public function testThrowMissingFiltersExceptionsWheneverFiltersAreMissing()
     {
         $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->filter();
+    }
+
+    /** @expectedException \Mado\QueryBundle\Exceptions\MissingFieldsException */
+    public function testThrowExceptionWheneverFieldsWereNotDefined()
+    {
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setAndFilters([ 'foo|eq' => 'bar' ]);
         $queryBuilderFactory->filter();
     }
 
