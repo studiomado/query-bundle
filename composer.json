@@ -19,9 +19,12 @@
         "symfony/dependency-injection": "^3.3",
         "symfony/config": "^3.3",
         "symfony/http-kernel": "^3.3",
-        "doctrine/orm": "^2.5",
+        "doctrine/orm": "v2.5.14",
         "doctrine/inflector": "v1.2.0",
-        "pagerfanta/pagerfanta": "^1.0"
+        "pagerfanta/pagerfanta": "^1.0",
+        "doctrine/annotations": "v1.4.0",
+        "doctrine/common": "v2.7.3",
+        "doctrine/dbal": "v2.5.13"
     },
     "require-dev": {
         "phpunit/phpunit": "^6.3"
