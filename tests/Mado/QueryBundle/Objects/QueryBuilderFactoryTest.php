@@ -262,10 +262,10 @@ class QueryBuilderFactoryTest extends TestCase
     {
         $rel = 'foo';
         $queryBuilderFactory = new QueryBuilderFactory($this->manager);
-        $queryBuilderFactory->setRel($rel);
+        $queryBuilderFactory->setRel([$rel]);
         $relReturned = $queryBuilderFactory->getRel();
 
-        $this->assertEquals($rel, $relReturned);
+        $this->assertEquals([$rel], $relReturned);
     }
 
     public function testSetPrinting()
@@ -617,6 +617,19 @@ class QueryBuilderFactoryTest extends TestCase
         $availableFilters = $queryBuilderFactory->getValueAvailableFilters();
 
         $this->assertEquals($expectedFilters, $availableFilters);
+    }
+
+    public function testAcceptRelationsToAdd()
+    {
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setFields([ 'id' ]);
+        $queryBuilderFactory->setRel([ 'group' ]);
+        $queryBuilderFactory->addRel('foo');
+
+        $this->assertEquals(
+            ['group', 'foo'],
+            $queryBuilderFactory->getRel()
+        );
     }
 }
 
