@@ -69,18 +69,12 @@ class QueryBuilderFactory extends AbstractQuery
         return $this->fields;
     }
 
-    /** @deprecated since version 2.2.2 will be removed in version 2.3 */
-    public function setFilters(array $andFilters = [])
+    /** @since version 2.2 */
+    public function setAndFilters(array $andFilters = [])
     {
         $this->andFilters = $andFilters;
 
         return $this;
-    }
-
-    /** @since version 2.2.2 */
-    public function setAndFilters(array $andFilters = [])
-    {
-        return $this->setFilters($andFilters);
     }
 
     public function setOrFilters(array $orFilters = [])
@@ -464,16 +458,21 @@ class QueryBuilderFactory extends AbstractQuery
         return $this->relationEntityAlias;
     }
 
-    public function setRel($rel)
+    public function setRel(array $rel)
     {
         $this->rel = $rel;
 
         return $this;
     }
 
-    public function getRel()
+    public function getRel() : array
     {
         return $this->rel;
+    }
+
+    public function addRel($relation)
+    {
+        array_push($this->rel, $relation);
     }
 
     public function setPrinting($printing)

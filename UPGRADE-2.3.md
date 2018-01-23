@@ -10,3 +10,6 @@ Queries\QueryBuilderFactory
 ---------------------------
 
  * Use `setAndFilters` instead of `setFilters`
+
+ * `QueryBuilderFactory::setRel()` now accept only arrays and relations are
+   always stored as array.
