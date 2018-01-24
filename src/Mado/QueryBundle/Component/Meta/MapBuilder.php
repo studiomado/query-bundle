@@ -2,7 +2,7 @@
 
 namespace Mado\QueryBundle\Component\Meta;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Psr\Log\LoggerInterface;
 
@@ -18,7 +18,7 @@ class MapBuilder implements DataMapper
     private $logger;
 
     public function __construct(
-        EntityManager $manager,
+        EntityManagerInterface $manager,
         LoggerInterface $logger = null
     ) {
         $this->manager = $manager;
