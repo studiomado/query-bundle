@@ -183,6 +183,7 @@ class BaseRepository extends EntityRepository
 
         $this->queryOptions = QueryBuilderOptions::fromArray([
             '_route' => $request->attributes->get('_route'),
+            '_route_params' => $request->attributes->get('_route_params'),
             'customer_id' => $request->attributes->get('customer_id'),
             'id' => $request->attributes->get('id'),
             'filtering' => $filtering,
@@ -229,6 +230,7 @@ class BaseRepository extends EntityRepository
 
         $this->queryOptions = QueryBuilderOptions::fromArray([
             '_route' => $request->attributes->get('_route'),
+            '_route_params' => $request->attributes->get('_route_params'),
             'customer_id' => $request->attributes->get('customer_id'),
             'id' => $request->attributes->get('id'),
             'filtering' => $filtering,
@@ -297,13 +299,14 @@ class BaseRepository extends EntityRepository
     protected function createRouter()
     {
         $params = [];
+        $routeParams = array_keys($this->queryOptions->get('_route_params'));
 
         $list = array_merge([
             'filtering',
             'limit',
             'page',
             'sorting',
-        ], $this->customQueryStringValues());
+        ], $routeParams);
 
         foreach ($list as $itemKey => $itemValue) {
             $params[$itemValue] = $this->queryOptions->get($itemValue);
