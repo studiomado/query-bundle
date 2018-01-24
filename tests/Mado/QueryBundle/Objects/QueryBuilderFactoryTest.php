@@ -2,6 +2,7 @@
 
 namespace Mado\QueryBundle\Tests\Objects;
 
+use Mado\QueryBundle\Dictionary;
 use Mado\QueryBundle\Queries\QueryBuilderFactory;
 use PHPUnit\Framework\TestCase;
 
@@ -343,6 +344,108 @@ class QueryBuilderFactoryTest extends TestCase
         $this->assertEquals($select, $selectReturned);
     }
 
+    public function testListOnEmbedded()
+    {
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setFields([ 'id' ]);
+        $queryBuilderFactory->setRel([ 'group' ]);
+        $queryBuilderFactory->setOrFilters([
+            '_embedded.group.id|list' => '1,2,3',
+        ]);
+        $queryBuilderFactory->createQueryBuilder(User::class, 'e');
+        $queryBuilderFactory->filter();
+
+        $this->assertEquals(
+            "SELECT "
+            . "u0_.id AS id_0, "
+            . "u0_.username AS username_1, "
+            . "u0_.group_id AS group_id_2 "
+            . "FROM User u0_ "
+            . "INNER JOIN Group g1_ ON u0_.group_id = g1_.id "
+            . "WHERE g1_.id IN (?)",
+            $queryBuilderFactory->getQueryBuilder()->getQuery()->getSql()
+        );
+    }
+
+    public function testFieldsArentInEntity()
+    {
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setFields([ 'id' ]);
+        $queryBuilderFactory->setRel([ 'group' ]);
+        $queryBuilderFactory->setOrFilters([
+            'id|list' => '1,2,3',
+        ]);
+        $queryBuilderFactory->createQueryBuilder(User::class, 'e');
+        $queryBuilderFactory->filter();
+
+        $this->assertEquals(
+            "SELECT" .
+            " u0_.id AS id_0," .
+            " u0_.username AS username_1," .
+            " u0_.group_id AS group_id_2 " .
+            "FROM User u0_ " .
+            "WHERE u0_.id IN (?)",
+            $queryBuilderFactory->getQueryBuilder()->getQuery()->getSql()
+        );
+    }
+
+    public function testCheckFieldsEqualitiWithOrOperator()
+    {
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setFields([ 'username', 'group' ]);
+        $queryBuilderFactory->setOrFilters([ 'username|field_eq' => 'group' ]);
+        $queryBuilderFactory->createQueryBuilder(User::class, 'e');
+        $queryBuilderFactory->filter();
+
+        $this->assertEquals(
+            "SELECT "
+            . "u0_.id AS id_0, "
+            . "u0_.username AS username_1, "
+            . "u0_.group_id AS group_id_2 "
+            . "FROM User u0_ "
+            . "WHERE u0_.username = u0_.group_id",
+            $queryBuilderFactory->getQueryBuilder()->getQuery()->getSql()
+        );
+    }
+
+    public function testCheckFieldsGreaterThan()
+    {
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setFields([ 'id', 'group' ]);
+        $queryBuilderFactory->setOrFilters([ 'id|gte' => '42' ]);
+        $queryBuilderFactory->createQueryBuilder(User::class, 'e');
+        $queryBuilderFactory->filter();
+
+        $this->assertEquals(
+            "SELECT "
+            . "u0_.id AS id_0, "
+            . "u0_.username AS username_1, "
+            . "u0_.group_id AS group_id_2 "
+            . "FROM User u0_ "
+            . "WHERE u0_.id >= ?",
+            $queryBuilderFactory->getQueryBuilder()->getQuery()->getSql()
+        );
+    }
+
+    public function testFilteringOrWithContains()
+    {
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setFields([ 'username', 'group' ]);
+        $queryBuilderFactory->setOrFilters([ 'username|contains' => 'sorar' ]);
+        $queryBuilderFactory->createQueryBuilder(User::class, 'e');
+        $queryBuilderFactory->filter();
+
+        $this->assertEquals(
+            "SELECT "
+            . "u0_.id AS id_0, "
+            . "u0_.username AS username_1, "
+            . "u0_.group_id AS group_id_2 "
+            . "FROM User u0_ "
+            . "WHERE u0_.username LIKE ?",
+            $queryBuilderFactory->getQueryBuilder()->getQuery()->getSql()
+        );
+    }
+
     public function testCanBuildQueriesUsingOrOperator()
     {
         $queryBuilderFactory = new QueryBuilderFactory($this->manager);
@@ -503,6 +606,17 @@ class QueryBuilderFactoryTest extends TestCase
         $queryBuilderFactory->setSorting(['_embedded.fizz.buzz' => 'bar']);
         $queryBuilderFactory->createQueryBuilder('EntityName', 'alias');
         $queryBuilderFactory->sort();
+    }
+
+    public function testGetAvailableFilters()
+    {
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+
+        $expectedFilters = Dictionary::getOperators();
+
+        $availableFilters = $queryBuilderFactory->getValueAvailableFilters();
+
+        $this->assertEquals($expectedFilters, $availableFilters);
     }
 
     public function testAcceptRelationsToAdd()
