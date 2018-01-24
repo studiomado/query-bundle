@@ -1,14 +1,13 @@
 # QueryBundle
 
+[![Build Status](https://scrutinizer-ci.com/g/studiomado/query-bundle/badges/build.png?b=master)](https://scrutinizer-ci.com/g/studiomado/query-bundle/build-status/master) [![Code Coverage](https://scrutinizer-ci.com/g/studiomado/query-bundle/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/studiomado/query-bundle/?branch=master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/studiomado/query-bundle/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/studiomado/query-bundle/?branch=master) [![Latest Stable Version](https://poser.pugx.org/studiomado/query-bundle/version)](https://packagist.org/packages/studiomado/query-bundle)
+
 ## Run tests
 
  - `./runtests.sh` run all unit tests
  - `./agile.sh` generate testdox documentation
  - `./coverage.sh` generate and open html coverage
 
-## Badges
-
-[![Build Status](https://scrutinizer-ci.com/g/studiomado/query-bundle/badges/build.png?b=master)](https://scrutinizer-ci.com/g/studiomado/query-bundle/build-status/master) [![Code Coverage](https://scrutinizer-ci.com/g/studiomado/query-bundle/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/studiomado/query-bundle/?branch=master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/studiomado/query-bundle/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/studiomado/query-bundle/?branch=master)
 # Plain symfony project for query-bundle
 
 The purpose of this project is to see how studiomado/query-bundle works and can be installed in a plain symfony project.
