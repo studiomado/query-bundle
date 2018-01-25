@@ -14,9 +14,9 @@ class RouterTest extends TestCase
         ]);
 
         $this->router = new Router();
-        $route = $this->router->createRouter($queryBuilderOptions, '');
+        $route = $this->router->createRouter($queryBuilderOptions, 'foo');
 
-        $this->assertInstanceOf('Hateoas\Configuration\Route', $route);
+        $this->assertEquals('foo', $route->getName());
     }
 
     public function testCreateRouterWithRouteParams()
@@ -32,7 +32,6 @@ class RouterTest extends TestCase
         $route = $this->router->createRouter($queryBuilderOptions, $routeName);
         $routeParams = $route->getParameters();
 
-        $this->assertInstanceOf('Hateoas\Configuration\Route', $route);
         $this->assertEquals($routeName, $route->getName());
         $this->assertTrue(array_key_exists($routeParamsKey, $routeParams));
     }

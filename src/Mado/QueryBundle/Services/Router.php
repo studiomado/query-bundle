@@ -7,7 +7,7 @@ use Mado\QueryBundle\Queries\QueryBuilderOptions;
 
 class Router
 {
-    public function createRouter(QueryBuilderOptions $queryOptions, $routeName)
+    public function createRouter(QueryBuilderOptions $queryOptions, $routeName) :Route
     {
         $params = [];
         $routeParams = [];
