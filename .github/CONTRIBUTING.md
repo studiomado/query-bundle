@@ -4,8 +4,11 @@ Contributing
 Changelog
 ---------
 
- * every time new feature is added, new line on CHANGELOG file must be present;
+ * every time new feature is added, new line on CHANGELOG file must be present
+   in the form
 
+   > feature - feature description
+   
 Choose the right branch
 -----------------------
 
