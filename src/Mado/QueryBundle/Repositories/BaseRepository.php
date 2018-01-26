@@ -4,10 +4,10 @@ namespace Mado\QueryBundle\Repositories;
 
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
-use Hateoas\Configuration\Route;
 use Hateoas\Representation\Factory\PagerfantaFactory;
 use Mado\QueryBundle\Queries\QueryBuilderFactory;
 use Mado\QueryBundle\Queries\QueryBuilderOptions;
+use Mado\QueryBundle\Services\Router;
 use Pagerfanta\Adapter\DoctrineORMAdapter;
 use Pagerfanta\Pagerfanta;
 use Symfony\Component\HttpFoundation\Request;
@@ -183,7 +183,7 @@ class BaseRepository extends EntityRepository
 
         $this->queryOptions = QueryBuilderOptions::fromArray([
             '_route' => $request->attributes->get('_route'),
-            'customer_id' => $request->attributes->get('customer_id'),
+            '_route_params' => $request->attributes->get('_route_params', []),
             'id' => $request->attributes->get('id'),
             'filtering' => $filtering,
             'limit' => $limit,
@@ -229,7 +229,7 @@ class BaseRepository extends EntityRepository
 
         $this->queryOptions = QueryBuilderOptions::fromArray([
             '_route' => $request->attributes->get('_route'),
-            'customer_id' => $request->attributes->get('customer_id'),
+            '_route_params' => $request->attributes->get('_route_params', []),
             'id' => $request->attributes->get('id'),
             'filtering' => $filtering,
             'limit' => $limit,
@@ -284,36 +284,16 @@ class BaseRepository extends EntityRepository
 
         $pagerFactory = new PagerfantaFactory();
 
-        $router = $this->createRouter();
+        $router = new Router();
+        $router->createRouter($this->queryOptions, $this->route_name);
 
         return $pagerFactory->createRepresentation($pager, $router);
     }
 
+    /** @deprecated since 2.3 */
     protected function customQueryStringValues()
     {
         return [];
-    }
-
-    protected function createRouter()
-    {
-        $params = [];
-
-        $list = array_merge([
-            'filtering',
-            'limit',
-            'page',
-            'sorting',
-        ], $this->customQueryStringValues());
-
-        foreach ($list as $itemKey => $itemValue) {
-            $params[$itemValue] = $this->queryOptions->get($itemValue);
-        }
-
-        if (!isset($this->route_name)) {
-            $this->route_name = $this->queryOptions->get('_route');
-        }
-
-        return new Route($this->route_name, $params);
     }
 
     protected function getCurrentEntityAlias() : string
