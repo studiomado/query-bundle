@@ -13,3 +13,5 @@ Queries\QueryBuilderFactory
 
  * `QueryBuilderFactory::setRel()` now accept only arrays and relations are
    always stored as array.
+   
+ * Deprecate `customQueryStringValues` so is unnecessary to overwrite It inside entities 
