@@ -183,8 +183,7 @@ class BaseRepository extends EntityRepository
 
         $this->queryOptions = QueryBuilderOptions::fromArray([
             '_route' => $request->attributes->get('_route'),
-            '_route_params' => $request->attributes->get('_route_params'),
-            'customer_id' => $request->attributes->get('customer_id'),
+            '_route_params' => $request->attributes->get('_route_params', []),
             'id' => $request->attributes->get('id'),
             'filtering' => $filtering,
             'limit' => $limit,
@@ -230,8 +229,7 @@ class BaseRepository extends EntityRepository
 
         $this->queryOptions = QueryBuilderOptions::fromArray([
             '_route' => $request->attributes->get('_route'),
-            '_route_params' => $request->attributes->get('_route_params'),
-            'customer_id' => $request->attributes->get('customer_id'),
+            '_route_params' => $request->attributes->get('_route_params', []),
             'id' => $request->attributes->get('id'),
             'filtering' => $filtering,
             'limit' => $limit,
