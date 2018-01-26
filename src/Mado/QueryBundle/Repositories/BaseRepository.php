@@ -59,7 +59,7 @@ class BaseRepository extends EntityRepository
         $this->queryBuilderFactory->setAndFilters($options->getAndFilters());
         $this->queryBuilderFactory->setOrFilters($options->getOrFilters());
         $this->queryBuilderFactory->setSorting($options->getSorting());
-        $this->queryBuilderFactory->setRel($options->getRel());
+        $this->queryBuilderFactory->setRel([$options->getRel()]);
         $this->queryBuilderFactory->setPrinting($options->getPrinting());
         $this->queryBuilderFactory->setSelect($options->getSelect());
     }
@@ -285,9 +285,9 @@ class BaseRepository extends EntityRepository
         $pagerFactory = new PagerfantaFactory();
 
         $router = new Router();
-        $router->createRouter($this->queryOptions, $this->route_name);
+        $route = $router->createRouter($this->queryOptions, $this->route_name);
 
-        return $pagerFactory->createRepresentation($pager, $router);
+        return $pagerFactory->createRepresentation($pager, $route);
     }
 
     /** @deprecated since 2.3 */
