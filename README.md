@@ -3,8 +3,8 @@
 [![Build Status](https://scrutinizer-ci.com/g/studiomado/query-bundle/badges/build.png?b=master)](https://scrutinizer-ci.com/g/studiomado/query-bundle/build-status/master) [![Code Coverage](https://scrutinizer-ci.com/g/studiomado/query-bundle/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/studiomado/query-bundle/?branch=master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/studiomado/query-bundle/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/studiomado/query-bundle/?branch=master) [![Latest Stable Version](https://poser.pugx.org/studiomado/query-bundle/version)](https://packagist.org/packages/studiomado/query-bundle)
 
 
-| 2.4 | 2.3 | 2.2 |
-|----------------|----------|
+| 2.4 (master) | 2.3 | 2.2 |
+|----------------|----------|---|
 | [![Build Status](https://scrutinizer-ci.com/g/studiomado/query-bundle/badges/build.png?b=master)](https://scrutinizer-ci.com/g/studiomado/query-bundle/build-status/master) | [![Build Status](https://scrutinizer-ci.com/g/studiomado/query-bundle/badges/build.png?b=2.3)](https://scrutinizer-ci.com/g/studiomado/query-bundle/build-status/2.3) | [![Build Status](https://scrutinizer-ci.com/g/studiomado/query-bundle/badges/build.png?b=2.2)](https://scrutinizer-ci.com/g/studiomado/query-bundle/build-status/2.2) |
 
 
