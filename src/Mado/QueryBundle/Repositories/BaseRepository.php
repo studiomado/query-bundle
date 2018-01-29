@@ -290,12 +290,6 @@ class BaseRepository extends EntityRepository
         return $pagerFactory->createRepresentation($pager, $route);
     }
 
-    /** @deprecated since 2.3 */
-    protected function customQueryStringValues()
-    {
-        return [];
-    }
-
     protected function getCurrentEntityAlias() : string
     {
         return $this->currentEntityAlias;
