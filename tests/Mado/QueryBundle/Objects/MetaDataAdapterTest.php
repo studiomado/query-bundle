@@ -1,6 +1,6 @@
 <?php
 
-use Mado\QueryBundle\Services\MetaDataAdapter;
+use Mado\QueryBundle\Objects\MetaDataAdapter;
 use PHPUnit\Framework\TestCase;
 
 class MetaDataAdapterTest extends TestCase

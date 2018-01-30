@@ -1,6 +1,6 @@
 <?php
 
-namespace Mado\QueryBundle\Services;
+namespace Mado\QueryBundle\Objects;
 
 class MetaDataAdapter
 {
