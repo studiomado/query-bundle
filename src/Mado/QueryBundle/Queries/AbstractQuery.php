@@ -3,6 +3,8 @@
 namespace Mado\QueryBundle\Queries;
 
 use Doctrine\ORM\EntityManager;
+use Mado\QueryBundle\Objects\MetaDataAdapter;
+use Mado\QueryBundle\Queries\QueryBuilderOptions;
 use Mado\QueryBundle\Services\StringParser;
 
 class AbstractQuery
@@ -49,5 +51,19 @@ class AbstractQuery
     public function getEntityName()
     {
         return $this->entityName;
+    }
+
+    public function loadMetadataAndOptions(
+        MetaDataAdapter $metadata,
+        QueryBuilderOptions $options
+    ) {
+        $this->setFields($metadata->getFields());
+
+        $this->setAndFilters($options->getAndFilters());
+        $this->setOrFilters($options->getOrFilters());
+        $this->setSorting($options->getSorting());
+        $this->setRel($options->getRel());
+        $this->setPrinting($options->getPrinting());
+        $this->setSelect($options->getSelect());
     }
 }
