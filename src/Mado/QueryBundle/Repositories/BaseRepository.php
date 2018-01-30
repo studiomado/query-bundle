@@ -5,6 +5,7 @@ namespace Mado\QueryBundle\Repositories;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Hateoas\Representation\Factory\PagerfantaFactory;
+use Mado\QueryBundle\Objects\MetaDataAdapter;
 use Mado\QueryBundle\Queries\QueryBuilderFactory;
 use Mado\QueryBundle\Queries\QueryBuilderOptions;
 use Mado\QueryBundle\Services\Router;
@@ -14,13 +15,9 @@ use Symfony\Component\HttpFoundation\Request;
 
 class BaseRepository extends EntityRepository
 {
-    protected $fields;
-
     protected $request;
 
     protected $use_result_cache = false;
-
-    protected $entityAlias;
 
     protected $route_name;
 
@@ -34,28 +31,27 @@ class BaseRepository extends EntityRepository
 
     protected $queryOptions;
 
+    protected $metadata;
+
     public function __construct($manager, $class)
     {
         parent::__construct($manager, $class);
 
-        $this->fields = array_keys($this->getClassMetadata()->fieldMappings);
-
-        $entityName = explode('\\', strtolower($this->getEntityName()));
-        $entityName = $entityName[count($entityName) - 1];
-        $entityAlias = $entityName[0];
-        $this->entityAlias = $entityAlias;
+        $this->metadata = new MetaDataAdapter();
+        $this->metadata->setClassMetadata($this->getClassMetadata());
+        $this->metadata->setEntityName($this->getEntityName());
 
         $this->queryBuilderFactory = new QueryBuilderFactory($this->getEntityManager());
     }
 
     public function initFromQueryBuilderOptions(QueryBuilderOptions $options)
     {
-        $this->queryBuilderFactory->createQueryBuilder($this->getEntityName(), $this->entityAlias);
+        $this->queryBuilderFactory->createQueryBuilder(
+            $this->getEntityName(),
+            $this->metadata->getEntityAlias()
+        );
 
-        $fieldMappings = $this->getClassMetadata()->fieldMappings;
-        $this->fields = array_keys($fieldMappings);
-
-        $this->queryBuilderFactory->setFields($this->fields ?? []);
+        $this->queryBuilderFactory->setFields($this->metadata->getFields());
         $this->queryBuilderFactory->setAndFilters($options->getAndFilters());
         $this->queryBuilderFactory->setOrFilters($options->getOrFilters());
         $this->queryBuilderFactory->setSorting($options->getSorting());
@@ -112,7 +108,7 @@ class BaseRepository extends EntityRepository
         $printing    = $request->query->get('printing', []);
         $rel         = $request->query->get('rel', '');
         $page        = $request->query->get('page', '');
-        $select      = $request->query->get('select', $this->entityAlias);
+        $select      = $request->query->get('select', $this->metadata->getEntityAlias());
         $filtering   = $request->query->get('filtering', '');
         $limit       = $request->query->get('limit', '');
 
@@ -161,7 +157,7 @@ class BaseRepository extends EntityRepository
         $printing = $request->query->get('printing', []);
         $rel = $request->query->get('rel', '');
         $page = $request->query->get('page', '');
-        $select = $request->query->get('select', $this->entityAlias);
+        $select = $request->query->get('select', $this->metadata->getEntityAlias());
         $filtering = $request->query->get('filtering', '');
         $limit = $request->query->get('limit', '');
 
@@ -207,7 +203,7 @@ class BaseRepository extends EntityRepository
         $printing = $request->query->get('printing', []);
         $rel = $request->query->get('rel', '');
         $page = $request->query->get('page', '');
-        $select = $request->query->get('select', $this->entityAlias);
+        $select = $request->query->get('select', $this->metadata->getEntityAlias());
         $filtering = $request->query->get('filtering', '');
         $limit = $request->query->get('limit', '');
 
@@ -316,10 +312,9 @@ class BaseRepository extends EntityRepository
         $this->embeddedFields = $embeddedFields;
     }
 
-    public function getEntityAlias(string $entityName) : string
+    public function getEntityAlias() : string
     {
-        $arrayEntityName = explode('\\', strtolower($entityName));
-        return $arrayEntityName[count($arrayEntityName) - 1];
+        return $this->metadata->getEntityAlias();
     }
 
     protected function relationship($queryBuilder)
