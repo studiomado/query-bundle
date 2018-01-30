@@ -51,13 +51,10 @@ class BaseRepository extends EntityRepository
             $this->metadata->getEntityAlias()
         );
 
-        $this->queryBuilderFactory->setFields($this->metadata->getFields());
-        $this->queryBuilderFactory->setAndFilters($options->getAndFilters());
-        $this->queryBuilderFactory->setOrFilters($options->getOrFilters());
-        $this->queryBuilderFactory->setSorting($options->getSorting());
-        $this->queryBuilderFactory->setRel([$options->getRel()]);
-        $this->queryBuilderFactory->setPrinting($options->getPrinting());
-        $this->queryBuilderFactory->setSelect($options->getSelect());
+        $this->queryBuilderFactory->loadMetadataAndOptions(
+            $this->metadata,
+            $options
+        );
     }
 
     public function getQueryBuilderFactory()
