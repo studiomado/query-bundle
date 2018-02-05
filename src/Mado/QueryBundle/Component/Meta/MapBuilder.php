@@ -15,10 +15,7 @@ class MapBuilder implements DataMapper
 
     private $map = [];
 
-    public function __construct(
-        EntityManagerInterface $manager,
-        LoggerInterface $logger = null
-    ) {
+    public function __construct(EntityManagerInterface $manager) {
         $this->manager = $manager;
     }
 
