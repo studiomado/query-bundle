@@ -45,7 +45,7 @@ class QueryBuilderOptions
 
     public function getRel()
     {
-        return $this->get('rel');
+        return $this->get('rel', []);
     }
 
     public function getPrinting()
