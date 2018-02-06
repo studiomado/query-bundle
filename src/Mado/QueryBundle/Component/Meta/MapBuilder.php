@@ -15,14 +15,8 @@ class MapBuilder implements DataMapper
 
     private $map = [];
 
-    private $logger;
-
-    public function __construct(
-        EntityManagerInterface $manager,
-        LoggerInterface $logger = null
-    ) {
+    public function __construct(EntityManagerInterface $manager) {
         $this->manager = $manager;
-        $this->logger = $logger;
     }
 
     public function setMap(array $map) : bool
@@ -47,10 +41,7 @@ class MapBuilder implements DataMapper
     }
 
     /** @codeCoverageIgnore */
-    public static function relations(
-        ClassMetadata $classMetadata,
-        LoggerInterface $logger = null
-    ) {
+    public static function relations(ClassMetadata $classMetadata) {
         $encoded = json_encode($classMetadata);
         $decoded = json_decode($encoded, true);
         $relations = $decoded['associationMappings'];
@@ -72,10 +63,7 @@ class MapBuilder implements DataMapper
 
         foreach ($allMetadata as $singleEntityMetadata) {
             // @codeCoverageIgnoreStart
-            $this->map[$singleEntityMetadata->getName()]['relations'] = self::relations(
-                $singleEntityMetadata,
-                $this->logger
-            );
+            $this->map[$singleEntityMetadata->getName()]['relations'] = self::relations($singleEntityMetadata);
             // @codeCoverageIgnoreEnd
         }
 
