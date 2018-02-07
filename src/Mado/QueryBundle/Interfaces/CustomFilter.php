@@ -16,8 +16,6 @@ interface CustomFilter
         LoggerInterface $logger
     );
 
-    public function getFilterNames();
-
     public function setUser(AdditionalFilterable $user);
 
     public function allItemsTo(string $entity);
@@ -27,6 +25,4 @@ interface CustomFilter
     public static function getEntityFromFilter(string $filterName);
 
     public function setEntity(string $entity);
-
-    public function getFilters($additionalFilterName);
 }
