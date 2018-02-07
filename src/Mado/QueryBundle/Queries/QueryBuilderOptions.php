@@ -18,11 +18,7 @@ class QueryBuilderOptions
 
     public function get($option, $defaultValue = null)
     {
-        if ('limit' == $option) {
-            if ($this->options[$option] < 0) {
-                $this->options[$option] = PHP_INT_MAX;
-            }
-        }
+        $this->validateOption($option, $defaultValue);
 
         if (
             !isset($this->options[$option])
@@ -62,5 +58,17 @@ class QueryBuilderOptions
     public function getSelect()
     {
         return $this->get('select');
+    }
+
+    public function validateOption($option, $defaultValue)
+    {
+        $optionIsDefinedNegativeAndNotNull = (
+            !isset($this->options[$option])
+            || $this->options[$option] < 0
+        ) && $defaultValue == null;
+
+        if ('limit' == $option && $optionIsDefinedNegativeAndNotNull) {
+            $this->options[$option] = PHP_INT_MAX;
+        }
     }
 }
