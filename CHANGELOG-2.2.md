@@ -9,3 +9,4 @@ in 2.2 minor versions.
  - fix #82 - anonymous method `setFilters` to more explicit `setAndFilters`
  - fix #95 - remove `Mado\QueryBundle\Queries\Objects\Operator` statement
  - fix #96 - remove variable assignment 'cause its unused
+ - fix #114 - convert negative limit to PHP_INT_MAX
