@@ -9,9 +9,7 @@ class QueryBuilderOptionsTest extends TestCase
 {
     public function testConvertNegativeLimitToInfinite()
     {
-        $options = QueryBuilderOptions::fromArray([
-            'limit' => -1,
-        ]);
+        $options = QueryBuilderOptions::fromArray(['limit' => -1]);
         $this->assertEquals(PHP_INT_MAX, $options->get('limit'));
     }
 }

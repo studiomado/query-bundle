@@ -19,7 +19,7 @@ class QueryBuilderOptions
     public function get($option, $defaultValue = null)
     {
         if ('limit' == $option) {
-            if (-1 == $this->options[$option]) {
+            if ($this->options[$option] < 0) {
                 $this->options[$option] = PHP_INT_MAX;
             }
         }
