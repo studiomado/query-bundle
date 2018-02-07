@@ -5,6 +5,7 @@ namespace Mado\QueryBundle\Repositories;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Hateoas\Representation\Factory\PagerfantaFactory;
+use Mado\QueryBundle\Exceptions\InvalidFiltersException;
 use Mado\QueryBundle\Objects\MetaDataAdapter;
 use Mado\QueryBundle\Queries\QueryBuilderFactory;
 use Mado\QueryBundle\Queries\QueryBuilderOptions;
@@ -146,6 +147,13 @@ class BaseRepository extends EntityRepository
         return $this;
     }
 
+    private function ensureFilterIsValid($filters )
+    {
+        if (!is_array($filters)) {
+            throw new InvalidFiltersException("Wrong query string exception: " . var_export($filters, true) . "\n Please check query string should be something like this http://127.0.0.1:8000/?filtering[status]=todo");
+        }
+    }
+
     public function setQueryOptionsFromRequestWithCustomFilter(Request $request = null, $filter)
     {
         $filters = $request->query->get('filtering', []);
@@ -158,6 +166,7 @@ class BaseRepository extends EntityRepository
         $filtering = $request->query->get('filtering', '');
         $limit = $request->query->get('limit', '');
 
+        $this->ensureFilterIsValid($filters);
         $filters = array_merge($filters, $filter);
 
         $filterOrCorrected = [];
@@ -294,7 +303,7 @@ class BaseRepository extends EntityRepository
         return $this->currentEntityAlias;
     }
 
-    protected function setCurrentEntityAlias(string $currentEntityAlias) 
+    protected function setCurrentEntityAlias(string $currentEntityAlias)
     {
         $this->currentEntityAlias = $currentEntityAlias;
     }
@@ -304,7 +313,7 @@ class BaseRepository extends EntityRepository
         return $this->embeddedFields;
     }
 
-    protected function setEmbeddedFields(array $embeddedFields) 
+    protected function setEmbeddedFields(array $embeddedFields)
     {
         $this->embeddedFields = $embeddedFields;
     }
