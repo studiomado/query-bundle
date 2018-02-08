@@ -2,8 +2,9 @@
 
 namespace Mado\QueryBundle\Services;
 
-use Mado\QueryBundle\Objects\Filter;
 use Mado\QueryBundle\Exceptions\ForbiddenContentException;
+use Mado\QueryBundle\Objects\Filter;
+use Psr\Log\LoggerInterface;
 
 class IdsChecker
 {
@@ -19,9 +20,16 @@ class IdsChecker
 
     private $finalFilterIds;
 
+    private $logger;
+
     public function __construct()
     {
         $this->idsMustBeSubset = true;
+    }
+
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
     }
 
     public function setFiltering($filtering)
@@ -46,6 +54,8 @@ class IdsChecker
 
     public function validateIds()
     {
+        $this->log('Start to check IDS');
+
         $rawFilteredIds = $this->objectFilter->getIds();
 
         foreach ($this->filtering as $key => $queryStringIds) {
@@ -82,6 +92,11 @@ class IdsChecker
                 $this->finalFilterIds = join(',', array_intersect($qsIds, $addFilIds));
             }
         }
+
+        $this->log(var_export([
+            'filterKey'      => $this->getFilterKey(),
+            'finalFilterIds' => $this->getFinalFilterIds(),
+        ], true));
     }
 
     public function getFilterKey()
@@ -92,5 +107,12 @@ class IdsChecker
     public function getFinalFilterIds()
     {
         return $this->finalFilterIds;
+    }
+
+    public function log($message)
+    {
+        if ($this->logger) {
+            $this->logger->debug('[IdsChecker] - ' . $message);
+        }
     }
 }
