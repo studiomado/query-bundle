@@ -62,7 +62,7 @@ class AbstractQuery
         $this->setAndFilters($options->getAndFilters());
         $this->setOrFilters($options->getOrFilters());
         $this->setSorting($options->getSorting());
-        $this->setRel($options->getRel());
+        $this->setRel([$options->getRel()]);
         $this->setPrinting($options->getPrinting());
         $this->setSelect($options->getSelect());
     }
