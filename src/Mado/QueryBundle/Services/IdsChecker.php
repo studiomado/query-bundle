@@ -3,6 +3,7 @@
 namespace Mado\QueryBundle\Services;
 
 use Mado\QueryBundle\Objects\Filter;
+use Mado\QueryBundle\Exceptions\ForbiddenContentException;
 
 class IdsChecker
 {
