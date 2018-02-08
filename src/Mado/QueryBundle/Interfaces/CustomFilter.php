@@ -4,8 +4,9 @@ namespace Mado\QueryBundle\Interfaces;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Mado\QueryBundle\Component\Meta\GraphWalker;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Mado\QueryBundle\Services\IdsChecker;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 interface CustomFilter
 {
@@ -13,6 +14,7 @@ interface CustomFilter
         EntityManagerInterface $manager,
         GraphWalker $walter,
         RequestStack $requestStack,
+        IdsChecker $idsChecker,
         LoggerInterface $logger
     );
 
