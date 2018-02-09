@@ -13,7 +13,7 @@ class IdsChecker
 
     private $additionalFiltersIds;
 
-    private $objectFilter;
+    private $additionalFilter;
 
     private $filterKey;
 
@@ -34,9 +34,9 @@ class IdsChecker
         $this->additionalFiltersIds = $additionalFiltersIds;
     }
 
-    public function setObjectFilter(Filter $objectFilter)
+    public function setObjectFilter(Filter $additionalFilter)
     {
-        $this->objectFilter = $objectFilter;
+        $this->additionalFilter = $additionalFilter;
     }
 
     public function setFilterKey($filterKey)
@@ -46,27 +46,27 @@ class IdsChecker
 
     public function validateIds()
     {
-        $rawFilteredIds = $this->objectFilter->getIds();
+        $rawFilteredIds = $this->additionalFilter->getIds();
 
         foreach ($this->filtering as $key => $queryStringIds) {
-            $qsIds = explode(',', $queryStringIds);
-            $addFilIds = explode(',', $this->additionalFiltersIds);
-            foreach ($qsIds as $requestedId) {
-                if ($this->objectFilter->getOperator() == 'list') {
-                    if (!in_array($requestedId, $addFilIds)) {
+            $querystringIds = explode(',', $queryStringIds);
+            $additionalFiltersIds = explode(',', $this->additionalFiltersIds);
+            foreach ($querystringIds as $requestedId) {
+                if ($this->additionalFilter->getOperator() == 'list') {
+                    if (!in_array($requestedId, $additionalFiltersIds)) {
                         throw new ForbiddenContentException(
                             'Oops! Forbidden requested id ' . $requestedId
                             . ' is not available. '
-                            . 'Available are "' . join(', ', $addFilIds) . '"'
+                            . 'Available are "' . join(', ', $additionalFiltersIds) . '"'
                         );
                     }
                 }
 
-                if ($this->objectFilter->getOperator() == 'nlist') {
+                if ($this->additionalFilter->getOperator() == 'nlist') {
                     $queryStringOperator = explode('|', key($this->filtering));
-                    if (array_intersect($qsIds, $addFilIds) == []) {
-                        $this->filterKey = str_replace('nlist', 'list', $this->objectFilter->getRawFilter());
-                        $rawFilteredIds = join(',', $qsIds);
+                    if (array_intersect($querystringIds, $additionalFiltersIds) == []) {
+                        $this->filterKey = str_replace('nlist', 'list', $this->additionalFilter->getRawFilter());
+                        $rawFilteredIds = join(',', $querystringIds);
                         $this->idsMustBeSubset = false;
                     }
                 }
@@ -77,9 +77,9 @@ class IdsChecker
 
         if (true == $this->idsMustBeSubset) {
             foreach ($this->filtering as $key => $queryStringIds) {
-                $qsIds = explode(',', $queryStringIds);
-                $addFilIds = explode(',', $this->additionalFiltersIds);
-                $this->finalFilterIds = join(',', array_intersect($qsIds, $addFilIds));
+                $querystringIds = explode(',', $queryStringIds);
+                $additionalFiltersIds = explode(',', $this->additionalFiltersIds);
+                $this->finalFilterIds = join(',', array_intersect($querystringIds, $additionalFiltersIds));
             }
         }
     }
