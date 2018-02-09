@@ -11,8 +11,6 @@ class IdsChecker
 
     private $filtering;
 
-    private $additionalFiltersIds;
-
     private $additionalFilter;
 
     private $filterKey;
@@ -27,11 +25,6 @@ class IdsChecker
     public function setFiltering($filtering)
     {
         $this->filtering = $filtering;
-    }
-
-    public function setAdditionalFiltersIds($additionalFiltersIds)
-    {
-        $this->additionalFiltersIds = $additionalFiltersIds;
     }
 
     public function setObjectFilter(Filter $additionalFilter)
@@ -50,7 +43,7 @@ class IdsChecker
 
         foreach ($this->filtering as $key => $queryStringIds) {
             $querystringIds = explode(',', $queryStringIds);
-            $additionalFiltersIds = explode(',', $this->additionalFiltersIds);
+            $additionalFiltersIds = explode(',', $this->additionalFilter->getIds());
             foreach ($querystringIds as $requestedId) {
                 if ($this->additionalFilter->getOperator() == 'list') {
                     if (!in_array($requestedId, $additionalFiltersIds)) {
@@ -78,7 +71,7 @@ class IdsChecker
         if (true == $this->idsMustBeSubset) {
             foreach ($this->filtering as $key => $queryStringIds) {
                 $querystringIds = explode(',', $queryStringIds);
-                $additionalFiltersIds = explode(',', $this->additionalFiltersIds);
+                $additionalFiltersIds = explode(',', $this->additionalFilter->getIds());
                 $this->finalFilterIds = join(',', array_intersect($querystringIds, $additionalFiltersIds));
             }
         }

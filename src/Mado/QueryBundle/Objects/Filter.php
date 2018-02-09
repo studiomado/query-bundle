@@ -15,12 +15,14 @@ class Filter
         $rawIds    = $params['ids'];
         $operator  = key($rawIds);
         $ids       = join(',', current($rawIds));
-        $rawFilter = $params['path'] . '.id|' . $operator;
+        $path      = $params['path'];
+        $rawFilter = $path . '.id|' . $operator;
 
         return new self([
             'raw_filter' => $rawFilter,
             'ids'        => $ids,
             'operator'   => $operator,
+            'path'       => $path,
         ]);
     }
 
@@ -29,6 +31,7 @@ class Filter
         $this->rawFilter = $params['raw_filter'];
         $this->ids       = $params['ids'];
         $this->operator  = $params['operator'];
+        $this->path      = $params['path'];
     }
 
     public function getRawFilter()
@@ -44,5 +47,10 @@ class Filter
     public function getOperator()
     {
         return $this->operator;
+    }
+
+    public function getPath()
+    {
+        return $this->path;
     }
 }

@@ -21,7 +21,6 @@ final class IdsCheckerTest extends TestCase
 
         $cheker = new IdsChecker();
         $cheker->setObjectFilter($filter);
-        $cheker->setAdditionalFiltersIds($additionalFiltersIds);
         $cheker->setFiltering(['filtering' => $querystringIds]);
 
         $cheker->validateIds();
@@ -30,16 +29,14 @@ final class IdsCheckerTest extends TestCase
     public function testValidIdsOverwriteFilteringWithIntersection()
     {
         $querystringIds = '2';
-        $additionalFiltersIds = '2,3';
 
         $filter = Filter::box([
-            'ids'  => ['list' => []],
+            'ids'  => ['list' => [2,3]],
             'path' => '_embedded.foo.bar',
         ]);
 
         $cheker = new IdsChecker();
         $cheker->setObjectFilter($filter);
-        $cheker->setAdditionalFiltersIds($additionalFiltersIds);
         $cheker->setFiltering(['filtering' => $querystringIds]);
 
         $cheker->validateIds();
@@ -59,7 +56,6 @@ final class IdsCheckerTest extends TestCase
 
         $cheker = new IdsChecker();
         $cheker->setObjectFilter($additionalFilterObject);
-        $cheker->setAdditionalFiltersIds($additionalFiltersIds);
         $cheker->setFiltering(['field' => $querystringIds]);
 
         $cheker->validateIds();
@@ -79,7 +75,6 @@ final class IdsCheckerTest extends TestCase
 
         $cheker = new IdsChecker();
         $cheker->setObjectFilter($additionalFilterObject);
-        $cheker->setAdditionalFiltersIds($additionalFiltersIds);
         $cheker->setFiltering(['field' => $querystringIds]);
 
         $cheker->validateIds();
@@ -100,7 +95,6 @@ final class IdsCheckerTest extends TestCase
         $cheker = new IdsChecker();
         $cheker->setObjectFilter($additionalFilterObject);
         $cheker->setFilterKey('foo');
-        $cheker->setAdditionalFiltersIds($additionalFiltersIds);
         $cheker->setFiltering(['field' => $querystringIds]);
 
         $cheker->validateIds();
