@@ -27,6 +27,7 @@ class IdsChecker
         $this->idsMustBeSubset = true;
     }
 
+    /** @codeCoverageIgnore */
     public function setLogger(LoggerInterface $logger)
     {
         $this->logger = $logger;
@@ -54,7 +55,19 @@ class IdsChecker
 
     public function validateIds()
     {
-        $this->log('Start to check IDS');
+        //$this->log('Start to check IDS');
+
+        if (!$this->objectFilter) {
+            throw new \RuntimeException(
+                'Oops! Missing GenericFilter object!!!'
+            );
+        }
+
+        if (!$this->filtering) {
+            throw new \RuntimeException(
+                'Oops! Filtering is missing!!!'
+            );
+        }
 
         $rawFilteredIds = $this->objectFilter->getIds();
 
@@ -99,6 +112,11 @@ class IdsChecker
         ], true));
     }
 
+    public function idsAreSubset()
+    {
+        return $this->idsMustBeSubset;
+    }
+
     public function getFilterKey()
     {
         return $this->filterKey;
@@ -109,6 +127,7 @@ class IdsChecker
         return $this->finalFilterIds;
     }
 
+    /** @codeCoverageIgnore */
     public function log($message)
     {
         if ($this->logger) {

@@ -1,0 +1,33 @@
+<?php
+
+use Mado\QueryBundle\Services\IdsChecker;
+use PHPUnit\Framework\TestCase;
+
+final class IdsCheckerTest extends TestCase
+{
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Oops! Missing GenericFilter object!!!
+     */
+    public function testValidationNeedsGenericFilterInjection()
+    {
+        $filter = new IdsChecker();
+        $filter->validateIds();
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Oops! Filtering is missing!!!
+     */
+    public function testEnsureThatFilteringIsConfigured()
+    {
+        $this->genericFilter = $this
+            ->getMockBuilder('Mado\QueryBundle\Objects\Filter')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $filter = new IdsChecker();
+        $filter->setObjectFilter($this->genericFilter);
+        $filter->validateIds();
+    }
+}
