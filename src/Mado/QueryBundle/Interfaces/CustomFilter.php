@@ -22,7 +22,7 @@ interface CustomFilter
 
     public function allItemsTo(string $entity);
 
-    public function getPathTo(string $fullyqualifiedClassName);
+    public function getPathTo(string $fullyQualifiedClassName);
 
     public static function getEntityFromFilter(string $filterName);
 
