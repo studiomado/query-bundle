@@ -2,8 +2,9 @@
 
 namespace Mado\QueryBundle\Services;
 
-use Mado\QueryBundle\Objects\Filter;
 use Mado\QueryBundle\Exceptions\ForbiddenContentException;
+use Mado\QueryBundle\Objects\Filter;
+use Psr\Log\LoggerInterface;
 
 class IdsChecker
 {
@@ -16,6 +17,8 @@ class IdsChecker
     private $filterKey;
 
     private $finalFilterIds;
+
+    private $logger;
 
     public function __construct()
     {
@@ -41,20 +44,31 @@ class IdsChecker
     {
         $rawFilteredIds = $this->additionalFilter->getIds();
 
+        // guard
+        $chiave = key($this->filtering);
+        $chiaveEsplosa = explode('|' , $chiave);
+        if (!isset($chiaveEsplosa[1]) || !in_array($chiaveEsplosa[1], ['list', 'nlist'])) {
+            return;
+        }
+
+        // check
         foreach ($this->filtering as $key => $queryStringIds) {
             $querystringIds = explode(',', $queryStringIds);
             $additionalFiltersIds = explode(',', $this->additionalFilter->getIds());
             foreach ($querystringIds as $requestedId) {
+
+                // list + list
                 if ($this->additionalFilter->getOperator() == 'list') {
                     if (!in_array($requestedId, $additionalFiltersIds)) {
                         throw new ForbiddenContentException(
                             'Oops! Forbidden requested id ' . $requestedId
                             . ' is not available. '
-                            . 'Available are "' . join(', ', $additionalFiltersIds) . '"'
+                            . 'Available are ' . join(', ', $additionalFiltersIds) . ''
                         );
                     }
                 }
 
+                // list + nlist
                 if ($this->additionalFilter->getOperator() == 'nlist') {
                     $queryStringOperator = explode('|', key($this->filtering));
                     if (array_intersect($querystringIds, $additionalFiltersIds) == []) {
@@ -63,6 +77,12 @@ class IdsChecker
                         $this->idsMustBeSubset = false;
                     }
                 }
+
+
+                // nlist + list
+
+                // nlist + nlist
+
             }
         }
 
@@ -85,5 +105,17 @@ class IdsChecker
     public function getFinalFilterIds()
     {
         return $this->finalFilterIds;
+    }
+
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
+
+    public function log($message)
+    {
+        if ($this->logger) {
+            $this->logger->critical($message);
+        }
     }
 }
