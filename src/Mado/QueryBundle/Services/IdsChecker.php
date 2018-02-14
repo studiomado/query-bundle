@@ -48,6 +48,7 @@ class IdsChecker
         $chiave = key($this->filtering);
         $chiaveEsplosa = explode('|' , $chiave);
         if (!isset($chiaveEsplosa[1]) || !in_array($chiaveEsplosa[1], ['list', 'nlist'])) {
+            $this->finalFilterIds = $this->additionalFilter->getIds();
             return;
         }
 
