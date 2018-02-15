@@ -98,4 +98,19 @@ class Filter
 
         return $field;
     }
+
+    public static function fromQueryStringFilter(array $params)
+    {
+        return new self([
+            'raw_filter' => key($params),
+            'ids' => current($params),
+            'operator' => null,
+            'path' => null,
+        ]);
+    }
+
+    public function getValue()
+    {
+        return $this->ids;
+    }
 }
