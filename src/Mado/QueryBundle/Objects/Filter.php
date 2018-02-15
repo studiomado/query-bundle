@@ -60,8 +60,14 @@ class Filter
 
     public function withPath($path)
     {
+        $rawFilter = self::buildRawFilter($path, $this->operator);
+
+        if ($path == '') {
+            $rawFilter = str_replace('.', '', $rawFilter);
+        }
+
         return new self([
-            'raw_filter' => self::buildRawFilter($path, $this->operator),
+            'raw_filter' => $rawFilter,
             'ids'        => $this->ids,
             'operator'   => $this->operator,
             'path'       => $path,
