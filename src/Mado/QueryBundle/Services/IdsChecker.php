@@ -73,7 +73,7 @@ class IdsChecker
                 if ($this->additionalFilter->getOperator() == 'nlist') {
                     $queryStringOperator = explode('|', key($this->filtering));
                     if (array_intersect($querystringIds, $additionalFiltersIds) == []) {
-                        $this->filterKey = str_replace('nlist', 'list', $this->additionalFilter->getRawFilter());
+                        $this->filterKey = str_replace('nlist', 'list', $this->additionalFilter->getFieldAndOperator());
                         $rawFilteredIds = join(',', $querystringIds);
                         $this->idsMustBeSubset = false;
                     }

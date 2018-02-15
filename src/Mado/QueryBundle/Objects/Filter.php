@@ -13,9 +13,10 @@ class Filter
     public static function box(array $params)
     {
         $rawIds    = $params['ids'];
+        $path      = $params['path'];
+
         $operator  = key($rawIds);
         $ids       = join(',', current($rawIds));
-        $path      = $params['path'];
 
         return new self([
             'raw_filter' => self::buildRawFilter($path, $operator),
@@ -38,7 +39,7 @@ class Filter
         $this->path      = $params['path'];
     }
 
-    public function getRawFilter()
+    public function getFieldAndOperator()
     {
         return $this->rawFilter;
     }
@@ -87,5 +88,14 @@ class Filter
             'operator'   => $operator,
             'path'       => $path,
         ]);
+    }
+
+    public function getField()
+    {
+        $explodedPath = explode('|', $this->getFieldAndOperator());
+
+        $field = $explodedPath[0];
+
+        return $field;
     }
 }

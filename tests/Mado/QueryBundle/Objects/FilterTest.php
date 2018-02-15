@@ -15,7 +15,8 @@ class FilterTest extends TestCase
         $this->assertEquals('list',$f->getOperator());
         $this->assertEquals('path.to',$f->getPath());
         $this->assertEquals('2,3,4',$f->getIds());
-        $this->assertEquals('path.to.id|list',$f->getRawFilter());
+        $this->assertEquals('path.to.id|list',$f->getFieldAndOperator());
+        $this->assertEquals('path.to.id',$f->getField());
     }
 
     public function testAllowPathChange()
@@ -28,7 +29,8 @@ class FilterTest extends TestCase
         $new = $old->withPath('new.path');
 
         $this->assertEquals('new.path',$new->getPath());
-        $this->assertEquals('new.path.id|list',$new->getRawFilter());
+        $this->assertEquals('new.path.id|list',$new->getFieldAndOperator());
+        $this->assertEquals('new.path.id',$new->getField());
     }
 
     public function testAllowFullPathChange()
@@ -41,7 +43,8 @@ class FilterTest extends TestCase
         $new = $old->withFullPath('new.path|foo');
 
         $this->assertEquals('new.path',$new->getPath());
-        $this->assertEquals('new.path|foo',$new->getRawFilter());
+        $this->assertEquals('new.path|foo',$new->getFieldAndOperator());
+        $this->assertEquals('new.path',$new->getField());
     }
 
     public function testPathChangeEmpty()
@@ -54,6 +57,7 @@ class FilterTest extends TestCase
         $new = $old->withPath('');
 
         $this->assertEquals('',$new->getPath());
-        $this->assertEquals('id|list',$new->getRawFilter());
+        $this->assertEquals('id|list',$new->getFieldAndOperator());
+        $this->assertEquals('id',$new->getField());
     }
 }
