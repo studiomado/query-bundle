@@ -60,7 +60,7 @@ class FilterTest extends TestCase
         $this->assertEquals('id|list',$new->getFieldAndOperator());
         $this->assertEquals('id',$new->getField());
     }
-    
+
     public function testBuildFromQueryString()
     {
         $queryStringFilter = Filter::fromQueryStringFilter([
@@ -70,5 +70,6 @@ class FilterTest extends TestCase
         $this->assertEquals('_embedded.attributes.alfanumerico12|eq',$queryStringFilter->getFieldAndOperator());
         $this->assertEquals('_embedded.attributes.alfanumerico12',$queryStringFilter->getField());
         $this->assertEquals('GTK',$queryStringFilter->getValue());
-    }    
+        $this->assertEquals('eq',$queryStringFilter->getOperator());
+    }
 }

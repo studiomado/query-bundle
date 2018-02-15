@@ -104,7 +104,7 @@ class Filter
         return new self([
             'raw_filter' => key($params),
             'ids' => current($params),
-            'operator' => null,
+            'operator' => explode('|', key($params))[1],
             'path' => null,
         ]);
     }
