@@ -16,14 +16,18 @@ class Filter
         $operator  = key($rawIds);
         $ids       = join(',', current($rawIds));
         $path      = $params['path'];
-        $rawFilter = $path . '.id|' . $operator;
 
         return new self([
-            'raw_filter' => $rawFilter,
+            'raw_filter' => self::buildRawFilter($path, $operator),
             'ids'        => $ids,
             'operator'   => $operator,
             'path'       => $path,
         ]);
+    }
+
+    private static function buildRawFilter($path, $operator)
+    {
+        return $path . '.id|' . $operator;
     }
 
     private function __construct(array $params)
@@ -52,5 +56,30 @@ class Filter
     public function getPath()
     {
         return $this->path;
+    }
+
+    public function withPath($path)
+    {
+        return new self([
+            'raw_filter' => self::buildRawFilter($path, $this->operator),
+            'ids'        => $this->ids,
+            'operator'   => $this->operator,
+            'path'       => $path,
+        ]);
+    }
+
+    public function withFullPath($path)
+    {
+        $explodedPath = explode('|', $path);
+
+        $path = $explodedPath[0];
+        $operator = $explodedPath[1];
+
+        return new self([
+            'raw_filter' => join('|', $explodedPath),
+            'ids'        => $this->ids,
+            'operator'   => $operator,
+            'path'       => $path,
+        ]);
     }
 }
