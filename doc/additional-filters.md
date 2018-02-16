@@ -18,43 +18,31 @@ respect the interface `Mado\QueryBundle\Interfaces\CustomFilter`.
 You can create your custom filter using this syntax.
 
 ```php
-class YourCustomeFilter implements CustomFilter
+<?php
+
+namespace Mt\AdditionalFilters;
+
+class YourCustomFilter implements CustomFilter
 {
-    private $manager;
-
-    private $dijkstraWalker;
-
-    private $logger;
-
-    private $filter;
-
-    private $entity;
-
-    private $requestStack;
-
-    private $idsChecker;
-
-    private static $domainilterToDomainEntityMap = [
-      'filtername' => \Path\To\YourEntity::class,
+    private static $filterMap = [
+        'filter_name' => \Bundle\To\EntityClass::class,
     ];
 
     public function __construct(
         EntityManagerInterface $manager,
         GraphWalker $dijkstraWalker,
         RequestStack $requestStack,
-        IdsChecker $idsChecker,
         LoggerInterface $logger
     ) {
         $this->manager        = $manager;
         $this->dijkstraWalker = $dijkstraWalker;
         $this->requestStack   = $requestStack;
-        $this->idsChecker     = $idsChecker;
         $this->logger         = $logger;
     }
 
     public function setUser(AdditionalFilterable $user)
     {
-        $this->filter = FilterExtractor::fromUser($user);
+        $this->additionalFilters = AdditionalFilterExtractor::fromUser($user);
         return $this;
     }
 
@@ -63,52 +51,75 @@ class YourCustomeFilter implements CustomFilter
         $this->entity = $entity;
         $filters = [];
         $translations = [
-          'filtername' => [],
+            'filter_name' => [
+                'from' => '_embedded.shops.id',
+                'to' => 'id',
+            ],
         ];
-
         foreach ($translations as $filterName => $filterTranslation) {
-            if ($this->filter->getFilters($filterName) != '') {
-                $genericFilter = Filter::box([
-                    'ids'  => $this->filter->getFilters($filterName),
-                    'path' => $this->getPathTo($filterName),
+            if ($this->additionalFilters->getFilters($filterName) != '') {
+                $path = $this->getPathTo($filterName);
+                $genericAdditionalFilter = Filter::box([
+                    'ids'  => $this->additionalFilters->getFilters($filterName),
+                    'path' => $path,
                 ]);
-
-                $filterKey = $genericFilter->getRawFilter();
-                $this->idsChecker->setFilterKey($filterKey);
-
-                $afWithOperator = $this->filter->getFilters($filterName);
-                $afOperator = $genericFilter->getOperator();
-                $additionalFiltersIds = join(',', $afWithOperator[$afOperator]);
-                $filtering = $this->requestStack
-                    ->getCurrentRequest()
-                    ->query
-                    ->get('filtering', []);
-                $rawFilteredIds = $genericFilter->getIds();
-                $idsMustBeSubset = true;
-                $this->idsChecker->setObjectFilter($genericFilter);
-                $this->idsChecker->setFiltering($filtering);
-                $this->idsChecker->validateIds();
-
-                $filters[$this->idsChecker->getFilterKey()] = $this->idsChecker->getFinalFilterIds();
+                $filterKey = $genericAdditionalFilter->getFieldAndOperator();
+                if ([] != $filterTranslation) {
+                    if ($filterKey == $filterTranslation['from'] . '|' . $genericAdditionalFilter->getOperator()) {
+                        $filterKey = $filterTranslation['to'] . '|' . $genericAdditionalFilter->getOperator();
+                        $genericAdditionalFilter = $genericAdditionalFilter->withFullPath($filterKey);
+                    }
+                }
+                $filtering = $this->requestStack->getCurrentRequest()->query->get('filtering', []);
+                $haveCheckedAdditionalFilters = false;
+                $field = $genericAdditionalFilter->getField();
+                foreach( $filtering as $filterKey => $value) {
+                    $genericQueryStringFilter = Filter::fromQueryStringFilter([
+                        $filterKey =>  $value
+                    ]);
+                    if ($genericAdditionalFilter->getField() == $genericQueryStringFilter->getField()) {
+                        if (
+                            $genericAdditionalFilter->getOperator() == 'list'
+                            && $genericAdditionalFilter->getOperator() == $genericQueryStringFilter->getOperator() 
+                        ) {
+                            $haveCheckedAdditionalFilters = true;
+                            $additionalFiltersIds = explode(',', $genericAdditionalFilter->getIds());
+                            $querystringIds = explode(',', $genericQueryStringFilter->getIds());
+                            $intersection = array_intersect($querystringIds, $additionalFiltersIds);
+                            $ids = join(',', $intersection);
+                            if ($intersection == []) {
+                                throw new ForbiddenContentException(
+                                    'Oops! Forbidden requested id ' . $value
+                                    . ' is not available. Available are '
+                                    . $genericAdditionalFilter->getIds()
+                                );
+                            }
+                            $filters[$genericAdditionalFilter->getFieldAndOperator()] = $ids;
+                        }
+                    }
+                }
+                if (!$haveCheckedAdditionalFilters) {
+                    $ids = $genericAdditionalFilter->getIds();
+                    $filters[$genericAdditionalFilter->getFieldAndOperator()] = $ids;
+                }
             }
         }
 
         return $filters;
     }
 
-    public function getPathTo(string $domainFilter)
+    public function getPathTo(string $filter)
     {
-        $domainEntity = self::getEntityFromFilter($domainFilter);
         $this->dijkstraWalker->buildPathBetween(
             $this->entity,
-            $domainEntity
+            self::getEntityFromFilter($filter)
         );
         return $this->dijkstraWalker->getPath();
     }
 
     public static function getEntityFromFilter(string $filterName)
     {
-        return self::$domainilterToDomainEntityMap[$filterName];
+        return self::$filterMap[$filterName];
     }
 
     public function setEntity(string $entity)
