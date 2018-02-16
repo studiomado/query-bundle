@@ -258,7 +258,20 @@ class BaseRepository extends EntityRepository
         $this->queryBuilderFactory->filter();
         $this->queryBuilderFactory->sort();
 
-        return $this->paginateResults($this->queryBuilderFactory->getQueryBuilder());
+        $queryBuilder = $this->queryBuilderFactory->getQueryBuilder();
+
+        $this->lastQuery = $queryBuilder->getQuery()->getSql();
+        $this->lastParameters = $queryBuilder->getQuery()->getParameters();
+
+        return $this->paginateResults($queryBuilder);
+    }
+
+    public function getLastQuery()
+    {
+        return [
+            'query' => $this->lastQuery,
+            'params' =>  $this->lastParameters,
+        ];
     }
 
     protected function paginateResults(
