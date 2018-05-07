@@ -93,9 +93,11 @@ First of all install vendors
     prompt> composer require jms/serializer-bundle
     prompt> composer require willdurand/hateoas-bundle
     prompt> composer require white-october/pagerfanta-bundle
+    prompt> composer require friendsofsymfony/rest-bundle
 
 and then, … add vendors in your app/AppKernel 
 
+    new FOS\RestBundle\FOSRestBundle(),
     new JMS\SerializerBundle\JMSSerializerBundle(),
     new Bazinga\Bundle\HateoasBundle\BazingaHateoasBundle(),
 
