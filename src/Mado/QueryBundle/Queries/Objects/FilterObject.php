@@ -55,7 +55,7 @@ final class FilterObject
             || $this->getOperatorName() == 'nlist';
     }
 
-    public function isFieldEqualityType() :bool
+    public function isFieldEqualityType() : bool
     {
         return $this->getOperatorName() == 'field_eq';
     }
