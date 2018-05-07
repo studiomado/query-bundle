@@ -32,15 +32,26 @@ class BaseRepository extends EntityRepository
 
     protected $metadata;
 
-    public function __construct($manager, $class)
+    public function __construct($manager, $classMetadata)
     {
-        parent::__construct($manager, $class);
+        parent::__construct($manager, $classMetadata);
 
-        $this->metadata = new MetaDataAdapter();
-        $this->metadata->setClassMetadata($this->getClassMetadata());
-        $this->metadata->setEntityName($this->getEntityName());
+        $this->metadata = $this(new MetaDataAdapter(), $this);
 
-        $this->queryBuilderFactory = new QueryBuilderFactory($this->getEntityManager());
+        $this->queryBuilderFactory = new QueryBuilderFactory(
+            $this->getEntityManager()
+        );
+    }
+
+    /** @since version 2.2 */
+    public function __invoke(
+        MetaDataAdapter $metadata,
+        BaseRepository $repository
+    ) {
+        $metadata->setClassMetadata($repository->getClassMetadata());
+        $metadata->setEntityName($repository->getEntityName());
+
+        return $metadata;
     }
 
     public function initFromQueryBuilderOptions(QueryBuilderOptions $options)
@@ -58,6 +69,12 @@ class BaseRepository extends EntityRepository
 
     public function getQueryBuilderFactory()
     {
+        if (!$this->queryOptions) {
+            throw new \RuntimeException(
+                'Oops! QueryBuilderOptions is missing'
+            );
+        }
+
         $this->initFromQueryBuilderOptions($this->queryOptions);
 
         return $this->queryBuilderFactory;
