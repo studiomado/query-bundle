@@ -51,8 +51,10 @@ final class FilterObject
 
     public function isListType() : bool
     {
-        return $this->getOperatorName() == 'list'
-            || $this->getOperatorName() == 'nlist';
+        return in_array(
+            $this->getOperatorName(),
+            $listOperators = ['list', 'nlist']
+        );
     }
 
     public function isFieldEqualityType() : bool
