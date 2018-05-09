@@ -15,9 +15,12 @@ Choose the right branch
 Before open your pull request, you must determine on which branch you need to
 work.
 
- * if it contains a bug fix, refactoring or simply some code improvements must
-   be opened against latest minor release branch. If latest stable version is
+ * if it contains a fix, refactoring or simply some code improvements must be
+   opened against latest minor release branch. If latest stable version is
    `v2.2.3`, pull request must be opened starting from branch 2.2;
+     
+   * once new branch is merged to version 2.2 a new tag can should be created
+     in this branch.
 
    * every time new version is released, that version must be merged to the
      upper minor branch (if exists) until master branch. This allow to keep all
