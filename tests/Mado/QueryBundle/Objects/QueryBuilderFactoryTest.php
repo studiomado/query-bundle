@@ -344,7 +344,7 @@ class QueryBuilderFactoryTest extends TestCase
         $this->assertEquals($select, $selectReturned);
     }
 
-    public function testListOnEmbedded()
+    public function testListOnEmbeddedOrFilter()
     {
         $queryBuilderFactory = new QueryBuilderFactory($this->manager);
         $queryBuilderFactory->setFields([ 'id' ]);
@@ -361,7 +361,7 @@ class QueryBuilderFactoryTest extends TestCase
             . "u0_.username AS username_1, "
             . "u0_.group_id AS group_id_2 "
             . "FROM User u0_ "
-            . "INNER JOIN Group g1_ ON u0_.group_id = g1_.id "
+            . "LEFT JOIN Group g1_ ON u0_.group_id = g1_.id "
             . "WHERE g1_.id IN (?)",
             $queryBuilderFactory->getQueryBuilder()->getQuery()->getSql()
         );
@@ -466,7 +466,7 @@ class QueryBuilderFactoryTest extends TestCase
             " u0_.username AS username_1," .
             " u0_.group_id AS group_id_2 " .
             "FROM User u0_ " .
-            "INNER JOIN Group g1_ ON u0_.group_id = g1_.id " .
+            "LEFT JOIN Group g1_ ON u0_.group_id = g1_.id " .
             "WHERE g1_.name LIKE ? " .
             "OR g1_.name LIKE ? " .
             "OR g1_.name LIKE ? " .
@@ -569,7 +569,7 @@ class QueryBuilderFactoryTest extends TestCase
             ->with('EntityName')
             ->willReturn($this->queryBuilder);
         $this->queryBuilder->expects($this->once())
-            ->method('join')
+            ->method('innerJoin')
             ->with('alias.ciao', 'table_fizz');
 
         $this->metadata = $this
@@ -630,6 +630,92 @@ class QueryBuilderFactoryTest extends TestCase
             ['group', 'foo'],
             $queryBuilderFactory->getRel()
         );
+    }
+
+    public function testAndFilterUseInnerJoin()
+    {
+        $expectJoinType = 'innerJoin';
+
+        $this->queryBuilder = $this
+            ->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->queryBuilder
+            ->method('select')
+            ->willReturn($this->queryBuilder);
+        $this->queryBuilder
+            ->method('from')
+            ->willReturn($this->queryBuilder);
+        $this->queryBuilder->expects($this->once())
+            ->method($expectJoinType)
+            ->with('alias.baz', 'table_foo');
+
+        $this->prepareDataForFilter();
+
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setFields([ 'id' ]);
+        $queryBuilderFactory->createQueryBuilder('EntityName', 'alias');
+        $queryBuilderFactory->setAndFilters([ '_embedded.foo.baz|eq' => 'bar' ]);
+        $queryBuilderFactory->filter();
+    }
+
+    public function testOrFilterUseLeftJoin()
+    {
+        $expectJoinType = 'leftJoin';
+
+        $this->queryBuilder = $this
+            ->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->queryBuilder
+            ->method('select')
+            ->willReturn($this->queryBuilder);
+        $this->queryBuilder
+            ->method('from')
+            ->willReturn($this->queryBuilder);
+        $this->queryBuilder->expects($this->once())
+            ->method($expectJoinType)
+            ->with('alias.baz', 'table_foo');
+
+        $this->prepareDataForFilter();
+
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setFields([ 'id' ]);
+        $queryBuilderFactory->createQueryBuilder('EntityName', 'alias');
+        $queryBuilderFactory->setOrFilters([ '_embedded.foo.baz|eq' => 'bar' ]);
+        $queryBuilderFactory->filter();
+    }
+
+    private function prepareDataForFilter()
+    {
+        $this->metadata = $this
+            ->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->metadata
+            ->method('hasAssociation')
+            ->with('foo')
+            ->willReturn(true);
+        $this->metadata
+            ->method('getAssociationMapping')
+            ->with('foo')
+            ->willReturn([
+                'fieldName'    => 'baz',
+                'targetEntity' => 'someEntityName',
+            ]);
+
+        $this->manager = $this
+            ->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->manager
+            ->method('createQueryBuilder')
+            ->with('EntityName')
+            ->willReturn($this->queryBuilder);
+        $this->manager
+            ->method('getClassMetadata')
+            ->with('EntityName')
+            ->willReturn($this->metadata);
     }
 }
 
