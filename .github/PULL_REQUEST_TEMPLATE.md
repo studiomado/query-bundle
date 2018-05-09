@@ -1,11 +1,14 @@
 | Q             | A
 | ------------- | ---
-| Branch?       | master for features / x.y for bug fixes <!-- see below -->
+| Branch?       | master
+| Version?      | (x.y) <!-- check composer.json file -->
 | Bug/Hotfix?   | yes/no
-| Refactoring?  | yes/no
-| New feature?  | yes/no <!-- don't forget to update src/**/CHANGELOG.md files -->
+| Refactoring?  | yes <!-- explain -->
+| New feature?  | yes <!-- don't forget to update src/**/CHANGELOG.md files -->
+| New feature?  | no <!-- don't update src/**/CHANGELOG.md files -->
 | BC breaks?    | yes/no
-| Deprecations? | yes/no <!-- don't forget to update UPGRADE-*.md files -->
+| Deprecations? | yes <!-- don't forget to update UPGRADE-*.md files -->
+| Deprecations? | no <!-- don't update UPGRADE-*.md files -->
 | Tests pass?   | yes/no
 
 <!-- Bug fixes must be submitted against the minor branch affected         -->
