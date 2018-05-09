@@ -275,19 +275,13 @@ class QueryBuilderFactory extends AbstractQuery
             $this->join($filterObject->getRawFilter());
             $relationEntityAlias = $this->getRelationEntityAlias();
 
-            $embeddedFields = explode('.', $filterObject->getFieldName());
-            $embeddedFieldName = $this->parser->camelize($embeddedFields[count($embeddedFields) - 1]);
+            $whereConditionObject = Objects\WhereCondition::fromFilterObject(
+                $this->parser,
+                $filterObject,
+                $relationEntityAlias
+            );
 
-            $salt = '_' . random_int(111, 999);
-
-            $whereCondition = $relationEntityAlias . '.' . $embeddedFieldName . ' '
-                . $filterObject->getOperatorMeta();
-
-            if ($filterObject->isListType()) {
-                $whereCondition .= ' (:field_' . $embeddedFieldName . $salt . ')';
-            } else {
-                $whereCondition .= ' :field_' . $embeddedFieldName . $salt;
-            }
+            $whereCondition = $whereConditionObject->getWhereCondition();
 
             $this->qBuilder->andWhere($whereCondition);
             if ($filterObject->haveOperatorSubstitutionPattern()) {
@@ -302,7 +296,10 @@ class QueryBuilderFactory extends AbstractQuery
                 }
             }
 
-            $this->qBuilder->setParameter('field_' . $embeddedFieldName . $salt, $value);
+            $this->qBuilder->setParameter(
+                $whereConditionObject->getParameterName(),
+                $value
+            );
         }
     }
 
