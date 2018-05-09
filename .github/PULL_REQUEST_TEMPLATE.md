@@ -2,8 +2,8 @@
 | ------------- | ---
 | Branch?       | master
 | Version?      | (x.y) <!-- check composer.json file -->
-| Bug/Hotfix?   | yes  <!-- don't forget to update src/**/CHANGELOG.md file -->
-| Bug/Hotfix?   | yes  <!-- don't update src/**/CHANGELOG.md file -->
+| Hotfix?       | yes  <!-- don't forget to update src/**/CHANGELOG.md file -->
+| Hotfix?       | no  <!-- don't update src/**/CHANGELOG.md file -->
 | Refactoring?  | yes <!-- explain -->
 | New feature?  | yes <!-- don't forget to update src/**/CHANGELOG.md file -->
 | New feature?  | no <!-- don't update src/**/CHANGELOG.md file -->
