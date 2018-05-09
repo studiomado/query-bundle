@@ -17,6 +17,10 @@ class QueryBuilderFactory extends AbstractQuery
 
     const DEFAULT_OPERATOR = 'eq';
 
+    private const AND_OPERATOR_LOGIC = 'AND';
+
+    private const OR_OPERATOR_LOGIC = 'OR';
+
     protected $qBuilder;
 
     protected $fields;
@@ -122,7 +126,7 @@ class QueryBuilderFactory extends AbstractQuery
      * @param String $relation Nome della relazione semplice (groups.name) o con embedded (_embedded.groups.name)
      * @return $this
      */
-    public function join(String $relation, $logicOperator = 'AND')
+    public function join(String $relation, $logicOperator = self::AND_OPERATOR_LOGIC)
     {
         $relation = explode('|', $relation)[0];
         $relations = [$relation];
@@ -157,9 +161,9 @@ class QueryBuilderFactory extends AbstractQuery
                 $fieldName = $this->parser->camelize($association['fieldName']);
 
                 if ($this->noExistsJoin($relationEntityAlias, $relation)) {
-                    if ($logicOperator == 'AND') {
+                    if ($logicOperator === self::AND_OPERATOR_LOGIC) {
                         $this->qBuilder->innerJoin($entityAlias . "." . $fieldName, $relationEntityAlias);
-                    } elseif ($logicOperator == 'OR') {
+                    } elseif ($logicOperator === self::OR_OPERATOR_LOGIC) {
                         $this->qBuilder->leftJoin($entityAlias . "." . $fieldName, $relationEntityAlias);
                     } else {
                         throw new Exceptions('Missing Logic operator');
@@ -361,7 +365,7 @@ class QueryBuilderFactory extends AbstractQuery
         // esempio per users: filtering[_embedded.groups.name|eq]=admin
         if (strstr($filterObject->getRawFilter(), '_embedded.')) {
 
-            $this->join($filterObject->getRawFilter(), 'OR');
+            $this->join($filterObject->getRawFilter(), self::OR_OPERATOR_LOGIC);
             $relationEntityAlias = $this->getRelationEntityAlias();
 
             $embeddedFields = explode('.', $filterObject->getFieldName());

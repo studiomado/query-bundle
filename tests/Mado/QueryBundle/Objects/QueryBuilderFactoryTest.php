@@ -632,30 +632,10 @@ class QueryBuilderFactoryTest extends TestCase
         );
     }
 
-    public function testAndFilterGenerateInnerJoin()
+    public function testAndFilterUseInnerJoin()
     {
-        $this->prepareDataForFilter('innerJoin');
+        $expectJoinType = 'innerJoin';
 
-        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
-        $queryBuilderFactory->setFields([ 'id' ]);
-        $queryBuilderFactory->createQueryBuilder('EntityName', 'alias');
-        $queryBuilderFactory->setAndFilters([ '_embedded.foo.baz|eq' => 'bar' ]);
-        $queryBuilderFactory->filter();
-    }
-
-    public function testOrFilterGenerateLeftJoin()
-    {
-        $this->prepareDataForFilter('leftJoin');
-
-        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
-        $queryBuilderFactory->setFields([ 'id' ]);
-        $queryBuilderFactory->createQueryBuilder('EntityName', 'alias');
-        $queryBuilderFactory->setOrFilters([ '_embedded.foo.baz|eq' => 'bar' ]);
-        $queryBuilderFactory->filter();
-    }
-
-    private function prepareDataForFilter($joinType)
-    {
         $this->queryBuilder = $this
             ->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->disableOriginalConstructor()
@@ -667,9 +647,47 @@ class QueryBuilderFactoryTest extends TestCase
             ->method('from')
             ->willReturn($this->queryBuilder);
         $this->queryBuilder->expects($this->once())
-            ->method($joinType)
+            ->method($expectJoinType)
             ->with('alias.baz', 'table_foo');
 
+        $this->prepareDataForFilter();
+
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setFields([ 'id' ]);
+        $queryBuilderFactory->createQueryBuilder('EntityName', 'alias');
+        $queryBuilderFactory->setAndFilters([ '_embedded.foo.baz|eq' => 'bar' ]);
+        $queryBuilderFactory->filter();
+    }
+
+    public function testOrFilterUseLeftJoin()
+    {
+        $expectJoinType = 'leftJoin';
+
+        $this->queryBuilder = $this
+            ->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->queryBuilder
+            ->method('select')
+            ->willReturn($this->queryBuilder);
+        $this->queryBuilder
+            ->method('from')
+            ->willReturn($this->queryBuilder);
+        $this->queryBuilder->expects($this->once())
+            ->method($expectJoinType)
+            ->with('alias.baz', 'table_foo');
+
+        $this->prepareDataForFilter();
+
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setFields([ 'id' ]);
+        $queryBuilderFactory->createQueryBuilder('EntityName', 'alias');
+        $queryBuilderFactory->setOrFilters([ '_embedded.foo.baz|eq' => 'bar' ]);
+        $queryBuilderFactory->filter();
+    }
+
+    private function prepareDataForFilter()
+    {
         $this->metadata = $this
             ->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
             ->disableOriginalConstructor()
