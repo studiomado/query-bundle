@@ -52,6 +52,12 @@ class Dictionary
         'field_eq' => [
             'meta' => '=',
         ],
+        'isnull' => [
+            'meta' => 'IS NULL',
+        ],
+        'isnotnull' => [
+            'meta' => 'IS NOT NULL',
+        ],
     ];
 
     public static function getOperators()

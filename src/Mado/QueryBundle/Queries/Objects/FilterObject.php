@@ -93,4 +93,9 @@ final class FilterObject
     {
         return $this->operatorName;
     }
+
+    public function isNullType() : bool
+    {
+        return $this->getOperatorName() === 'isnull' || $this->getOperatorName() === 'isnotnull';
+    }
 }
