@@ -242,10 +242,12 @@ class QueryBuilderFactory extends AbstractQuery
                 $whereCondition .= ' (:field_' . $filterObject->getFieldName() . $salt . ')';
             } elseif ($filterObject->isFieldEqualityType()) {
                 $whereCondition .= ' ' . $this->entityAlias . '.' . $value;
+            } elseif ($filterObject->isNullType()) {
+                $whereCondition .= ' ';
             } else {
                 $whereCondition .= ' :field_' . $filterObject->getFieldName() . $salt;
             }
-
+            
             $this->qBuilder->andWhere($whereCondition);
 
             if ($filterObject->haveOperatorSubstitutionPattern()) {
@@ -260,7 +262,9 @@ class QueryBuilderFactory extends AbstractQuery
                 }
             }
 
-            $this->qBuilder->setParameter('field_' . $filterObject->getFieldName() . $salt, $value);
+            if (!$filterObject->isNullType()) {
+                $this->qBuilder->setParameter('field_' . $filterObject->getFieldName() . $salt, $value);
+            }
         } else {
             if (strpos($filterObject->getFieldName(), 'Embedded.') === false) {
                 $whereCondition .= ' ' . $this->entityAlias . '.' . $value;
@@ -285,6 +289,8 @@ class QueryBuilderFactory extends AbstractQuery
 
             if ($filterObject->isListType()) {
                 $whereCondition .= ' (:field_' . $embeddedFieldName . $salt . ')';
+            } elseif ($filterObject->isNullType()) {
+                $whereCondition .= ' ';
             } else {
                 $whereCondition .= ' :field_' . $embeddedFieldName . $salt;
             }
@@ -301,8 +307,10 @@ class QueryBuilderFactory extends AbstractQuery
                     );
                 }
             }
-
-            $this->qBuilder->setParameter('field_' . $embeddedFieldName . $salt, $value);
+            
+            if (!$filterObject->isNullType()) {
+                $this->qBuilder->setParameter('field_' . $embeddedFieldName . $salt, $value);
+            }
         }
     }
 
@@ -323,6 +331,8 @@ class QueryBuilderFactory extends AbstractQuery
                 $whereCondition .= ' (:field_' . $filterObject->getFieldName() . $salt . ')';
             } else if ($filterObject->isFieldEqualityType()) {
                 $whereCondition .= $this->entityAlias . '.' . $value;
+            } elseif ($filterObject->isNullType()) {
+                $whereCondition .= ' ';
             } else {
                 $whereCondition .= ' :field_' . $filterObject->getFieldName() . $salt;
             }
@@ -378,6 +388,8 @@ class QueryBuilderFactory extends AbstractQuery
 
             if ($filterObject->isListType()) {
                 $whereCondition .= ' (:field_' . $embeddableFieldName . $salt . ')';
+            } elseif ($filterObject->isNullType()) {
+                $whereCondition .= ' ';
             } else {
                 $whereCondition .= ' :field_' . $embeddableFieldName . $salt;
             }
@@ -400,10 +412,12 @@ class QueryBuilderFactory extends AbstractQuery
                 }
             }
 
-            $orCondition['parameters'][] = [
-                'field' => 'field_' . $embeddableFieldName . $salt,
-                'value' => $value
-            ];
+            //if (!$filterObject->isNullType()) {
+                $orCondition['parameters'][] = [
+                    'field' => 'field_' . $embeddableFieldName . $salt,
+                    'value' => $value
+                ];
+            //}
         }
 
         return $orCondition;
