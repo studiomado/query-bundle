@@ -355,10 +355,12 @@ class QueryBuilderFactory extends AbstractQuery
                 }
             }
 
-            $orCondition['parameters'][] = [
-                'field' => 'field_' . $filterObject->getFieldName() . $salt,
-                'value' => $value
-            ];
+            if (!$filterObject->isNullType()) {
+                $orCondition['parameters'][] = [
+                    'field' => 'field_' . $filterObject->getFieldName() . $salt,
+                    'value' => $value
+                ];
+            }
         } else {
             $isNotARelation = 0 !== strpos($filterObject->getFieldName(), 'Embedded.');
             if ($isNotARelation) {
@@ -412,12 +414,12 @@ class QueryBuilderFactory extends AbstractQuery
                 }
             }
 
-            //if (!$filterObject->isNullType()) {
+            if (!$filterObject->isNullType()) {
                 $orCondition['parameters'][] = [
                     'field' => 'field_' . $embeddableFieldName . $salt,
                     'value' => $value
                 ];
-            //}
+            }
         }
 
         return $orCondition;
