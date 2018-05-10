@@ -804,8 +804,6 @@ class QueryBuilderFactoryTest extends TestCase
         );
     }
 
-    //---
-
     public function testFilteringWithIsNotNull()
     {
         $queryBuilderFactory = new QueryBuilderFactory($this->manager);
