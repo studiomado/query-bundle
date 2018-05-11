@@ -1,7 +1,7 @@
 | Q             | A
 | ------------- | ---
 | Branch?       | master
-| Version?      | (x.y) <!-- check composer.json file -->
+| Minor version?      | (x.y) <!-- check composer.json file -->
 | Hotfix?       | yes  <!-- don't forget to update src/**/CHANGELOG.md file -->
 | Hotfix?       | no  <!-- don't update src/**/CHANGELOG.md file -->
 | Refactoring?  | yes <!-- explain -->
