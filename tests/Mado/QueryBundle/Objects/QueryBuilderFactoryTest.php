@@ -546,7 +546,6 @@ class QueryBuilderFactoryTest extends TestCase
             ->getMock();
         $this->manager->expects($this->once())
             ->method('createQueryBuilder')
-            ->with('EntityName')
             ->willReturn($this->queryBuilder);
 
         $queryBuilderFactory = new QueryBuilderFactory($this->manager);
@@ -596,7 +595,6 @@ class QueryBuilderFactoryTest extends TestCase
             ->getMock();
         $this->manager->expects($this->once())
             ->method('createQueryBuilder')
-            ->with('EntityName')
             ->willReturn($this->queryBuilder);
         $this->manager->expects($this->once())
             ->method('getClassMetadata')
@@ -712,7 +710,6 @@ class QueryBuilderFactoryTest extends TestCase
             ->getMock();
         $this->manager
             ->method('createQueryBuilder')
-            ->with('EntityName')
             ->willReturn($this->queryBuilder);
         $this->manager
             ->method('getClassMetadata')
