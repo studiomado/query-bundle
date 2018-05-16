@@ -33,7 +33,7 @@ class AbstractQuery
         $this->entityName = $entityName;
         $this->entityAlias = $alias;
 
-        $this->qBuilder = $this->manager->createQueryBuilder($this->entityName)
+        $this->qBuilder = $this->manager->createQueryBuilder()
             ->select($select)
             ->groupBy($groupBy);
     }
@@ -43,7 +43,7 @@ class AbstractQuery
         $this->entityName = $entityName;
         $this->entityAlias = $alias;
 
-        $this->qBuilder = $this->manager->createQueryBuilder($this->entityName)
+        $this->qBuilder = $this->manager->createQueryBuilder()
             ->select($alias)
             ->from($this->entityName, $alias);
     }
