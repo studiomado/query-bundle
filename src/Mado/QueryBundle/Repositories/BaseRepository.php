@@ -17,9 +17,9 @@ class BaseRepository extends EntityRepository
 {
     protected $request;
 
-    protected $use_result_cache = false;
+    protected $useResultCache = false;
 
-    protected $route_name;
+    protected $routeName;
 
     protected $currentEntityAlias;
 
@@ -66,7 +66,7 @@ class BaseRepository extends EntityRepository
 
     public function useResultCache($bool)
     {
-        $this->use_result_cache = $bool;
+        $this->useResultCache = $bool;
     }
 
     public function setRequest(Request $request)
@@ -243,9 +243,9 @@ class BaseRepository extends EntityRepository
         return $this->request;
     }
 
-    public function setRouteName($route_name = '')
+    public function setRouteName($routeName = '')
     {
-        $this->route_name = $route_name;
+        $this->routeName = $routeName;
         return $this;
     }
 
@@ -266,7 +266,7 @@ class BaseRepository extends EntityRepository
         $pagerAdapter = new DoctrineORMAdapter($queryBuilder);
 
         $query = $pagerAdapter->getQuery();
-        if (isset($this->use_result_cache) and $this->use_result_cache) {
+        if (isset($this->useResultCache) && $this->useResultCache) {
             $query->useResultCache(true, 600);
         }
 
@@ -278,7 +278,7 @@ class BaseRepository extends EntityRepository
         $pagerFactory = new PagerfantaFactory();
 
         $router = new Router();
-        $route = $router->createRouter($this->queryOptions, $this->route_name);
+        $route = $router->createRouter($this->queryOptions, $this->routeName);
 
         return $pagerFactory->createRepresentation($pager, $route);
     }
