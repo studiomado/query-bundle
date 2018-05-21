@@ -6,11 +6,11 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Hateoas\Representation\Factory\PagerfantaFactory;
 use Mado\QueryBundle\Objects\MetaDataAdapter;
+use Mado\QueryBundle\Objects\PagerfantaBuilder;
 use Mado\QueryBundle\Queries\QueryBuilderFactory;
 use Mado\QueryBundle\Queries\QueryBuilderOptions;
-use Mado\QueryBundle\Services\Router;
+use Mado\QueryBundle\Services\Pager;
 use Pagerfanta\Adapter\DoctrineORMAdapter;
-use Pagerfanta\Pagerfanta;
 use Symfony\Component\HttpFoundation\Request;
 
 class BaseRepository extends EntityRepository
@@ -259,28 +259,18 @@ class BaseRepository extends EntityRepository
         return $this->paginateResults($this->queryBuilderFactory->getQueryBuilder());
     }
 
-    protected function paginateResults(QueryBuilder $queryBuilder) {
-        $limit = $this->queryOptions->get('limit', 10);
-        $page = $this->queryOptions->get('page', 1);
-
-        $pagerAdapter = new DoctrineORMAdapter($queryBuilder);
-
-        $query = $pagerAdapter->getQuery();
-        if (isset($this->useResultCache) && $this->useResultCache) {
-            $query->useResultCache(true, 600);
-        }
-
-        $pager = new Pagerfanta($pagerAdapter);
-        $pager->setNormalizeOutOfRangePages(true);
-        $pager->setMaxPerPage($limit);
-        $pager->setCurrentPage($page);
-
-        $pagerFactory = new PagerfantaFactory();
-
-        $router = new Router();
-        $route = $router->createRouter($this->queryOptions, $this->routeName);
-
-        return $pagerFactory->createRepresentation($pager, $route);
+    protected function paginateResults(QueryBuilder $queryBuilder)
+    {
+        $ormAdapter = new DoctrineORMAdapter($queryBuilder);
+        $pagerfantaBuilder = new PagerfantaBuilder(new PagerfantaFactory(), $ormAdapter);
+        $pager = new Pager();
+        return $pager->paginateResults(
+            $this->queryOptions,
+            $ormAdapter,
+            $pagerfantaBuilder,
+            $this->routeName,
+            $this->useResultCache
+        );
     }
 
     protected function getCurrentEntityAlias() : string
