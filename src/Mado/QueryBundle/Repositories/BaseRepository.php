@@ -147,10 +147,16 @@ class BaseRepository extends EntityRepository
         return $this;
     }
 
-    private function ensureFilterIsValid($filters )
+    private function ensureFilterIsValid($filters)
     {
         if (!is_array($filters)) {
-            throw new InvalidFiltersException("Wrong query string exception: " . var_export($filters, true) . "\n Please check query string should be something like this http://127.0.0.1:8000/?filtering[status]=todo");
+
+            $message = "Wrong query string exception: ";
+            $message .= var_export($filters, true) . "\n";
+            $message .= "Please check query string should be something like " .
+                "http://127.0.0.1:8000/?filtering[status]=todo";
+
+            throw new InvalidFiltersException($message);
         }
     }
 
