@@ -7,7 +7,7 @@ use Mado\QueryBundle\Objects\MetaDataAdapter;
 use Mado\QueryBundle\Queries\QueryBuilderOptions;
 use Mado\QueryBundle\Services\StringParser;
 
-class AbstractQuery
+abstract class AbstractQuery
 {
     protected $manager;
 
@@ -66,4 +66,12 @@ class AbstractQuery
         $this->setPrinting($options->getPrinting());
         $this->setSelect($options->getSelect());
     }
+
+    abstract public function setFields(array $fields = []);
+    abstract public function setAndFilters(array $andFilters = []);
+    abstract public function setOrFilters(array $orFilters = []);
+    abstract public function setSorting(array $sorting = []);
+    abstract public function setRel(array $rel);
+    abstract public function setPrinting($printing);
+    abstract public function setSelect($select);
 }
