@@ -5,7 +5,7 @@ namespace Mado\QueryBundle\Queries;
 use Doctrine\ORM\EntityManager;
 use Mado\QueryBundle\Services\StringParser;
 
-class JoinFactory
+class Join
 {
     private const AND_OPERATOR_LOGIC = 'AND';
 
@@ -35,7 +35,6 @@ class JoinFactory
         $this->manager = $manager;
         $this->innerJoin = [];
         $this->leftJoin = [];
-        $joins = [];
     }
 
     /**

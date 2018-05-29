@@ -7,7 +7,6 @@ use Doctrine\ORM\QueryBuilder;
 use Mado\QueryBundle\Component\Meta\Exceptions\UnInitializedQueryBuilderException;
 use Mado\QueryBundle\Dictionary;
 use Mado\QueryBundle\Exceptions;
-use Mado\QueryBundle\Queries\Objects\FilterObject;
 
 class QueryBuilderFactory extends AbstractQuery
 {
@@ -116,14 +115,14 @@ class QueryBuilderFactory extends AbstractQuery
 
         foreach ($innerJoins as $join) {
             if (!$this->joinAlreadyDone($join)) {
-                $this->storeJoinDone($join);
+                $this->storeJoin($join);
                 $this->qBuilder->innerJoin($join['field'], $join['relation']);
             }
         }
 
         foreach ($leftJoins as $join) {
             if (!$this->joinAlreadyDone($join)) {
-                $this->storeJoinDone($join);
+                $this->storeJoin($join);
                 $this->qBuilder->leftJoin($join['field'], $join['relation']);
             }
         }
@@ -139,7 +138,7 @@ class QueryBuilderFactory extends AbstractQuery
         return false;
     }
 
-    private function storeJoinDone($join)
+    private function storeJoin($join)
     {
         $needle = $join['field'] . '_' . $join['relation'];
         $this->joins[] = $needle;
@@ -156,7 +155,7 @@ class QueryBuilderFactory extends AbstractQuery
         }
 
         if (null !== $this->andFilters) {
-            $andFilterFactory = new AndFilterFactory($this->entityAlias, $this->fields, $this->joinFactory);
+            $andFilterFactory = new AndFilter($this->entityAlias, $this->fields, $this->joinFactory);
             $andFilterFactory->createFilter($this->andFilters);
 
             $conditions = $andFilterFactory->getConditions();
@@ -173,14 +172,14 @@ class QueryBuilderFactory extends AbstractQuery
 
             foreach ($innerJoins as $join) {
                 if (!$this->joinAlreadyDone($join)) {
-                    $this->storeJoinDone($join);
+                    $this->storeJoin($join);
                     $this->qBuilder->innerJoin($join['field'], $join['relation']);
                 }
             }
         }
 
         if (null !== $this->orFilters) {
-            $orFilterFactory = new OrFilterFactory($this->entityAlias, $this->fields, $this->joinFactory);
+            $orFilterFactory = new OrFilter($this->entityAlias, $this->fields, $this->joinFactory);
             $orFilterFactory->createFilter($this->orFilters);
 
             $conditions = $orFilterFactory->getConditions();
@@ -196,7 +195,7 @@ class QueryBuilderFactory extends AbstractQuery
 
                 foreach ($leftJoins as $join) {
                     if (!$this->joinAlreadyDone($join)) {
-                        $this->storeJoinDone($join);
+                        $this->storeJoin($join);
                         $this->qBuilder->leftJoin($join['field'], $join['relation']);
                     }
                 }

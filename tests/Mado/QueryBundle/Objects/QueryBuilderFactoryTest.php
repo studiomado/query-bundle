@@ -83,7 +83,7 @@ class QueryBuilderFactoryTest extends TestCase
     {
         $queryBuilderFactory = new QueryBuilderFactory($this->manager);
         $queryBuilderFactory->setFields([ 'id' ]);
-        $queryBuilderFactory->setAndFilters([ '_embedded.group.id|list' => '42, 33', '_embedded.group.company.name|contains' => 's' ]);
+        $queryBuilderFactory->setAndFilters([ '_embedded.group.id|list' => '42, 33']);
         $queryBuilderFactory->createQueryBuilder(User::class, 'e');
         $queryBuilderFactory->filter();
 
@@ -94,8 +94,7 @@ class QueryBuilderFactoryTest extends TestCase
             . "u0_.group_id AS group_id_2 "
             . "FROM User u0_ "
             . "INNER JOIN Group g1_ ON u0_.group_id = g1_.id "
-            . "INNER JOIN Company c2_ ON g1_.company_id = c2_.id "
-            . "WHERE g1_.id IN (?) AND c2_.name LIKE ?",
+            . "WHERE g1_.id IN (?)",
             $queryBuilderFactory->getQueryBuilder()->getQuery()->getSql()
         );
     }

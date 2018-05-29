@@ -39,7 +39,7 @@ abstract class AbstractQuery
             ->select($select)
             ->groupBy($groupBy);
 
-        $this->joinFactory = new JoinFactory($this->getEntityName(), $this->entityAlias, $this->manager);
+        $this->joinFactory = new Join($this->getEntityName(), $this->entityAlias, $this->manager);
     }
 
     public function createQueryBuilder($entityName, $alias)
@@ -51,7 +51,7 @@ abstract class AbstractQuery
             ->select($alias)
             ->from($this->entityName, $alias);
 
-        $this->joinFactory = new JoinFactory($this->getEntityName(), $this->entityAlias, $this->manager);
+        $this->joinFactory = new Join($this->getEntityName(), $this->entityAlias, $this->manager);
     }
 
     public function getEntityName()

@@ -4,11 +4,17 @@ namespace Mado\QueryBundle\Queries;
 
 use Mado\QueryBundle\Services\StringParser;
 
-class AndFilterFactory
+class OrFilter
 {
+    private const OR_OPERATOR_LOGIC = 'OR';
+
     private $entityAlias;
 
     private $fields;
+
+    private $join;
+
+    private $parser;
 
     private $conditions;
 
@@ -16,53 +22,52 @@ class AndFilterFactory
 
     private $relationEntityAlias;
 
-    private $parser;
-
-    private $joinFactory;
-
-    public function __construct(string $entityAlias, array $fields, JoinFactory $joinFactory)
+    public function __construct(string $entityAlias, array $fields, Join $join)
     {
         $this->entityAlias = $entityAlias;
         $this->fields = $fields;
-        $this->conditions = [];
+        $this->join = $join;
+
+        $this->conditions = '';
         $this->parameters = [];
         $this->parser  = new StringParser();
-        $this->joinFactory = $joinFactory;
     }
 
-    public function createFilter(array $andFilters)
+    public function createFilter(array $orFilters)
     {
-        foreach ($andFilters as $filter => $value) {
-            $this->applyFilterAnd(
+        foreach ($orFilters as $filter => $value) {
+            $this->applyFilter(
                 Objects\FilterObject::fromRawFilter($filter),
-                $value,
-                Objects\Value::fromFilter($value)
+                $value
             );
         }
     }
 
-    private function applyFilterAnd(
-        Objects\FilterObject $filterObject,
-        $value,
-        Objects\Value $filterValue
-    ) {
+    private function applyFilter(Objects\FilterObject $filterObject, $value)
+    {
         $whereCondition = $this->entityAlias . '.' . $filterObject->getFieldName() . ' '
             . $filterObject->getOperatorMeta();
 
+        // controllo se il filtro che mi arriva dalla richiesta è una proprietà di questa entità
+        // esempio per users: filtering[username|contains]=mado
         if (in_array($filterObject->getFieldName(), $this->fields)) {
             $salt = '_' . random_int(111, 999);
 
             if ($filterObject->isListType()) {
                 $whereCondition .= ' (:field_' . $filterObject->getFieldName() . $salt . ')';
-            } elseif ($filterObject->isFieldEqualityType()) {
-                $whereCondition .= ' ' . $this->entityAlias . '.' . $value;
+            } else if ($filterObject->isFieldEqualityType()) {
+                $whereCondition .= $this->entityAlias . '.' . $value;
             } elseif ($filterObject->isNullType()) {
                 $whereCondition .= ' ';
             } else {
                 $whereCondition .= ' :field_' . $filterObject->getFieldName() . $salt;
             }
 
-            $this->conditions[] = $whereCondition;
+            if ('' != $this->conditions) {
+                $this->conditions .= ' OR ' . $whereCondition;
+            } else {
+                $this->conditions = $whereCondition;
+            }
 
             if ($filterObject->haveOperatorSubstitutionPattern()) {
                 if ($filterObject->isListType()) {
@@ -77,44 +82,54 @@ class AndFilterFactory
             }
 
             if (!$filterObject->isNullType()) {
-                $param = [];
-                $param['field'] = 'field_' . $filterObject->getFieldName() . $salt;
-                $param['value'] = $value;
-                $this->parameters[] = $param;
+                $this->parameters[] = [
+                    'field' => 'field_' . $filterObject->getFieldName() . $salt,
+                    'value' => $value
+                ];
             }
         } else {
-            if (strpos($filterObject->getFieldName(), 'Embedded.') === false) {
+            $isNotARelation = 0 !== strpos($filterObject->getFieldName(), 'Embedded.');
+            if ($isNotARelation) {
                 $whereCondition .= ' ' . $this->entityAlias . '.' . $value;
-                $this->conditions[] = $whereCondition;
+                if ('' != $this->conditions) {
+                    $this->conditions .= ' OR ' . $whereCondition;
+                } else {
+                    $this->conditions = $whereCondition;
+                }
             }
         }
 
         // controllo se il filtro si riferisce ad una relazione dell'entità quindi devo fare dei join
         // esempio per users: filtering[_embedded.groups.name|eq]=admin
         if (strstr($filterObject->getRawFilter(), '_embedded.')) {
-            $this->joinFactory->join($filterObject->getRawFilter());
-            $this->relationEntityAlias = $this->joinFactory->getRelationEntityAlias();
+            $this->join->join($filterObject->getRawFilter(), self::OR_OPERATOR_LOGIC);
+            $this->relationEntityAlias = $this->join->getRelationEntityAlias();
 
             $embeddedFields = explode('.', $filterObject->getFieldName());
-            $embeddedFieldName = $this->parser->camelize($embeddedFields[count($embeddedFields) - 1]);
+            $embeddableFieldName = $this->parser->camelize($embeddedFields[count($embeddedFields) - 1]);
 
             $salt = '_' . random_int(111, 999);
 
-            $whereCondition = $this->relationEntityAlias . '.' . $embeddedFieldName . ' '
+            $whereCondition = $this->relationEntityAlias . '.' . $embeddableFieldName . ' '
                 . $filterObject->getOperatorMeta();
 
             if ($filterObject->isListType()) {
-                $whereCondition .= ' (:field_' . $embeddedFieldName . $salt . ')';
+                $whereCondition .= ' (:field_' . $embeddableFieldName . $salt . ')';
             } elseif ($filterObject->isNullType()) {
                 $whereCondition .= ' ';
             } else {
-                $whereCondition .= ' :field_' . $embeddedFieldName . $salt;
+                $whereCondition .= ' :field_' . $embeddableFieldName . $salt;
             }
 
-            $this->conditions[] = $whereCondition;
+            if ('' != $this->conditions) {
+                $this->conditions .= ' OR ' . $whereCondition;
+            } else {
+                $this->conditions = $whereCondition;
+            }
+
             if ($filterObject->haveOperatorSubstitutionPattern()) {
                 if ($filterObject->isListType()) {
-                    $value = explode(',', $filterValue->getFilter());
+                    $value = explode(',', $value);
                 } else {
                     $value = str_replace(
                         '{string}',
@@ -125,15 +140,15 @@ class AndFilterFactory
             }
 
             if (!$filterObject->isNullType()) {
-                $param = [];
-                $param['field'] = 'field_' . $embeddedFieldName . $salt;
-                $param['value'] = $value;
-                $this->parameters[] = $param;
+                $this->parameters[] = [
+                    'field' => 'field_' . $embeddableFieldName . $salt,
+                    'value' => $value
+                ];
             }
         }
     }
 
-    public function getConditions() :array
+    public function getConditions() :string
     {
         return $this->conditions;
     }
@@ -143,8 +158,8 @@ class AndFilterFactory
         return $this->parameters;
     }
 
-    public function getInnerJoin() :array
+    public function getLeftJoin() :array
     {
-        return $this->joinFactory->getInnerJoin();
+        return $this->join->getLeftJoin();
     }
 }
