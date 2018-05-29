@@ -19,6 +19,8 @@ abstract class AbstractQuery
 
     protected $qBuilder;
 
+    protected $joinFactory;
+
     public function __construct(EntityManager $manager)
     {
         $this->manager = $manager;
@@ -36,6 +38,8 @@ abstract class AbstractQuery
         $this->qBuilder = $this->manager->createQueryBuilder()
             ->select($select)
             ->groupBy($groupBy);
+
+        $this->joinFactory = new JoinFactory($this->getEntityName(), $this->entityAlias, $this->manager);
     }
 
     public function createQueryBuilder($entityName, $alias)
@@ -46,6 +50,8 @@ abstract class AbstractQuery
         $this->qBuilder = $this->manager->createQueryBuilder()
             ->select($alias)
             ->from($this->entityName, $alias);
+
+        $this->joinFactory = new JoinFactory($this->getEntityName(), $this->entityAlias, $this->manager);
     }
 
     public function getEntityName()

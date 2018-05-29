@@ -33,7 +33,7 @@ class QueryBuilderFactory extends AbstractQuery
 
     protected $sorting;
 
-    private $joins;
+    private $joins = [];
 
     protected $rel;
 
@@ -105,81 +105,33 @@ class QueryBuilderFactory extends AbstractQuery
         return $this->orFilters;
     }
 
-    private function noExistsJoin($prevEntityAlias, $currentEntityAlias)
-    {
-        if (null === $this->joins) {
-            $this->joins = [];
-        }
-
-        $needle = $prevEntityAlias . '_' . $currentEntityAlias;
-
-        return !in_array($needle, $this->joins);
-    }
-
-    private function storeJoin($prevEntityAlias, $currentEntityAlias)
-    {
-        $needle = $prevEntityAlias . '_' . $currentEntityAlias;
-        $this->joins[$needle] = $needle;
-    }
-
     /**
      * @param String $relation Nome della relazione semplice (groups.name) o con embedded (_embedded.groups.name)
      * @return $this
      */
     public function join(String $relation, $logicOperator = self::AND_OPERATOR_LOGIC)
     {
-        $relation = explode('|', $relation)[0];
-        $relations = [$relation];
+        $this->joinFactory->join($relation, $logicOperator);
 
+        $innerJoins = $this->joinFactory->getInnerJoin();
+        $leftJoins = $this->joinFactory->getLeftJoin();
 
-        if (strstr($relation, '_embedded.')) {
-            $embeddedFields = explode('.', $relation);
-            $this->parser->camelize($embeddedFields[1]);
+        foreach ($innerJoins as $innerJoin) {
+            $needle = $innerJoin['field'] . '_' . $innerJoin['relation'];
+            if (!in_array($needle, $this->joins)) {
+                $this->joins[] = $needle;
+                $this->qBuilder->innerJoin($innerJoin['field'], $innerJoin['relation']);
 
-            // elimino l'ultimo elemento che dovrebbe essere il nome del campo
-            unset($embeddedFields[count($embeddedFields) - 1]);
-
-            // elimino il primo elemento _embedded
-            unset($embeddedFields[0]);
-
-            $relations = $embeddedFields;
-        }
-
-        $entityName = $this->getEntityName();
-        $entityAlias = $this->entityAlias;
-
-        foreach ($relations as $relation) {
-            $relation = $this->parser->camelize($relation);
-            $relationEntityAlias = 'table_' . $relation;
-
-            $metadata = $this->manager->getClassMetadata($entityName);
-
-            if ($metadata->hasAssociation($relation)) {
-
-                $association = $metadata->getAssociationMapping($relation);
-
-                $fieldName = $this->parser->camelize($association['fieldName']);
-
-                if ($this->noExistsJoin($relationEntityAlias, $relation)) {
-                    if ($logicOperator === self::AND_OPERATOR_LOGIC) {
-                        $this->qBuilder->innerJoin($entityAlias . "." . $fieldName, $relationEntityAlias);
-                    } elseif ($logicOperator === self::OR_OPERATOR_LOGIC) {
-                        $this->qBuilder->leftJoin($entityAlias . "." . $fieldName, $relationEntityAlias);
-                    } else {
-                        throw new Exceptions('Missing Logic operator');
-                    }
-
-                    $this->storeJoin($relationEntityAlias, $relation);
-                }
-
-                $entityName = $association['targetEntity'];
-                $entityAlias = $relationEntityAlias;
             }
-
-            $this->setRelationEntityAlias($relationEntityAlias);
         }
 
-        return $this;
+        foreach ($leftJoins as $leftJoin) {
+            $needle = $leftJoin['field'] . '_' . $leftJoin['relation'];
+            if (!in_array($needle, $this->joins)) {
+                $this->joins[] = $needle;
+                $this->qBuilder->leftJoin($leftJoin['field'], $leftJoin['relation']);
+            }
+        }
     }
 
     public function filter()
@@ -192,18 +144,13 @@ class QueryBuilderFactory extends AbstractQuery
             throw new Exceptions\MissingFieldsException();
         }
 
-        $joinFactory = new JoinFactory($this->getEntityName(), $this->entityAlias, $this->manager);
-
         if (null !== $this->andFilters) {
-
-            $andFilterFactory = new AndFilterFactory($this->entityAlias, $this->fields, $joinFactory);
-
+            $andFilterFactory = new AndFilterFactory($this->entityAlias, $this->fields, $this->joinFactory);
             $andFilterFactory->createFilter($this->andFilters);
 
             $conditions = $andFilterFactory->getConditions();
             $parameters = $andFilterFactory->getParameters();
             $innerJoins = $andFilterFactory->getInnerJoin();
-            $leftJoins = $andFilterFactory->getLeftJoin();
 
             foreach($conditions as $condition) {
                 $this->qBuilder->andWhere($condition);
@@ -214,16 +161,39 @@ class QueryBuilderFactory extends AbstractQuery
             }
 
             foreach ($innerJoins as $innerJoin) {
-                $this->qBuilder->innerJoin($innerJoin['field'], $innerJoin['relation']);
-            }
-
-            foreach ($leftJoins as $leftJoin) {
-                $this->qBuilder->leftJoin($leftJoin['field'], $leftJoin['relation']);
+                $needle = $innerJoin['field'] . '_' . $innerJoin['relation'];
+                if (!in_array($needle, $this->joins)) {
+                    $this->joins[] = $needle;
+                    $this->qBuilder->innerJoin($innerJoin['field'], $innerJoin['relation']);
+                }
             }
         }
 
         if (null !== $this->orFilters) {
-            $orFilter = [];
+            $orFilterFactory = new OrFilterFactory($this->entityAlias, $this->fields, $this->joinFactory);
+            $orFilterFactory->createFilter($this->orFilters);
+
+            $conditions = $orFilterFactory->getConditions();
+            $parameters = $orFilterFactory->getParameters();
+            $leftJoins = $orFilterFactory->getLeftJoin();
+
+            if ($conditions != '') {
+                $this->qBuilder->andWhere($conditions);
+
+                foreach ($parameters as $parameter) {
+                    $this->qBuilder->setParameter($parameter['field'], $parameter['value']);
+                }
+
+                foreach ($leftJoins as $leftJoin) {
+                    $needle = $leftJoin['field'] . '_' . $leftJoin['relation'];
+                    if (!in_array($needle, $this->joins)) {
+                        $this->joins[] = $needle;
+                        $this->qBuilder->leftJoin($leftJoin['field'], $leftJoin['relation']);
+                    }
+                }
+            }
+
+            /*$orFilter = [];
             $orFilter['orCondition'] = null;
             $orFilter['parameters'] = [];
 
@@ -241,121 +211,10 @@ class QueryBuilderFactory extends AbstractQuery
                 foreach ($orFilter['parameters'] as $parameter) {
                     $this->qBuilder->setParameter($parameter['field'], $parameter['value']);
                 }
-            }
+            }*/
         }
 
         return $this;
-    }
-
-    private function applyFilterOr(
-        Objects\FilterObject $filterObject,
-        $value,
-        $orCondition
-    ) {
-        $whereCondition = $this->entityAlias . '.' . $filterObject->getFieldName() . ' '
-            . $filterObject->getOperatorMeta();
-
-        // controllo se il filtro che mi arriva dalla richiesta è una proprietà di questa entità
-        // esempio per users: filtering[username|contains]=mado
-        if (in_array($filterObject->getFieldName(), $this->fields)) {
-            $salt = '_' . random_int(111, 999);
-
-            if ($filterObject->isListType()) {
-                $whereCondition .= ' (:field_' . $filterObject->getFieldName() . $salt . ')';
-            } else if ($filterObject->isFieldEqualityType()) {
-                $whereCondition .= $this->entityAlias . '.' . $value;
-            } elseif ($filterObject->isNullType()) {
-                $whereCondition .= ' ';
-            } else {
-                $whereCondition .= ' :field_' . $filterObject->getFieldName() . $salt;
-            }
-
-            if (null != $orCondition['orCondition']) {
-                $orCondition['orCondition'] .= ' OR ' . $whereCondition;
-            } else {
-                $orCondition['orCondition'] = $whereCondition;
-            }
-
-            if ($filterObject->haveOperatorSubstitutionPattern()) {
-                if ($filterObject->isListType()) {
-                    $value = explode(',', $value);
-                } else {
-                    $value = str_replace(
-                        '{string}',
-                        $value,
-                        $filterObject->getOperatorsSubstitutionPattern()
-                    );
-                }
-            }
-
-            if (!$filterObject->isNullType()) {
-                $orCondition['parameters'][] = [
-                    'field' => 'field_' . $filterObject->getFieldName() . $salt,
-                    'value' => $value
-                ];
-            }
-        } else {
-            $isNotARelation = 0 !== strpos($filterObject->getFieldName(), 'Embedded.');
-            if ($isNotARelation) {
-                    $whereCondition .= ' ' . $this->entityAlias . '.' . $value;
-                if (null != $orCondition['orCondition']) {
-                    $orCondition['orCondition'] .= ' OR ' . $whereCondition;
-                } else {
-                    $orCondition['orCondition'] = $whereCondition;
-                }
-            }
-        }
-
-        // controllo se il filtro si riferisce ad una relazione dell'entità quindi devo fare dei join
-        // esempio per users: filtering[_embedded.groups.name|eq]=admin
-        if (strstr($filterObject->getRawFilter(), '_embedded.')) {
-
-            $this->join($filterObject->getRawFilter(), self::OR_OPERATOR_LOGIC);
-            $relationEntityAlias = $this->getRelationEntityAlias();
-
-            $embeddedFields = explode('.', $filterObject->getFieldName());
-            $embeddableFieldName = $this->parser->camelize($embeddedFields[count($embeddedFields) - 1]);
-
-            $salt = '_' . random_int(111, 999);
-
-            $whereCondition = $relationEntityAlias . '.' . $embeddableFieldName . ' '
-                . $filterObject->getOperatorMeta();
-
-            if ($filterObject->isListType()) {
-                $whereCondition .= ' (:field_' . $embeddableFieldName . $salt . ')';
-            } elseif ($filterObject->isNullType()) {
-                $whereCondition .= ' ';
-            } else {
-                $whereCondition .= ' :field_' . $embeddableFieldName . $salt;
-            }
-
-            if (null != $orCondition['orCondition']) {
-                $orCondition['orCondition'] .= ' OR ' . $whereCondition;
-            } else {
-                $orCondition['orCondition'] = $whereCondition;
-            }
-
-            if ($filterObject->haveOperatorSubstitutionPattern()) {
-                if ($filterObject->isListType()) {
-                    $value = explode(',', $value);
-                } else {
-                    $value = str_replace(
-                        '{string}',
-                        $value,
-                        $filterObject->getOperatorsSubstitutionPattern()
-                    );
-                }
-            }
-
-            if (!$filterObject->isNullType()) {
-                $orCondition['parameters'][] = [
-                    'field' => 'field_' . $embeddableFieldName . $salt,
-                    'value' => $value
-                ];
-            }
-        }
-
-        return $orCondition;
     }
 
     public function sort()
@@ -385,7 +244,7 @@ class QueryBuilderFactory extends AbstractQuery
 
             if (strstr($sort, '_embedded.')) {
                 $this->join($sort);
-                $relationEntityAlias = $this->getRelationEntityAlias();
+                $relationEntityAlias = $this->joinFactory->getRelationEntityAlias();
 
                 $embeddedFields = explode('.', $sort);
                 $fieldName = $this->parser->camelize($embeddedFields[2]);
