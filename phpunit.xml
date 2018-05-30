@@ -13,6 +13,7 @@
             <directory suffix=".php">src/Mado/QueryBundle/Component</directory>
             <directory suffix=".php">src/Mado/QueryBundle/Dictionary</directory>
             <directory suffix=".php">src/Mado/QueryBundle/Queries</directory>
+            <directory suffix=".php">src/Mado/QueryBundle/Objects</directory>
             <directory suffix=".php">src/Mado/QueryBundle/Repositories</directory>
             <directory suffix=".php">src/Mado/QueryBundle/Resources</directory>
             <directory suffix=".php">src/Mado/QueryBundle/Services</directory>
