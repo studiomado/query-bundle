@@ -9,6 +9,18 @@ Changelog
 
    > feature - feature description
    
+Branch names
+------------
+
+The following is just a suggestion and it is not mandatory to follow as naming
+convention. According to what the branch represents it can start with the
+following prefix:
+
+ - feature/
+ - refactoring/
+ - enhancement/
+ - fix/
+   
 Choose the right branch
 -----------------------
 
