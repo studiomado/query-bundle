@@ -83,7 +83,7 @@ class QueryBuilderFactoryTest extends TestCase
     {
         $queryBuilderFactory = new QueryBuilderFactory($this->manager);
         $queryBuilderFactory->setFields([ 'id' ]);
-        $queryBuilderFactory->setAndFilters([ '_embedded.group.id|list' => '42, 33' ]);
+        $queryBuilderFactory->setAndFilters([ '_embedded.group.id|list' => '42, 33']);
         $queryBuilderFactory->createQueryBuilder(User::class, 'e');
         $queryBuilderFactory->filter();
 
@@ -913,4 +913,17 @@ class Group
     private $name;
     /** @OneToMany(targetEntity="User", mappedBy="member") */
     private $members;
+    /** @ManyToOne(targetEntity="Company", inversedBy="groups") */
+    private $company;
+}
+
+/** @Entity() */
+class Company
+{
+    /** @Id @Column(type="integer") */
+    private $id;
+    /** @Column(type="string") */
+    private $name;
+    /** @OneToMany(targetEntity="Group", mappedBy="company") */
+    private $group;
 }
