@@ -53,7 +53,10 @@ class AndFilter
         if (in_array($filterObject->getFieldName(), $this->fields)) {
             $salt = '_' . random_int(111, 999);
 
-            if ($filterObject->isListType()) {
+            if ($filterObject->isListContainsType()) {
+                $fieldName = $this->entityAlias . '.' . $filterObject->getFieldName();
+                $whereCondition = $this->createWhereConditionForListContains($value, $fieldName, $filterObject->getFieldName(), $salt);
+            } elseif ($filterObject->isListType()) {
                 $whereCondition .= ' (:field_' . $filterObject->getFieldName() . $salt . ')';
             } elseif ($filterObject->isFieldEqualityType()) {
                 $whereCondition .= ' ' . $this->entityAlias . '.' . $value;
@@ -66,7 +69,9 @@ class AndFilter
             $this->conditions[] = $whereCondition;
 
             if ($filterObject->haveOperatorSubstitutionPattern()) {
-                if ($filterObject->isListType()) {
+                if ($filterObject->isListContainsType()) {
+                    $value = $this->encapsulateValueForLike($value);
+                } elseif ($filterObject->isListType()) {
                     $value = explode(',', $value);
                 } else {
                     $value = str_replace(
@@ -78,10 +83,14 @@ class AndFilter
             }
 
             if (!$filterObject->isNullType()) {
-                $param = [];
-                $param['field'] = 'field_' . $filterObject->getFieldName() . $salt;
-                $param['value'] = $value;
-                $this->parameters[] = $param;
+                if ($filterObject->isListContainsType()) {
+                    $this->addMultipleParameters($value, $filterObject->getFieldName(), $salt);
+                } else {
+                    $param = [];
+                    $param['field'] = 'field_' . $filterObject->getFieldName() . $salt;
+                    $param['value'] = $value;
+                    $this->parameters[] = $param;
+                }
             }
         } else {
             if (strpos($filterObject->getFieldName(), 'Embedded.') === false) {
@@ -104,7 +113,10 @@ class AndFilter
             $whereCondition = $this->relationEntityAlias . '.' . $embeddedFieldName . ' '
                 . $filterObject->getOperatorMeta();
 
-            if ($filterObject->isListType()) {
+            if ($filterObject->isListContainsType()) {
+                $fieldName =  $this->relationEntityAlias . '.' . $embeddedFieldName;
+                $whereCondition = $this->createWhereConditionForListContains($value, $fieldName, $embeddedFieldName, $salt);
+            } elseif ($filterObject->isListType()) {
                 $whereCondition .= ' (:field_' . $embeddedFieldName . $salt . ')';
             } elseif ($filterObject->isNullType()) {
                 $whereCondition .= ' ';
@@ -114,7 +126,9 @@ class AndFilter
 
             $this->conditions[] = $whereCondition;
             if ($filterObject->haveOperatorSubstitutionPattern()) {
-                if ($filterObject->isListType()) {
+                if ($filterObject->isListContainsType()) {
+                    $value = $this->encapsulateValueForLike($value);
+                } elseif ($filterObject->isListType()) {
                     $value = explode(',', $filterValue->getFilter());
                 } else {
                     $value = str_replace(
@@ -126,12 +140,56 @@ class AndFilter
             }
 
             if (!$filterObject->isNullType()) {
-                $param = [];
-                $param['field'] = 'field_' . $embeddedFieldName . $salt;
-                $param['value'] = $value;
-                $this->parameters[] = $param;
+                if ($filterObject->isListContainsType()) {
+                    $this->addMultipleParameters($value, $embeddedFieldName, $salt);
+                } else {
+                    $param = [];
+                    $param['field'] = 'field_' . $embeddedFieldName . $salt;
+                    $param['value'] = $value;
+                    $this->parameters[] = $param;
+                }
             }
         }
+    }
+
+    private function addMultipleParameters($value, $fieldName, $salt)
+    {
+        foreach ($value as $key => $val) {
+            $param = [];
+            $param['field'] = 'field_' . $fieldName . $salt . $key;
+            $param['value'] = $val;
+            $this->parameters[] = $param;
+        }
+    }
+
+    private function createWhereConditionForListContains($value, $fieldName, $fieldNameWithoutAlias, $salt) :string
+    {
+        $whereCondition = '';
+        $values = explode(',', $value);
+        foreach ($values as $key => $val) {
+            if ($whereCondition == '') {
+                $whereCondition = ' (';
+            } else {
+                $whereCondition .=  ' OR ';
+            }
+
+            $whereCondition .= $fieldName .
+                ' LIKE :field_' . str_replace('.', '_', $fieldNameWithoutAlias) . $salt . $key;
+        }
+
+        $whereCondition .= ')';
+
+        return $whereCondition;
+    }
+
+    private function encapsulateValueForLike(string $value) : array
+    {
+        $values = explode(',', $value);
+        foreach ($values as $key => $val) {
+            $values[$key] = '%' . $val . '%';
+        }
+
+        return $values;
     }
 
     public function getConditions() :array

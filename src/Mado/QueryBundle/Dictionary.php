@@ -58,6 +58,10 @@ class Dictionary
         'isnotnull' => [
             'meta' => 'IS NOT NULL',
         ],
+        'listcontains' => [
+            'meta' => 'LIKE',
+            'substitution_pattern' => '({string})',
+        ],
     ];
 
     public static function getOperators()
