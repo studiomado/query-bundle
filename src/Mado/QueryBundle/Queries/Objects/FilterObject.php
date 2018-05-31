@@ -98,4 +98,9 @@ final class FilterObject
     {
         return $this->getOperatorName() === 'isnull' || $this->getOperatorName() === 'isnotnull';
     }
+
+    public function isListContainsType() : bool
+    {
+        return $this->getOperatorName() === 'listcontains';
+    }
 }

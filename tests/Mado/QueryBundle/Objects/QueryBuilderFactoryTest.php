@@ -186,6 +186,7 @@ class QueryBuilderFactoryTest extends TestCase
             'field_eq',
             'isnull',
             'isnotnull',
+            'listcontains',
         ];
 
         $this->assertEquals(
@@ -881,6 +882,28 @@ class QueryBuilderFactoryTest extends TestCase
             "FROM User u0_ " .
             "LEFT JOIN Group g1_ ON u0_.group_id = g1_.id " .
             "WHERE g1_.name IS NOT NULL",
+            $queryBuilderFactory->getQueryBuilder()->getQuery()->getSql()
+        );
+    }
+
+    public function testFilteringListContains()
+    {
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setFields([ 'id', 'username' ]);
+        $queryBuilderFactory->setRel([ 'group' ]);
+        $queryBuilderFactory->setAndFilters([
+            'username|listcontains' => 'a,b',
+            '_embedded.group.name|listcontains' => 'c,d'
+        ]);
+        $queryBuilderFactory->createQueryBuilder(User::class, 'e');
+        $queryBuilderFactory->filter();
+
+        $this->assertEquals(
+            "SELECT u0_.id AS id_0, u0_.username AS username_1, u0_.group_id AS group_id_2" .
+            " FROM User u0_" .
+            " INNER JOIN Group g1_ ON u0_.group_id = g1_.id " .
+            "WHERE ((u0_.username LIKE ? OR u0_.username LIKE ?)) " .
+            "AND ((g1_.name LIKE ? OR g1_.name LIKE ?))",
             $queryBuilderFactory->getQueryBuilder()->getQuery()->getSql()
         );
     }
