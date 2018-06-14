@@ -264,6 +264,17 @@ class BaseRepository extends EntityRepository
         return $this;
     }
 
+    public function findAllNoPaginated()
+    {
+        $queryBuilderFactory = $this->getQueryBuilderFactory()
+            ->filter()
+            ->sort();
+
+        $doctrineQueryBuilder = $queryBuilderFactory->getQueryBuilder();
+
+        return $doctrineQueryBuilder->getQuery()->getResult();
+    }
+    
     public function findAllPaginated()
     {
         $this->initFromQueryBuilderOptions($this->queryOptions);
