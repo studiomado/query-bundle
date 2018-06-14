@@ -907,6 +907,30 @@ class QueryBuilderFactoryTest extends TestCase
             $queryBuilderFactory->getQueryBuilder()->getQuery()->getSql()
         );
     }
+
+    public function testSortingIntoTwoLevelsEmbedded()
+    {
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setFields([ 'id' ]);
+        $queryBuilderFactory->setRel([ 'group', 'company' ]);
+        $queryBuilderFactory->setSorting([
+            '_embedded.group.company.id' => 'asc'
+        ]);
+        $queryBuilderFactory->createQueryBuilder(User::class, 'e');
+        $queryBuilderFactory->sort();
+
+        $this->assertEquals(
+            "SELECT" .
+            " u0_.id AS id_0," .
+            " u0_.username AS username_1," .
+            " u0_.group_id AS group_id_2 " .
+            "FROM User u0_ " .
+            "INNER JOIN Group g1_ ON u0_.group_id = g1_.id " .
+            "INNER JOIN Company c2_ ON g1_.company_id = c2_.id " .
+            "ORDER BY c2_.id ASC",
+            $queryBuilderFactory->getQueryBuilder()->getQuery()->getSql()
+        );
+    }
 }
 
 /** @Entity() */
