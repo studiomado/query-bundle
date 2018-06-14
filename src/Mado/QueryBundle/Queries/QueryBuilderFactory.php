@@ -235,7 +235,7 @@ class QueryBuilderFactory extends AbstractQuery
                 $relationEntityAlias = $this->joinFactory->getRelationEntityAlias();
 
                 $embeddedFields = explode('.', $sort);
-                $fieldName = $this->parser->camelize($embeddedFields[2]);
+                $fieldName = $this->parser->camelize($embeddedFields[count($embeddedFields) - 1]);
                 $direction = ($val === self::DIRECTION_AZ) ? self::DIRECTION_AZ : self::DIRECTION_ZA;
 
                 $this->qBuilder->addOrderBy($relationEntityAlias . '.' . $fieldName, $direction);
