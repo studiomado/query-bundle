@@ -19,9 +19,9 @@
         "bin-dir": "bin"
     },
     "require": {
-        "symfony/dependency-injection": "^3.3",
+        "symfony/dependency-injection": ">=3.3",
         "symfony/config": ">=3.3",
-        "symfony/http-kernel": "^3.3",
+        "symfony/http-kernel": ">=3.3",
         "doctrine/orm": "^2.5",
         "pagerfanta/pagerfanta": "^1.0",
         "willdurand/hateoas": "2.10"
