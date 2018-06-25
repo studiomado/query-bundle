@@ -8,3 +8,4 @@ in 2.4 minor versions.
  - feature - added operator isnull and isnotnull
  - fix - don't adding parameters in filter or if operator is null type
  - feature - added operator listcontains
+ - feature - [BaseRepository] added find all no paginated method 
