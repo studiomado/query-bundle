@@ -176,3 +176,49 @@ Here some examples:
  - http://127.0.0.1:8000/?filtering[status]=todo
  - http://127.0.0.1:8000/?filtering[status|contains]=od
  - http://127.0.0.1:8000/?filtering[status|endswith]=gress
+
+# Find All No Paginated
+
+Added a new method in **BaseRepository**  
+When you need results applying filter and sort without pagination
+```
+public function findAllNoPaginated();
+```
+This feature was needed to create an Excel Report, injecting results into the Excel Report
+
+Example without pagination
+--------------------------
+In Controller:
+```
+public function getTasksExcelReportAction(Request $request)
+    {
+        $tasks = $this->getDoctrine()
+            ->getRepository('AppBundle:Task')
+            ->findAllNoPaginated();
+        
+        $reportExcel = new TasksReport($tasks);
+        $reportExcel->createReport();
+        
+        $excelContent = $reportExcel->printReport();
+        
+        return new Response(
+            $excelContent,
+            200, [
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            ]
+        );        
+    } 
+```  
+
+Example with pagination
+-----------------------
+In Controller:
+```
+    public function getTasksAction(Request $request)
+    {
+        return $this->getDoctrine()
+            ->getRepository('AppBundle:Task')
+            ->setRequest($request)
+            ->findAllPaginated();
+    }
+```
