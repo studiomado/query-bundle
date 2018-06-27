@@ -57,14 +57,19 @@ class CurrentMetaData
 
     public function hasRelations() : bool
     {
-        return count($this->currentMetadata->associationMappings) > 0;
+        return count($this->getCurrentAssociationMapping()) > 0;
+    }
+
+    public function getCurrentAssociationMapping()
+    {
+        return $this->currentMetadata->associationMappings;
     }
 
     public function getRelations() : array
     {
         $relations = [];
 
-        foreach ($this->currentMetadata->associationMappings as $rel) {
+        foreach ($this->getCurrentAssociationMapping() as $rel) {
             $relations[
                 $rel['inversedBy']
             ] = StringParser::dotNotationFor($rel['targetEntity']);
