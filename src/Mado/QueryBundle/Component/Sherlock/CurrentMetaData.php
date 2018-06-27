@@ -55,7 +55,7 @@ class CurrentMetaData
         }, $this->currentMetadata->fieldMappings);
     }
 
-    public function haveRelations() : bool
+    public function hasRelations() : bool
     {
         return count($this->currentMetadata->associationMappings) > 0;
     }

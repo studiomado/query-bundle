@@ -31,7 +31,7 @@ class Sherlock
             $entity = StringParser::dotNotationFor($entityClass);
             $opList[$entity]['fields'] = $fields;
 
-            if ($this->metadata->haveRelations()) {
+            if ($this->metadata->hasRelations()) {
                 $relations = $this->metadata->getRelations();
                 $opList[$entity]['relations'][] = $relations;
             }
