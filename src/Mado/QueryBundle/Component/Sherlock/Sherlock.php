@@ -18,6 +18,11 @@ class Sherlock
 
     public function getOpList($entityPath) : array
     {
+        return $this->getAll()[$entityPath];
+    }
+
+    public function getAll() : array
+    {
         $opList = [];
 
         foreach ($this->metadata->justEntitiesMetadata() as $entityClass) {
@@ -32,11 +37,25 @@ class Sherlock
             }
         }
 
-        return $opList[$entityPath];
+        return $opList;
     }
 
     public function getRelations($entityPath) : array
     {
         return current($this->getOpList($entityPath)['relations']);
+    }
+
+    public function getFieldsType($entityPath) : array
+    {
+        $fieldTypes = [];
+
+        foreach ($this->metadata->justEntitiesMetadata() as $entityClass) {
+            $fields = $this->metadata->extractFieldsType($entityClass);
+
+            $entity = StringParser::dotNotationFor($entityClass);
+            $fieldTypes[$entity]['fields'] = $fields;
+        }
+
+        return $fieldTypes[$entityPath];
     }
 }

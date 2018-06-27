@@ -46,6 +46,15 @@ class CurrentMetaData
         }, $this->currentMetadata->fieldMappings);
     }
 
+    public function extractFieldsType($entityClass) : array
+    {
+        $this->currentMetadata = $this->manager->getClassMetadata($entityClass);
+
+        return array_map(function ($item) {
+            return $item['type'];
+        }, $this->currentMetadata->fieldMappings);
+    }
+
     public function haveRelations() : bool
     {
         return count($this->currentMetadata->associationMappings) > 0;

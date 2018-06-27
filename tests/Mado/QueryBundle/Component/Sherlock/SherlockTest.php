@@ -54,6 +54,19 @@ class SherlockTest extends TestCase
         );
     }
 
+    public function testExtractJustFieldTypeAndNotOperatorList()
+    {
+        $this->assertEquals(
+            [
+                'fields' => [
+                    'id' => 'integer',
+                    'username' => 'string',
+                ],
+            ],
+            $this->sherlock->getFieldsType("mado.querybundle.tests.objects.startingentity")
+        );
+    }
+
     public function testExtractRelations()
     {
         $this->assertEquals(
