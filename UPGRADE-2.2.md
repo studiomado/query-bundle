@@ -42,3 +42,24 @@ Component\Sherlock
 Added this new component. The component provide a service to obtain the entire
 database map with fields and operator available in each fields. Also, it
 provide for each entity the list of related relation.
+
+For example a field `id` (if id is a number) cannot be filtered with fitlers:
+
+ - contains
+ - endswith
+ - ...
+
+but ...
+
+ - >
+ - <
+ - <=
+ - >=
+ - =
+ - <>
+
+Mainly there are three kinds of fields:
+
+ - number
+ - field
+ - string
