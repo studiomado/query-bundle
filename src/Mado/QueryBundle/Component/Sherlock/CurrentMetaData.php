@@ -39,19 +39,30 @@ class CurrentMetaData
 
     public function extractFields($entityClass) : array
     {
-        $this->currentMetadata = $this->manager->getClassMetadata($entityClass);
-
-        return array_map(function ($item) {
-            return Dictionary::getOperatorsFromDoctrineType($item['type']);
-        }, $this->currentMetadata->fieldMappings);
+        return $this->extraction(
+            $entityClass,
+            function ($item) {
+                return Dictionary::getOperatorsFromDoctrineType($item);
+            }
+        );
     }
 
     public function extractFieldsType($entityClass) : array
     {
+        return $this->extraction(
+            $entityClass,
+            function ($item) {
+                return $item;
+            }
+        );
+    }
+
+    private function extraction($entityClass, callable $step) : array
+    {
         $this->currentMetadata = $this->manager->getClassMetadata($entityClass);
 
-        return array_map(function ($item) {
-            return $item['type'];
+        return array_map(function ($item) use ($step) {
+            return $step($item['type']);
         }, $this->currentMetadata->fieldMappings);
     }
 
