@@ -16,19 +16,19 @@ class Sherlock
         $this->metadata = CurrentMetaData::fromEntityManager($manager);
     }
 
-    public function getOpList($entityPath)
+    public function getOpList($entityPath) : array
     {
         $opList = [];
 
-        foreach ($this->metadata->lightMetaData() as $entityClass) {
-            $fields = $this->metadata->extractField($entityClass);
+        foreach ($this->metadata->justEntitiesMetadata() as $entityClass) {
+            $fields = $this->metadata->extractFields($entityClass);
 
-            $node = StringParser::dotNotationFor($entityClass);
-            $opList[$node]['fields'] = $fields;
+            $entity = StringParser::dotNotationFor($entityClass);
+            $opList[$entity]['fields'] = $fields;
 
-            if ($this->metadata->haveCurrentMetadataRelations()) {
+            if ($this->metadata->haveRelations()) {
                 $targetEntity = $this->metadata->getCurrentTargetEntity();
-                $opList[$node]['relations'] = [StringParser::dotNotationFor($targetEntity)];
+                $opList[$entity]['relations'] = [StringParser::dotNotationFor($targetEntity)];
             }
         }
 

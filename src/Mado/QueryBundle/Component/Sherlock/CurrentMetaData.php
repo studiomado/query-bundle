@@ -24,19 +24,19 @@ class CurrentMetaData
         $this->metadata = $metadata;
     }
 
-    public static function fromEntityManager(EntityManagerInterface $manager)
+    public static function fromEntityManager(EntityManagerInterface $manager) : CurrentMetaData
     {
         return new self($manager);
     }
 
-    public function lightMetaData()
+    public function justEntitiesMetadata() : array
     {
         return array_map(function ($item) {
             return $item->rootEntityName;
         }, $this->metadata);
     }
 
-    public function extractField($entityClass)
+    public function extractFields($entityClass) : array
     {
         $this->currentMetadata = $this->manager->getClassMetadata($entityClass);
 
@@ -45,14 +45,14 @@ class CurrentMetaData
         }, $this->currentMetadata->fieldMappings);
     }
 
-    public function haveCurrentMetadataRelations()
+    public function haveRelations() : bool
     {
         return isset(
             $this->currentMetadata->associationMappings['members']
         );
     }
 
-    public function getCurrentTargetEntity()
+    public function getCurrentTargetEntity() : string
     {
         return $this->currentMetadata->associationMappings
             ['members']
