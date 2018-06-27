@@ -35,3 +35,10 @@ UPGRADE FROM 2.1 to 2.2
  * This new component take te responsibility to manage a filtering option. For
    example, inside the `filtering[foo|bar]=42` query, FilterObject aims to
    manage the `foo|bar` part. It knows field name and operator name.
+
+Component\Sherlock
+------------------
+
+Added this new component. The component provide a service to obtain the entire
+database map with fields and operator available in each fields. Also, it
+provide for each entity the list of related relation.
