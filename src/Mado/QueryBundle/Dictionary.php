@@ -24,6 +24,22 @@ class Dictionary
 
     private static $doctrineTypeToOperatorsMap = [
 
+        'default' => [
+            self::FIELD_LIST,
+            self::FIELD_NOT_IN_LIST,
+            self::FIELD_EQUALITY,
+            self::NUMBER_EQUAL,
+            self::NUMBER_NOT_EQUAL,
+            self::NUMBER_GREATER,
+            self::NUMBER_GREATER_EQUAL,
+            self::NUMBER_LITTLE,
+            self::NUMBER_LITTLE_EQUAL,
+            self::STRING_STARTS_WITH,
+            self::STRING_CONTAINS,
+            self::STRING_NOT_CONTAINS,
+            self::STRING_ENDS_WITH,
+        ],
+
         'fields' => [
             self::FIELD_LIST,
             self::FIELD_NOT_IN_LIST,
@@ -75,13 +91,18 @@ class Dictionary
 
     public static function getOperatorsFromDoctrineType(string $type)
     {
+        self::ensureTypeIsDefined($type);
+
+        return self::$doctrineTypeToOperatorsMap[$type];
+    }
+
+    public static function ensureTypeIsDefined($type)
+    {
         if (!isset(self::$doctrineTypeToOperatorsMap[$type])) {
             throw new \RuntimeException(
                 'Oops! Type "'.$type.'" is not yet defined.'
             );
         }
-
-        return self::$doctrineTypeToOperatorsMap[$type];
     }
 }
 
