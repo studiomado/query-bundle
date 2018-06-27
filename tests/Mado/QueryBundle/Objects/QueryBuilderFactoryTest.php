@@ -14,7 +14,7 @@ class QueryBuilderFactoryTest extends TestCase
             'path' => __DIR__ . '/../../data/db.sqlite',
         ),
         \Doctrine\ORM\Tools\Setup::createAnnotationMetadataConfiguration(
-            array(__DIR__."/src"),
+            array(__DIR__),
             true
         ));
     }
@@ -59,7 +59,7 @@ class QueryBuilderFactoryTest extends TestCase
         );
 
         $this->assertContains(
-            "SELECT e FROM Mado\QueryBundle\Tests\Objects\MySimpleEntity e WHERE e.id = :field_id",
+            "SELECT e FROM Mado\QueryBundle\Tests\Objects\MySimpleEntity e WHERE e.id  = :field_id",
             $queryBuilderFactory->getQueryBuilder()->getQuery()->getDql()
         );
     }
