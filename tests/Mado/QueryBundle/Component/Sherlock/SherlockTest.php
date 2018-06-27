@@ -23,7 +23,7 @@ class SherlockTest extends TestCase
         );
     }
 
-    public function testShouldProvideFieldsAndRelationsOfGivenEntityPath()
+    public function testShouldProvideAvailableOperatorsForASpecificEntity()
     {
         $this->assertEquals(
             [
