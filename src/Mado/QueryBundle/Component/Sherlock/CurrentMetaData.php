@@ -4,6 +4,7 @@ namespace Mado\QueryBundle\Component\Sherlock;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Mado\QueryBundle\Dictionary;
+use Mado\QueryBundle\Services\StringParser;
 
 class CurrentMetaData
 {
@@ -47,15 +48,19 @@ class CurrentMetaData
 
     public function haveRelations() : bool
     {
-        return isset(
-            $this->currentMetadata->associationMappings['members']
-        );
+        return count($this->currentMetadata->associationMappings) > 0;
     }
 
-    public function getCurrentTargetEntity() : string
+    public function getRelations() : array
     {
-        return $this->currentMetadata->associationMappings
-            ['members']
-            ['targetEntity'];
+        $relations = [];
+
+        foreach ($this->currentMetadata->associationMappings as $rel) {
+            $relations[
+                $rel['inversedBy']
+            ] = StringParser::dotNotationFor($rel['targetEntity']);
+        }
+
+        return $relations;
     }
 }

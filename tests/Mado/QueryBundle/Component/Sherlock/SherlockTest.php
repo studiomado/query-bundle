@@ -36,7 +36,7 @@ class SherlockTest extends TestCase
                         'lt',
                         'lte',
                     ],
-                    'name' => [
+                    'username' => [
                         'startswith',
                         'contains',
                         'notcontains',
@@ -44,10 +44,24 @@ class SherlockTest extends TestCase
                     ],
                 ],
                 'relations' => [
-                    'mado.querybundle.tests.objects.startingentity',
+                    [
+                        'middle' => 'mado.querybundle.tests.objects.middleentity',
+                        'tooMany' => 'mado.querybundle.tests.objects.toomany',
+                    ]
                 ]
             ],
-            $this->sherlock->getOpList("mado.querybundle.tests.objects.middleentity")
+            $this->sherlock->getOpList("mado.querybundle.tests.objects.startingentity")
+        );
+    }
+
+    public function testExtractRelations()
+    {
+        $this->assertEquals(
+            [
+                'middle' => 'mado.querybundle.tests.objects.middleentity',
+                'tooMany' => 'mado.querybundle.tests.objects.toomany',
+            ],
+            $this->sherlock->getRelations("mado.querybundle.tests.objects.startingentity")
         );
     }
 }
@@ -66,8 +80,21 @@ class StartingEntity
     private $id;
     /** @Column(type="string") */
     private $username;
-    /** @ManyToOne(targetEntity="MiddleEntity", inversedBy="member") */
-    private $middle;
+    /** @ManyToOne(targetEntity="MiddleEntity", inversedBy="middle") */
+    private $one;
+    /** @ManyToOne(targetEntity="TooMany", inversedBy="tooMany") */
+    private $tooMany;
+}
+
+/** @Entity() */
+class TooMany
+{
+    /** @Id @Column(type="integer") */
+    private $id;
+    /** @Column(type="string") */
+    private $stringa;
+    /** @OneToMany(targetEntity="StartingEntity", mappedBy="starting") */
+    private $starting;
 }
 
 /** @Entity() */
@@ -77,6 +104,6 @@ class MiddleEntity
     private $id;
     /** @Column(type="string") */
     private $name;
-    /** @OneToMany(targetEntity="StartingEntity", mappedBy="member") */
-    private $members;
+    /** @OneToMany(targetEntity="StartingEntity", mappedBy="oneToMany") */
+    private $oneToMany;
 }

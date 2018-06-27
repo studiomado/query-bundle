@@ -27,11 +27,16 @@ class Sherlock
             $opList[$entity]['fields'] = $fields;
 
             if ($this->metadata->haveRelations()) {
-                $targetEntity = $this->metadata->getCurrentTargetEntity();
-                $opList[$entity]['relations'] = [StringParser::dotNotationFor($targetEntity)];
+                $relations = $this->metadata->getRelations();
+                $opList[$entity]['relations'][] = $relations;
             }
         }
 
         return $opList[$entityPath];
+    }
+
+    public function getRelations($entityPath) : array
+    {
+        return current($this->getOpList($entityPath)['relations']);
     }
 }
