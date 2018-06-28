@@ -26,11 +26,17 @@ class SherlockTest extends TestCase
     /** @dataProvider startingPoints */
     public function testExtractJustTypeAndRelations(
         $metadataAsJson,
-        $startingEntity
+        $startingEntity,
+        $compressed
     ) {
         $this->assertEquals(
             $metadataAsJson,
             $this->sherlock->getShortOpList($startingEntity)
+        );
+
+        $this->assertEquals(
+            $compressed,
+            $foo = $this->sherlock->getSearchable($startingEntity)
         );
     }
 
@@ -56,7 +62,14 @@ class SherlockTest extends TestCase
                             'tooMany' => 'mado.querybundle.tests.objects.toomany',
                         ]
                     ]
-                ], "mado.querybundle.tests.objects.startingentity"
+                ], "mado.querybundle.tests.objects.startingentity", [
+                    'id' => 'integer',
+                    'username' => 'string',
+                    'middle.id' => 'integer',
+                    'middle.name' => 'string',
+                    'tooMany.id' => 'integer',
+                    'tooMany.stringa' => 'string',
+                ]
             ],
             [
                 [
@@ -72,7 +85,12 @@ class SherlockTest extends TestCase
                             'oneToMany' => 'mado.querybundle.tests.objects.startingentity'
                         ]
                     ]
-                ], "mado.querybundle.tests.objects.middleentity"
+                ], "mado.querybundle.tests.objects.middleentity", [
+                    'id' => 'integer',
+                    'name' => 'string',
+                    'oneToMany.id' => 'integer',
+                    'oneToMany.username' => 'string',
+                ]
             ],
             [
                 [
@@ -88,7 +106,12 @@ class SherlockTest extends TestCase
                             'starting' => 'mado.querybundle.tests.objects.startingentity'
                         ]
                     ]
-                ], "mado.querybundle.tests.objects.toomany"
+                ], "mado.querybundle.tests.objects.toomany", [
+                    'id' => 'integer',
+                    'stringa' => 'string',
+                    'starting.id' => 'integer',
+                    'starting.username' => 'string',
+                ]
             ],
         ];
     }

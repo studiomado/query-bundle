@@ -92,4 +92,19 @@ class Sherlock
     {
         return $this->getRelations($fullyQualifiedClassName);
     }
+
+    public function getSearchable($entityPath) : array
+    {
+        $raw = $this->getShortOpList($entityPath);
+
+        $ultimateListOfSearchableFields = $raw['fields'];
+
+        foreach ($raw['_embedded'] as $em => $bedded) {
+            foreach ($raw['_embedded'][$em] as $foo => $bar) {
+                $ultimateListOfSearchableFields[$em .'.'. $foo] = $bar;
+            }
+        }
+
+        return $ultimateListOfSearchableFields;
+    }
 }
