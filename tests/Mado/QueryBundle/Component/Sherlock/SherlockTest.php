@@ -23,6 +23,91 @@ class SherlockTest extends TestCase
         );
     }
 
+    /** @dataProvider startingPoints */
+    public function testExtractJustTypeAndRelations(
+        $metadataAsJson,
+        $startingEntity
+    ) {
+        $this->assertEquals(
+            $metadataAsJson,
+            $this->sherlock->getShortOpList($startingEntity)
+        );
+    }
+
+    public function startingPoints()
+    {
+        return [
+            [
+                [
+                    'fields' => [ 'id' => 'integer', 'username' => 'string', ],
+                    '_embedded' => [
+                        'middle' => [
+                            'id' => 'integer',
+                            'name' => 'string',
+                        ],
+                        'tooMany' => [
+                            'id' => 'integer',
+                            'stringa' => 'string',
+                        ],
+                    ],
+                    'relations' => [
+                        [
+                            'middle' => 'mado.querybundle.tests.objects.middleentity',
+                            'tooMany' => 'mado.querybundle.tests.objects.toomany',
+                        ]
+                    ]
+                ], "mado.querybundle.tests.objects.startingentity"
+            ],
+            [
+                [
+                    'fields' => [ 'id' => 'integer', 'name' => 'string', ],
+                    '_embedded' => [
+                        'oneToMany' => [
+                            'id' => 'integer',
+                            'username' => 'string',
+                        ],
+                    ],
+                    'relations' => [
+                        [
+                            'oneToMany' => 'mado.querybundle.tests.objects.startingentity'
+                        ]
+                    ]
+                ], "mado.querybundle.tests.objects.middleentity"
+            ],
+            [
+                [
+                    'fields' => [ 'id' => 'integer', 'stringa' => 'string', ],
+                    '_embedded' => [
+                        'starting' => [
+                            'id' => 'integer',
+                            'username' => 'string',
+                        ],
+                    ],
+                    'relations' => [
+                        [
+                            'starting' => 'mado.querybundle.tests.objects.startingentity'
+                        ]
+                    ]
+                ], "mado.querybundle.tests.objects.toomany"
+            ],
+        ];
+    }
+
+    public function test()
+    {
+        $relations = $this
+            ->sherlock
+            ->willCall("mado.querybundle.tests.objects.startingentity");
+
+        $this->assertEquals(
+            [
+                'middle' => 'mado.querybundle.tests.objects.middleentity',
+                'tooMany' => 'mado.querybundle.tests.objects.toomany',
+            ],
+            $relations
+        );
+    }
+
     public function testShouldProvideAvailableOperatorsForASpecificEntity()
     {
         $this->assertEquals(

@@ -81,9 +81,13 @@ class CurrentMetaData
         $relations = [];
 
         foreach ($this->getCurrentAssociationMapping() as $rel) {
-            $relations[
-                $rel['inversedBy']
-            ] = StringParser::dotNotationFor($rel['targetEntity']);
+            $relationName = $rel['inversedBy'] == ''
+                ? $rel['mappedBy']
+                : $rel['inversedBy'];
+
+            $relations[$relationName] = StringParser::dotNotationFor(
+                $rel['targetEntity']
+            );
         }
 
         return $relations;
