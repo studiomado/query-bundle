@@ -28,7 +28,7 @@ class MapBuilder implements DataMapper
 
     public function getMap() : array
     {
-        if (!$this->map) {
+        if ($this->map == []) {
             $this->rebuildRelationMap();
         }
 
