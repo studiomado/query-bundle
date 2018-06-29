@@ -14,6 +14,7 @@ use Mado\QueryBundle\Services\Pager;
 use Pagerfanta\Adapter\DoctrineORMAdapter;
 use Symfony\Component\HttpFoundation\Request;
 
+/** @codeCoverageIgnore */
 class BaseRepository extends EntityRepository
 {
     protected $request;
