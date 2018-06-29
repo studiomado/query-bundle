@@ -4,3 +4,8 @@ services:
         class: Mado\QueryBundle\Queries\QueryBuilderFactory
         arguments:
             - "@doctrine.orm.entity_manager"
+
+    mado.sherlock:
+        class: Mado\QueryBundle\Component\Sherlock\Sherlock
+        arguments:
+            - "@doctrine.orm.entity_manager"

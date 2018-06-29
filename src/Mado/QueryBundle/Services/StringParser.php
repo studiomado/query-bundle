@@ -29,4 +29,10 @@ class StringParser
 
         return $camelized;
     }
+
+    public static function dotNotationFor(string $class)
+    {
+        $dottedFullyQualifiedClassName = str_replace( '\\', '.', $class);
+        return strtolower($dottedFullyQualifiedClassName);
+    }
 }
