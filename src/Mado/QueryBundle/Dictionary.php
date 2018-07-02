@@ -115,9 +115,9 @@ class Dictionary
         try {
             self::ensureTypeIsDefined($type);
             return self::$doctrineTypeToOperatorsMap[$type];
-        } catch (\Exception $e) {}
-
-        return self::$doctrineTypeToOperatorsMap['default'];
+        } catch (\Exception $e) {
+            return self::$doctrineTypeToOperatorsMap['default'];
+        }
     }
 
     public static function ensureTypeIsDefined($type)
