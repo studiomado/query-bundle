@@ -10,6 +10,8 @@ class Filter
 
     private $operator;
 
+    private $path;
+
     public static function box(array $params)
     {
         $rawIds    = $params['ids'];
@@ -94,9 +96,7 @@ class Filter
     {
         $explodedPath = explode('|', $this->getFieldAndOperator());
 
-        $field = $explodedPath[0];
-
-        return $field;
+        return $explodedPath[0];
     }
 
     public static function fromQueryStringFilter(array $params)
