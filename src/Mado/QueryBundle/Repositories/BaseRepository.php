@@ -35,6 +35,10 @@ class BaseRepository extends EntityRepository
 
     protected $metadata;
 
+    private $lastQuery;
+    
+    private $lastParameters;
+
     public function __construct($manager, $class)
     {
         parent::__construct($manager, $class);
