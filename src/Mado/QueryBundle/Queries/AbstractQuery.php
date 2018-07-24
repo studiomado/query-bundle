@@ -7,7 +7,7 @@ use Mado\QueryBundle\Objects\MetaDataAdapter;
 use Mado\QueryBundle\Queries\QueryBuilderOptions;
 use Mado\QueryBundle\Services\StringParser;
 
-class AbstractQuery
+abstract class AbstractQuery
 {
     protected $manager;
 
@@ -18,6 +18,8 @@ class AbstractQuery
     protected $parser;
 
     protected $qBuilder;
+
+    protected $joinFactory;
 
     public function __construct(EntityManager $manager)
     {
@@ -33,9 +35,11 @@ class AbstractQuery
         $this->entityName = $entityName;
         $this->entityAlias = $alias;
 
-        $this->qBuilder = $this->manager->createQueryBuilder($this->entityName)
+        $this->qBuilder = $this->manager->createQueryBuilder()
             ->select($select)
             ->groupBy($groupBy);
+
+        $this->joinFactory = new Join($this->getEntityName(), $this->entityAlias, $this->manager);
     }
 
     public function createQueryBuilder($entityName, $alias)
@@ -43,9 +47,11 @@ class AbstractQuery
         $this->entityName = $entityName;
         $this->entityAlias = $alias;
 
-        $this->qBuilder = $this->manager->createQueryBuilder($this->entityName)
+        $this->qBuilder = $this->manager->createQueryBuilder()
             ->select($alias)
             ->from($this->entityName, $alias);
+
+        $this->joinFactory = new Join($this->getEntityName(), $this->entityAlias, $this->manager);
     }
 
     public function getEntityName()
@@ -62,8 +68,16 @@ class AbstractQuery
         $this->setAndFilters($options->getAndFilters());
         $this->setOrFilters($options->getOrFilters());
         $this->setSorting($options->getSorting());
-        $this->setRel($options->getRel());
+        $this->setRel([$options->getRel()]);
         $this->setPrinting($options->getPrinting());
         $this->setSelect($options->getSelect());
     }
+
+    abstract public function setFields(array $fields = []);
+    abstract public function setAndFilters(array $andFilters = []);
+    abstract public function setOrFilters(array $orFilters = []);
+    abstract public function setSorting(array $sorting = []);
+    abstract public function setRel(array $rel);
+    abstract public function setPrinting($printing);
+    abstract public function setSelect($select);
 }

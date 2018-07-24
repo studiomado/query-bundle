@@ -2,6 +2,7 @@
 
 namespace Mado\QueryBundle\Tests\Objects;
 
+use Mado\QueryBundle\Dictionary;
 use Mado\QueryBundle\Queries\QueryBuilderFactory;
 use PHPUnit\Framework\TestCase;
 
@@ -82,7 +83,7 @@ class QueryBuilderFactoryTest extends TestCase
     {
         $queryBuilderFactory = new QueryBuilderFactory($this->manager);
         $queryBuilderFactory->setFields([ 'id' ]);
-        $queryBuilderFactory->setAndFilters([ '_embedded.group.id|list' => '42, 33' ]);
+        $queryBuilderFactory->setAndFilters([ '_embedded.group.id|list' => '42, 33']);
         $queryBuilderFactory->createQueryBuilder(User::class, 'e');
         $queryBuilderFactory->filter();
 
@@ -183,6 +184,9 @@ class QueryBuilderFactoryTest extends TestCase
             'list',
             'nlist',
             'field_eq',
+            'isnull',
+            'isnotnull',
+            'listcontains',
         ];
 
         $this->assertEquals(
@@ -261,10 +265,10 @@ class QueryBuilderFactoryTest extends TestCase
     {
         $rel = 'foo';
         $queryBuilderFactory = new QueryBuilderFactory($this->manager);
-        $queryBuilderFactory->setRel($rel);
+        $queryBuilderFactory->setRel([$rel]);
         $relReturned = $queryBuilderFactory->getRel();
 
-        $this->assertEquals($rel, $relReturned);
+        $this->assertEquals([$rel], $relReturned);
     }
 
     public function testSetPrinting()
@@ -343,6 +347,108 @@ class QueryBuilderFactoryTest extends TestCase
         $this->assertEquals($select, $selectReturned);
     }
 
+    public function testListOnEmbeddedOrFilter()
+    {
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setFields([ 'id' ]);
+        $queryBuilderFactory->setRel([ 'group' ]);
+        $queryBuilderFactory->setOrFilters([
+            '_embedded.group.id|list' => '1,2,3',
+        ]);
+        $queryBuilderFactory->createQueryBuilder(User::class, 'e');
+        $queryBuilderFactory->filter();
+
+        $this->assertEquals(
+            "SELECT "
+            . "u0_.id AS id_0, "
+            . "u0_.username AS username_1, "
+            . "u0_.group_id AS group_id_2 "
+            . "FROM User u0_ "
+            . "LEFT JOIN Group g1_ ON u0_.group_id = g1_.id "
+            . "WHERE g1_.id IN (?)",
+            $queryBuilderFactory->getQueryBuilder()->getQuery()->getSql()
+        );
+    }
+
+    public function testFieldsArentInEntity()
+    {
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setFields([ 'id' ]);
+        $queryBuilderFactory->setRel([ 'group' ]);
+        $queryBuilderFactory->setOrFilters([
+            'id|list' => '1,2,3',
+        ]);
+        $queryBuilderFactory->createQueryBuilder(User::class, 'e');
+        $queryBuilderFactory->filter();
+
+        $this->assertEquals(
+            "SELECT" .
+            " u0_.id AS id_0," .
+            " u0_.username AS username_1," .
+            " u0_.group_id AS group_id_2 " .
+            "FROM User u0_ " .
+            "WHERE u0_.id IN (?)",
+            $queryBuilderFactory->getQueryBuilder()->getQuery()->getSql()
+        );
+    }
+
+    public function testCheckFieldsEqualitiWithOrOperator()
+    {
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setFields([ 'username', 'group' ]);
+        $queryBuilderFactory->setOrFilters([ 'username|field_eq' => 'group' ]);
+        $queryBuilderFactory->createQueryBuilder(User::class, 'e');
+        $queryBuilderFactory->filter();
+
+        $this->assertEquals(
+            "SELECT "
+            . "u0_.id AS id_0, "
+            . "u0_.username AS username_1, "
+            . "u0_.group_id AS group_id_2 "
+            . "FROM User u0_ "
+            . "WHERE u0_.username = u0_.group_id",
+            $queryBuilderFactory->getQueryBuilder()->getQuery()->getSql()
+        );
+    }
+
+    public function testCheckFieldsGreaterThan()
+    {
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setFields([ 'id', 'group' ]);
+        $queryBuilderFactory->setOrFilters([ 'id|gte' => '42' ]);
+        $queryBuilderFactory->createQueryBuilder(User::class, 'e');
+        $queryBuilderFactory->filter();
+
+        $this->assertEquals(
+            "SELECT "
+            . "u0_.id AS id_0, "
+            . "u0_.username AS username_1, "
+            . "u0_.group_id AS group_id_2 "
+            . "FROM User u0_ "
+            . "WHERE u0_.id >= ?",
+            $queryBuilderFactory->getQueryBuilder()->getQuery()->getSql()
+        );
+    }
+
+    public function testFilteringOrWithContains()
+    {
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setFields([ 'username', 'group' ]);
+        $queryBuilderFactory->setOrFilters([ 'username|contains' => 'sorar' ]);
+        $queryBuilderFactory->createQueryBuilder(User::class, 'e');
+        $queryBuilderFactory->filter();
+
+        $this->assertEquals(
+            "SELECT "
+            . "u0_.id AS id_0, "
+            . "u0_.username AS username_1, "
+            . "u0_.group_id AS group_id_2 "
+            . "FROM User u0_ "
+            . "WHERE u0_.username LIKE ?",
+            $queryBuilderFactory->getQueryBuilder()->getQuery()->getSql()
+        );
+    }
+
     public function testCanBuildQueriesUsingOrOperator()
     {
         $queryBuilderFactory = new QueryBuilderFactory($this->manager);
@@ -363,7 +469,7 @@ class QueryBuilderFactoryTest extends TestCase
             " u0_.username AS username_1," .
             " u0_.group_id AS group_id_2 " .
             "FROM User u0_ " .
-            "INNER JOIN Group g1_ ON u0_.group_id = g1_.id " .
+            "LEFT JOIN Group g1_ ON u0_.group_id = g1_.id " .
             "WHERE g1_.name LIKE ? " .
             "OR g1_.name LIKE ? " .
             "OR g1_.name LIKE ? " .
@@ -441,7 +547,6 @@ class QueryBuilderFactoryTest extends TestCase
             ->getMock();
         $this->manager->expects($this->once())
             ->method('createQueryBuilder')
-            ->with('EntityName')
             ->willReturn($this->queryBuilder);
 
         $queryBuilderFactory = new QueryBuilderFactory($this->manager);
@@ -466,7 +571,7 @@ class QueryBuilderFactoryTest extends TestCase
             ->with('EntityName')
             ->willReturn($this->queryBuilder);
         $this->queryBuilder->expects($this->once())
-            ->method('join')
+            ->method('innerJoin')
             ->with('alias.ciao', 'table_fizz');
 
         $this->metadata = $this
@@ -491,7 +596,6 @@ class QueryBuilderFactoryTest extends TestCase
             ->getMock();
         $this->manager->expects($this->once())
             ->method('createQueryBuilder')
-            ->with('EntityName')
             ->willReturn($this->queryBuilder);
         $this->manager->expects($this->once())
             ->method('getClassMetadata')
@@ -503,6 +607,329 @@ class QueryBuilderFactoryTest extends TestCase
         $queryBuilderFactory->setSorting(['_embedded.fizz.buzz' => 'bar']);
         $queryBuilderFactory->createQueryBuilder('EntityName', 'alias');
         $queryBuilderFactory->sort();
+    }
+
+    public function testGetAvailableFilters()
+    {
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+
+        $expectedFilters = Dictionary::getOperators();
+
+        $availableFilters = $queryBuilderFactory->getValueAvailableFilters();
+
+        $this->assertEquals($expectedFilters, $availableFilters);
+    }
+
+    public function testAcceptRelationsToAdd()
+    {
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setFields([ 'id' ]);
+        $queryBuilderFactory->setRel([ 'group' ]);
+        $queryBuilderFactory->addRel('foo');
+
+        $this->assertEquals(
+            ['group', 'foo'],
+            $queryBuilderFactory->getRel()
+        );
+    }
+
+    public function testAndFilterUseInnerJoin()
+    {
+        $expectJoinType = 'innerJoin';
+
+        $this->queryBuilder = $this
+            ->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->queryBuilder
+            ->method('select')
+            ->willReturn($this->queryBuilder);
+        $this->queryBuilder
+            ->method('from')
+            ->willReturn($this->queryBuilder);
+        $this->queryBuilder->expects($this->once())
+            ->method($expectJoinType)
+            ->with('alias.baz', 'table_foo');
+
+        $this->prepareDataForFilter();
+
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setFields([ 'id' ]);
+        $queryBuilderFactory->createQueryBuilder('EntityName', 'alias');
+        $queryBuilderFactory->setAndFilters([ '_embedded.foo.baz|eq' => 'bar' ]);
+        $queryBuilderFactory->filter();
+    }
+
+    public function testOrFilterUseLeftJoin()
+    {
+        $expectJoinType = 'leftJoin';
+
+        $this->queryBuilder = $this
+            ->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->queryBuilder
+            ->method('select')
+            ->willReturn($this->queryBuilder);
+        $this->queryBuilder
+            ->method('from')
+            ->willReturn($this->queryBuilder);
+        $this->queryBuilder->expects($this->once())
+            ->method($expectJoinType)
+            ->with('alias.baz', 'table_foo');
+
+        $this->prepareDataForFilter();
+
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setFields([ 'id' ]);
+        $queryBuilderFactory->createQueryBuilder('EntityName', 'alias');
+        $queryBuilderFactory->setOrFilters([ '_embedded.foo.baz|eq' => 'bar' ]);
+        $queryBuilderFactory->filter();
+    }
+
+    private function prepareDataForFilter()
+    {
+        $this->metadata = $this
+            ->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->metadata
+            ->method('hasAssociation')
+            ->with('foo')
+            ->willReturn(true);
+        $this->metadata
+            ->method('getAssociationMapping')
+            ->with('foo')
+            ->willReturn([
+                'fieldName'    => 'baz',
+                'targetEntity' => 'someEntityName',
+            ]);
+
+        $this->manager = $this
+            ->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->manager
+            ->method('createQueryBuilder')
+            ->willReturn($this->queryBuilder);
+        $this->manager
+            ->method('getClassMetadata')
+            ->with('EntityName')
+            ->willReturn($this->metadata);
+    }
+
+    public function testFilteringWithIsNull()
+    {
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setFields([ 'username', 'group' ]);
+        $queryBuilderFactory->setAndFilters([ 'username|isnull' => '' ]);
+        $queryBuilderFactory->createQueryBuilder(User::class, 'e');
+        $queryBuilderFactory->filter();
+
+        $this->assertEquals(
+            "SELECT "
+            . "u0_.id AS id_0, "
+            . "u0_.username AS username_1, "
+            . "u0_.group_id AS group_id_2 "
+            . "FROM User u0_ "
+            . "WHERE u0_.username IS NULL",
+            $queryBuilderFactory->getQueryBuilder()->getQuery()->getSql()
+        );
+    }
+
+    public function testFilteringOrWithIsNull()
+    {
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setFields([ 'username', 'group' ]);
+        $queryBuilderFactory->setOrFilters([ 'username|isnull' => '' ]);
+        $queryBuilderFactory->createQueryBuilder(User::class, 'e');
+        $queryBuilderFactory->filter();
+
+        $this->assertEquals(
+            "SELECT "
+            . "u0_.id AS id_0, "
+            . "u0_.username AS username_1, "
+            . "u0_.group_id AS group_id_2 "
+            . "FROM User u0_ "
+            . "WHERE u0_.username IS NULL",
+            $queryBuilderFactory->getQueryBuilder()->getQuery()->getSql()
+        );
+    }
+
+    public function testFilteringAndWithIsNullIntoEmbedded()
+    {
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setFields([ 'id' ]);
+        $queryBuilderFactory->setRel([ 'group' ]);
+        $queryBuilderFactory->setAndFilters([
+            '_embedded.group.name|isnull' => ''
+        ]);
+        $queryBuilderFactory->createQueryBuilder(User::class, 'e');
+        $queryBuilderFactory->filter();
+
+        $this->assertEquals(
+            "SELECT" .
+            " u0_.id AS id_0," .
+            " u0_.username AS username_1," .
+            " u0_.group_id AS group_id_2 " .
+            "FROM User u0_ " .
+            "INNER JOIN Group g1_ ON u0_.group_id = g1_.id " .
+            "WHERE g1_.name IS NULL",
+            $queryBuilderFactory->getQueryBuilder()->getQuery()->getSql()
+        );
+    }
+
+    public function testFilteringOrWithIsNullIntoEmbedded()
+    {
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setFields([ 'id' ]);
+        $queryBuilderFactory->setRel([ 'group' ]);
+        $queryBuilderFactory->setOrFilters([
+            '_embedded.group.name|isnull' => ''
+        ]);
+        $queryBuilderFactory->createQueryBuilder(User::class, 'e');
+        $queryBuilderFactory->filter();
+
+        $this->assertEquals(
+            "SELECT" .
+            " u0_.id AS id_0," .
+            " u0_.username AS username_1," .
+            " u0_.group_id AS group_id_2 " .
+            "FROM User u0_ " .
+            "LEFT JOIN Group g1_ ON u0_.group_id = g1_.id " .
+            "WHERE g1_.name IS NULL",
+            $queryBuilderFactory->getQueryBuilder()->getQuery()->getSql()
+        );
+    }
+
+    public function testFilteringWithIsNotNull()
+    {
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setFields([ 'username', 'group' ]);
+        $queryBuilderFactory->setAndFilters([ 'username|isnotnull' => '' ]);
+        $queryBuilderFactory->createQueryBuilder(User::class, 'e');
+        $queryBuilderFactory->filter();
+
+        $this->assertEquals(
+            "SELECT "
+            . "u0_.id AS id_0, "
+            . "u0_.username AS username_1, "
+            . "u0_.group_id AS group_id_2 "
+            . "FROM User u0_ "
+            . "WHERE u0_.username IS NOT NULL",
+            $queryBuilderFactory->getQueryBuilder()->getQuery()->getSql()
+        );
+    }
+
+    public function testFilteringOrWithIsNotNull()
+    {
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setFields([ 'username', 'group' ]);
+        $queryBuilderFactory->setOrFilters([ 'username|isnotnull' => '' ]);
+        $queryBuilderFactory->createQueryBuilder(User::class, 'e');
+        $queryBuilderFactory->filter();
+
+        $this->assertEquals(
+            "SELECT "
+            . "u0_.id AS id_0, "
+            . "u0_.username AS username_1, "
+            . "u0_.group_id AS group_id_2 "
+            . "FROM User u0_ "
+            . "WHERE u0_.username IS NOT NULL",
+            $queryBuilderFactory->getQueryBuilder()->getQuery()->getSql()
+        );
+    }
+
+    public function testFilteringAndWithIsNotNullIntoEmbedded()
+    {
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setFields([ 'id' ]);
+        $queryBuilderFactory->setRel([ 'group' ]);
+        $queryBuilderFactory->setAndFilters([
+            '_embedded.group.name|isnotnull' => ''
+        ]);
+        $queryBuilderFactory->createQueryBuilder(User::class, 'e');
+        $queryBuilderFactory->filter();
+
+        $this->assertEquals(
+            "SELECT" .
+            " u0_.id AS id_0," .
+            " u0_.username AS username_1," .
+            " u0_.group_id AS group_id_2 " .
+            "FROM User u0_ " .
+            "INNER JOIN Group g1_ ON u0_.group_id = g1_.id " .
+            "WHERE g1_.name IS NOT NULL",
+            $queryBuilderFactory->getQueryBuilder()->getQuery()->getSql()
+        );
+    }
+
+    public function testFilteringOrWithIsNotNullIntoEmbedded()
+    {
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setFields([ 'id' ]);
+        $queryBuilderFactory->setRel([ 'group' ]);
+        $queryBuilderFactory->setOrFilters([
+            '_embedded.group.name|isnotnull' => ''
+        ]);
+        $queryBuilderFactory->createQueryBuilder(User::class, 'e');
+        $queryBuilderFactory->filter();
+
+        $this->assertEquals(
+            "SELECT" .
+            " u0_.id AS id_0," .
+            " u0_.username AS username_1," .
+            " u0_.group_id AS group_id_2 " .
+            "FROM User u0_ " .
+            "LEFT JOIN Group g1_ ON u0_.group_id = g1_.id " .
+            "WHERE g1_.name IS NOT NULL",
+            $queryBuilderFactory->getQueryBuilder()->getQuery()->getSql()
+        );
+    }
+
+    public function testFilteringListContains()
+    {
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setFields([ 'id', 'username' ]);
+        $queryBuilderFactory->setRel([ 'group' ]);
+        $queryBuilderFactory->setAndFilters([
+            'username|listcontains' => 'a,b',
+            '_embedded.group.name|listcontains' => 'c,d'
+        ]);
+        $queryBuilderFactory->createQueryBuilder(User::class, 'e');
+        $queryBuilderFactory->filter();
+
+        $this->assertEquals(
+            "SELECT u0_.id AS id_0, u0_.username AS username_1, u0_.group_id AS group_id_2" .
+            " FROM User u0_" .
+            " INNER JOIN Group g1_ ON u0_.group_id = g1_.id " .
+            "WHERE ((u0_.username LIKE ? OR u0_.username LIKE ?)) " .
+            "AND ((g1_.name LIKE ? OR g1_.name LIKE ?))",
+            $queryBuilderFactory->getQueryBuilder()->getQuery()->getSql()
+        );
+    }
+
+    public function testSortingIntoTwoLevelsEmbedded()
+    {
+        $queryBuilderFactory = new QueryBuilderFactory($this->manager);
+        $queryBuilderFactory->setFields([ 'id' ]);
+        $queryBuilderFactory->setRel([ 'group', 'company' ]);
+        $queryBuilderFactory->setSorting([
+            '_embedded.group.company.id' => 'asc'
+        ]);
+        $queryBuilderFactory->createQueryBuilder(User::class, 'e');
+        $queryBuilderFactory->sort();
+
+        $this->assertEquals(
+            "SELECT" .
+            " u0_.id AS id_0," .
+            " u0_.username AS username_1," .
+            " u0_.group_id AS group_id_2 " .
+            "FROM User u0_ " .
+            "INNER JOIN Group g1_ ON u0_.group_id = g1_.id " .
+            "INNER JOIN Company c2_ ON g1_.company_id = c2_.id " .
+            "ORDER BY c2_.id ASC",
+            $queryBuilderFactory->getQueryBuilder()->getQuery()->getSql()
+        );
     }
 }
 
@@ -533,4 +960,17 @@ class Group
     private $name;
     /** @OneToMany(targetEntity="User", mappedBy="member") */
     private $members;
+    /** @ManyToOne(targetEntity="Company", inversedBy="groups") */
+    private $company;
+}
+
+/** @Entity() */
+class Company
+{
+    /** @Id @Column(type="integer") */
+    private $id;
+    /** @Column(type="string") */
+    private $name;
+    /** @OneToMany(targetEntity="Group", mappedBy="company") */
+    private $group;
 }

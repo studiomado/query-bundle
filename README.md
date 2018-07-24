@@ -1,14 +1,21 @@
 # QueryBundle
 
+latest stable version [![Latest Stable Version](https://poser.pugx.org/studiomado/query-bundle/version)](https://packagist.org/packages/studiomado/query-bundle)
+
+
+| 2.4 (master) | 2.3 | 2.2 |
+|----------------|----------|---|
+| [![Build Status](https://scrutinizer-ci.com/g/studiomado/query-bundle/badges/build.png?b=master)](https://scrutinizer-ci.com/g/studiomado/query-bundle/build-status/master) | [![Build Status](https://scrutinizer-ci.com/g/studiomado/query-bundle/badges/build.png?b=2.3)](https://scrutinizer-ci.com/g/studiomado/query-bundle/build-status/2.3) | [![Build Status](https://scrutinizer-ci.com/g/studiomado/query-bundle/badges/build.png?b=2.2)](https://scrutinizer-ci.com/g/studiomado/query-bundle/build-status/2.2) |
+| [![Code Coverage](https://scrutinizer-ci.com/g/studiomado/query-bundle/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/studiomado/query-bundle/?branch=master) | [![Code Coverage](https://scrutinizer-ci.com/g/studiomado/query-bundle/badges/coverage.png?b=2.3)](https://scrutinizer-ci.com/g/studiomado/query-bundle/?branch=2.3) | [![Code Coverage](https://scrutinizer-ci.com/g/studiomado/query-bundle/badges/coverage.png?b=2.2)](https://scrutinizer-ci.com/g/studiomado/query-bundle/?branch=2.2) |
+| [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/studiomado/query-bundle/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/studiomado/query-bundle/?branch=master) |  [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/studiomado/query-bundle/badges/quality-score.png?b=2.3)](https://scrutinizer-ci.com/g/studiomado/query-bundle/?branch=2.3) | [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/studiomado/query-bundle/badges/quality-score.png?b=2.2)](https://scrutinizer-ci.com/g/studiomado/query-bundle/?branch=2.2) |
+
+
 ## Run tests
 
  - `./runtests.sh` run all unit tests
  - `./agile.sh` generate testdox documentation
  - `./coverage.sh` generate and open html coverage
 
-## Badges
-
-[![Build Status](https://scrutinizer-ci.com/g/studiomado/query-bundle/badges/build.png?b=master)](https://scrutinizer-ci.com/g/studiomado/query-bundle/build-status/master) [![Code Coverage](https://scrutinizer-ci.com/g/studiomado/query-bundle/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/studiomado/query-bundle/?branch=master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/studiomado/query-bundle/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/studiomado/query-bundle/?branch=master)
 # Plain symfony project for query-bundle
 
 The purpose of this project is to see how studiomado/query-bundle works and can be installed in a plain symfony project.
@@ -94,9 +101,11 @@ First of all install vendors
     prompt> composer require jms/serializer-bundle
     prompt> composer require willdurand/hateoas-bundle
     prompt> composer require white-october/pagerfanta-bundle
+    prompt> composer require friendsofsymfony/rest-bundle
 
 and then, … add vendors in your app/AppKernel 
 
+    new FOS\RestBundle\FOSRestBundle(),
     new JMS\SerializerBundle\JMSSerializerBundle(),
     new Bazinga\Bundle\HateoasBundle\BazingaHateoasBundle(),
 
