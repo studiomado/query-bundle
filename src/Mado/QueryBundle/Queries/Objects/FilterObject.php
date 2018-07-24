@@ -8,9 +8,9 @@ use Mado\QueryBundle\Dictionary;
 /** @since class available since release 2.2 */
 final class FilterObject
 {
-    const FIELD = 0;
+    private const FIELD = 0;
 
-    const OPERATOR = 1;
+    private const OPERATOR = 1;
 
     private $rawFilter;
 
@@ -55,7 +55,7 @@ final class FilterObject
             || $this->getOperatorName() == 'nlist';
     }
 
-    public function isFieldEqualityType()
+    public function isFieldEqualityType() : bool
     {
         return $this->getOperatorName() == 'field_eq';
     }
@@ -92,5 +92,15 @@ final class FilterObject
     public function getOperator()
     {
         return $this->operatorName;
+    }
+
+    public function isNullType() : bool
+    {
+        return $this->getOperatorName() === 'isnull' || $this->getOperatorName() === 'isnotnull';
+    }
+
+    public function isListContainsType() : bool
+    {
+        return $this->getOperatorName() === 'listcontains';
     }
 }

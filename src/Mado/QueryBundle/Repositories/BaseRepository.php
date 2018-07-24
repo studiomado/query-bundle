@@ -3,22 +3,24 @@
 namespace Mado\QueryBundle\Repositories;
 
 use Doctrine\ORM\EntityRepository;
-use Hateoas\Configuration\Route;
+use Doctrine\ORM\QueryBuilder;
 use Hateoas\Representation\Factory\PagerfantaFactory;
+use Mado\QueryBundle\Exceptions\InvalidFiltersException;
 use Mado\QueryBundle\Objects\MetaDataAdapter;
+use Mado\QueryBundle\Objects\PagerfantaBuilder;
 use Mado\QueryBundle\Queries\QueryBuilderFactory;
 use Mado\QueryBundle\Queries\QueryBuilderOptions;
+use Mado\QueryBundle\Services\Pager;
 use Pagerfanta\Adapter\DoctrineORMAdapter;
-use Pagerfanta\Pagerfanta;
 use Symfony\Component\HttpFoundation\Request;
 
 class BaseRepository extends EntityRepository
 {
     protected $request;
 
-    protected $use_result_cache = false;
+    protected $useResultCache = false;
 
-    protected $route_name;
+    protected $routeName;
 
     protected $currentEntityAlias;
 
@@ -65,7 +67,7 @@ class BaseRepository extends EntityRepository
 
     public function useResultCache($bool)
     {
-        $this->use_result_cache = $bool;
+        $this->useResultCache = $bool;
     }
 
     public function setRequest(Request $request)
@@ -105,7 +107,6 @@ class BaseRepository extends EntityRepository
         $rel         = $request->query->get('rel', '');
         $page        = $request->query->get('page', '');
         $select      = $request->query->get('select', $this->metadata->getEntityAlias());
-        $pageLength  = $request->query->get('limit', 666);
         $filtering   = $request->query->get('filtering', '');
         $limit       = $request->query->get('limit', '');
 
@@ -116,7 +117,7 @@ class BaseRepository extends EntityRepository
             if (is_array($filter)) {
                 foreach ($filter as $keyInternal => $internal) {
                     $filterOrCorrected[$keyInternal . '|' . $count] = $internal;
-                    $count = $count + 1;
+                    $count += 1;
                 }
             } else {
                 $filterOrCorrected[$key] = $filter;
@@ -146,6 +147,19 @@ class BaseRepository extends EntityRepository
         return $this;
     }
 
+    private function ensureFilterIsValid($filters)
+    {
+        if (!is_array($filters)) {
+
+            $message = "Wrong query string exception: ";
+            $message .= var_export($filters, true) . "\n";
+            $message .= "Please check query string should be something like " .
+                "http://127.0.0.1:8000/?filtering[status]=todo";
+
+            throw new InvalidFiltersException($message);
+        }
+    }
+
     public function setQueryOptionsFromRequestWithCustomFilter(Request $request = null, $filter)
     {
         $filters = $request->query->get('filtering', []);
@@ -155,29 +169,29 @@ class BaseRepository extends EntityRepository
         $rel = $request->query->get('rel', '');
         $page = $request->query->get('page', '');
         $select = $request->query->get('select', $this->metadata->getEntityAlias());
-        $pageLength = $request->query->get('limit', 666);
         $filtering = $request->query->get('filtering', '');
         $limit = $request->query->get('limit', '');
 
+        $this->ensureFilterIsValid($filters);
         $filters = array_merge($filters, $filter);
 
         $filterOrCorrected = [];
 
         $count = 0;
-        foreach ($orFilters as $key => $filter) {
-            if (is_array($filter)) {
-                foreach ($filter as $keyInternal => $internal) {
+        foreach ($orFilters as $key => $filterValue) {
+            if (is_array($filterValue)) {
+                foreach ($filterValue as $keyInternal => $internal) {
                     $filterOrCorrected[$keyInternal . '|' . $count] = $internal;
-                    $count = $count + 1;
+                    $count += 1;
                 }
             } else {
-                $filterOrCorrected[$key] = $filter;
+                $filterOrCorrected[$key] = $filterValue;
             }
         }
 
         $this->queryOptions = QueryBuilderOptions::fromArray([
             '_route' => $request->attributes->get('_route'),
-            'customer_id' => $request->attributes->get('customer_id'),
+            '_route_params' => $request->attributes->get('_route_params', []),
             'id' => $request->attributes->get('id'),
             'filtering' => $filtering,
             'limit' => $limit,
@@ -202,7 +216,6 @@ class BaseRepository extends EntityRepository
         $rel = $request->query->get('rel', '');
         $page = $request->query->get('page', '');
         $select = $request->query->get('select', $this->metadata->getEntityAlias());
-        $pageLength = $request->query->get('limit', 666);
         $filtering = $request->query->get('filtering', '');
         $limit = $request->query->get('limit', '');
 
@@ -215,7 +228,7 @@ class BaseRepository extends EntityRepository
             if (is_array($filter)) {
                 foreach ($filter as $keyInternal => $internal) {
                     $filterOrCorrected[$keyInternal . '|' . $count] = $internal;
-                    $count = $count + 1;
+                    $count += 1;
                 }
             } else {
                 $filterOrCorrected[$key] = $filter;
@@ -224,7 +237,7 @@ class BaseRepository extends EntityRepository
 
         $this->queryOptions = QueryBuilderOptions::fromArray([
             '_route' => $request->attributes->get('_route'),
-            'customer_id' => $request->attributes->get('customer_id'),
+            '_route_params' => $request->attributes->get('_route_params', []),
             'id' => $request->attributes->get('id'),
             'filtering' => $filtering,
             'limit' => $limit,
@@ -245,9 +258,9 @@ class BaseRepository extends EntityRepository
         return $this->request;
     }
 
-    public function setRouteName($route_name = '')
+    public function setRouteName($routeName = '')
     {
-        $this->route_name = $route_name;
+        $this->routeName = $routeName;
         return $this;
     }
 
@@ -274,60 +287,18 @@ class BaseRepository extends EntityRepository
         ];
     }
 
-    protected function paginateResults(
-        \Doctrine\ORM\QueryBuilder $queryBuilder
-    ) {
-        $limit = $this->queryOptions->get('limit', 10);
-        $page = $this->queryOptions->get('page', 1);
-
-
-        $pagerAdapter = new DoctrineORMAdapter($queryBuilder);
-
-        $query = $pagerAdapter->getQuery();
-        if (isset($this->use_result_cache) and $this->use_result_cache) {
-            $query->useResultCache(true, 600);
-        }
-
-        $pager = new Pagerfanta($pagerAdapter);
-        $pager->setNormalizeOutOfRangePages(true);
-        $pager->setMaxPerPage($limit);
-        $pager->setCurrentPage($page);
-
-        $pagerFactory = new PagerfantaFactory();
-
-        $router = $this->createRouter();
-
-        $results = $pagerFactory->createRepresentation($pager, $router);
-
-        return $results;
-    }
-
-    protected function customQueryStringValues()
+    protected function paginateResults(QueryBuilder $queryBuilder)
     {
-        return [];
-    }
-
-    protected function createRouter()
-    {
-        $request = $this->getRequest();
-        $params = [];
-
-        $list = array_merge([
-            'filtering',
-            'limit',
-            'page',
-            'sorting',
-        ], $this->customQueryStringValues());
-
-        foreach ($list as $itemKey => $itemValue) {
-            $params[$itemValue] = $this->queryOptions->get($itemValue);
-        }
-
-        if (!isset($this->route_name)) {
-            $this->route_name = $this->queryOptions->get('_route');
-        }
-
-        return new Route($this->route_name, $params);
+        $ormAdapter = new DoctrineORMAdapter($queryBuilder);
+        $pagerfantaBuilder = new PagerfantaBuilder(new PagerfantaFactory(), $ormAdapter);
+        $pager = new Pager();
+        return $pager->paginateResults(
+            $this->queryOptions,
+            $ormAdapter,
+            $pagerfantaBuilder,
+            $this->routeName,
+            $this->useResultCache
+        );
     }
 
     protected function getCurrentEntityAlias() : string
@@ -335,7 +306,7 @@ class BaseRepository extends EntityRepository
         return $this->currentEntityAlias;
     }
 
-    protected function setCurrentEntityAlias(string $currentEntityAlias) 
+    protected function setCurrentEntityAlias(string $currentEntityAlias)
     {
         $this->currentEntityAlias = $currentEntityAlias;
     }
@@ -345,7 +316,7 @@ class BaseRepository extends EntityRepository
         return $this->embeddedFields;
     }
 
-    protected function setEmbeddedFields(array $embeddedFields) 
+    protected function setEmbeddedFields(array $embeddedFields)
     {
         $this->embeddedFields = $embeddedFields;
     }
