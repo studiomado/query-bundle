@@ -71,4 +71,10 @@ class QueryBuilderOptions
             $this->options[$option] = PHP_INT_MAX;
         }
     }
+
+    public function requireJustCount()
+    {
+        return isset($this->options['justCount'])
+            && $this->options['justCount'] === 'true';
+    }
 }
