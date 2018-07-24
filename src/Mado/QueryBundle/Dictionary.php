@@ -82,6 +82,19 @@ class Dictionary
         self::FIELD_NOT_IN_LIST => [ 'meta' => 'NOT IN', 'substitution_pattern' => '({string})' ],
         self::FIELD_EQUALITY    => [ 'meta' => '=' ],
 
+        'isnull' => [
+            'meta' => 'IS NULL',
+        ],
+
+        'isnotnull' => [
+            'meta' => 'IS NOT NULL',
+        ],
+
+        'listcontains' => [
+            'meta' => 'LIKE',
+            'substitution_pattern' => '({string})',
+        ],
+
     ];
 
     public static function getOperators()

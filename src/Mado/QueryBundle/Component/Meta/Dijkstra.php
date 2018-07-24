@@ -82,7 +82,9 @@ class Dijkstra
 
         if ($source === $target) {
             return [[$source]];
-        } elseif (empty($this->prev[$target])) {
+        }
+
+        if (empty($this->prev[$target])) {
             return [];
         }
 

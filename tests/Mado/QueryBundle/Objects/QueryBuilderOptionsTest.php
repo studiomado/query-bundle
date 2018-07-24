@@ -30,9 +30,6 @@ class QueryBuilderOptionsTest extends TestCase
             $op->getAndFilters()
         );
 
-        $this->assertEquals(
-            null,
-            $op->get('fake')
-        );
+        $this->assertNull($op->get('fake'));
     }
 }

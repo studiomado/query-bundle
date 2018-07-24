@@ -7,20 +7,20 @@ use Doctrine\ORM\QueryBuilder;
 use Hateoas\Representation\Factory\PagerfantaFactory;
 use Mado\QueryBundle\Exceptions\InvalidFiltersException;
 use Mado\QueryBundle\Objects\MetaDataAdapter;
+use Mado\QueryBundle\Objects\PagerfantaBuilder;
 use Mado\QueryBundle\Queries\QueryBuilderFactory;
 use Mado\QueryBundle\Queries\QueryBuilderOptions;
-use Mado\QueryBundle\Services\Router;
+use Mado\QueryBundle\Services\Pager;
 use Pagerfanta\Adapter\DoctrineORMAdapter;
-use Pagerfanta\Pagerfanta;
 use Symfony\Component\HttpFoundation\Request;
 
 class BaseRepository extends EntityRepository
 {
     protected $request;
 
-    protected $use_result_cache = false;
+    protected $useResultCache = false;
 
-    protected $route_name;
+    protected $routeName;
 
     protected $currentEntityAlias;
 
@@ -67,7 +67,7 @@ class BaseRepository extends EntityRepository
 
     public function useResultCache($bool)
     {
-        $this->use_result_cache = $bool;
+        $this->useResultCache = $bool;
     }
 
     public function setRequest(Request $request)
@@ -258,9 +258,9 @@ class BaseRepository extends EntityRepository
         return $this->request;
     }
 
-    public function setRouteName($route_name = '')
+    public function setRouteName($routeName = '')
     {
-        $this->route_name = $route_name;
+        $this->routeName = $routeName;
         return $this;
     }
 
@@ -287,34 +287,18 @@ class BaseRepository extends EntityRepository
         ];
     }
 
-    protected function paginateResults(QueryBuilder $queryBuilder) {
-        $limit = $this->queryOptions->get('limit', 10);
-        $page = $this->queryOptions->get('page', 1);
-
-        $pagerAdapter = new DoctrineORMAdapter($queryBuilder);
-
-        $query = $pagerAdapter->getQuery();
-        if (isset($this->use_result_cache) and $this->use_result_cache) {
-            $query->useResultCache(true, 600);
-        }
-
-        $pager = new Pagerfanta($pagerAdapter);
-        $pager->setNormalizeOutOfRangePages(true);
-        $pager->setMaxPerPage($limit);
-        $pager->setCurrentPage($page);
-
-        $pagerFactory = new PagerfantaFactory();
-
-        $router = new Router();
-        $route = $router->createRouter($this->queryOptions, $this->route_name);
-
-        return $pagerFactory->createRepresentation($pager, $route);
-    }
-
-    /** @deprecated since 2.3 */
-    protected function customQueryStringValues()
+    protected function paginateResults(QueryBuilder $queryBuilder)
     {
-        return [];
+        $ormAdapter = new DoctrineORMAdapter($queryBuilder);
+        $pagerfantaBuilder = new PagerfantaBuilder(new PagerfantaFactory(), $ormAdapter);
+        $pager = new Pager();
+        return $pager->paginateResults(
+            $this->queryOptions,
+            $ormAdapter,
+            $pagerfantaBuilder,
+            $this->routeName,
+            $this->useResultCache
+        );
     }
 
     protected function getCurrentEntityAlias() : string
