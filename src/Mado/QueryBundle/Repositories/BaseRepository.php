@@ -175,6 +175,7 @@ class BaseRepository extends EntityRepository
         $select = $request->query->get('select', $this->metadata->getEntityAlias());
         $filtering = $request->query->get('filtering', '');
         $limit = $request->query->get('limit', '');
+        $justCount = $request->query->get('justCount', 'false');
 
         $this->ensureFilterIsValid($filters);
         $filters = array_merge($filters, $filter);
@@ -206,6 +207,7 @@ class BaseRepository extends EntityRepository
             'rel' => $rel,
             'printing' => $printing,
             'select' => $select,
+            'justCount' => $justCount,
         ]);
 
         return $this;
@@ -287,6 +289,19 @@ class BaseRepository extends EntityRepository
         $this->queryBuilderFactory->sort();
 
         $queryBuilder = $this->queryBuilderFactory->getQueryBuilder();
+
+        if ($this->queryOptions->requireJustCount()) {
+            $metadata = $this->metadata;
+            $rootEntityAlias = $metadata->getEntityAlias();
+            $select = 'count(' . $rootEntityAlias . '.id)';
+
+            $count = $queryBuilder
+                ->select($select)
+                ->getQuery()
+                ->getSingleScalarResult();
+
+            return [ 'count' => $count ];
+        }
 
         $this->lastQuery = $queryBuilder->getQuery()->getSql();
         $this->lastParameters = $queryBuilder->getQuery()->getParameters();
