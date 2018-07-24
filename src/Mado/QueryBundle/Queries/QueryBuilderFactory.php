@@ -16,9 +16,9 @@ class QueryBuilderFactory extends AbstractQuery
 
     const DEFAULT_OPERATOR = 'eq';
 
-    private const AND_OPERATOR_LOGIC = 'AND';
+    const AND_OPERATOR_LOGIC = 'AND';
 
-    private const OR_OPERATOR_LOGIC = 'OR';
+    const OR_OPERATOR_LOGIC = 'OR';
 
     protected $qBuilder;
 
