@@ -8,11 +8,11 @@ use Pagerfanta\Adapter\DoctrineORMAdapter;
 
 class Pager
 {
-    private const DEFAULT_LIMIT = 10;
+    const DEFAULT_LIMIT = 10;
 
-    private const DEFAULT_PAGE = 1;
+    const DEFAULT_PAGE = 1;
 
-    private const DEFAULT_LIFETIME = 600;
+    const DEFAULT_LIFETIME = 600;
 
     private $router;
 

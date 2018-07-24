@@ -8,9 +8,9 @@ use Mado\QueryBundle\Dictionary;
 /** @since class available since release 2.2 */
 final class FilterObject
 {
-    private const FIELD = 0;
+    const FIELD = 0;
 
-    private const OPERATOR = 1;
+    const OPERATOR = 1;
 
     private $rawFilter;
 

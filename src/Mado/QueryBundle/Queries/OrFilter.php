@@ -6,7 +6,7 @@ use Mado\QueryBundle\Services\StringParser;
 
 class OrFilter
 {
-    private const OR_OPERATOR_LOGIC = 'OR';
+    const OR_OPERATOR_LOGIC = 'OR';
 
     private $entityAlias;
 
