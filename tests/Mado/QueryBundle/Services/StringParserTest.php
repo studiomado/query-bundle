@@ -14,4 +14,11 @@ class StringParserTest extends TestCase
             $this->parser->camelize('fizz_buzz_foo_bar')
         );
     }
+
+    public function testDotNotationFor()
+    {
+        $result = StringParser::dotNotationFor('Foo\bar');
+
+        $this->assertEquals('foo.bar', $result);
+    }
 }
