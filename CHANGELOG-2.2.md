@@ -13,3 +13,4 @@ in 2.2 minor versions.
  - add [Services\FilterExtractor] extract additional filters from AdditionalFilterable
  - add [Objects\Filter] to read filter value
  - add [AdditionalFilterable] interface
+ - add the possibility to just return the count of query results
