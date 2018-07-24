@@ -276,9 +276,16 @@ class BaseRepository extends EntityRepository
         $queryBuilder = $this->queryBuilderFactory->getQueryBuilder();
 
         if ($this->queryOptions->requireJustCount()) {
-            return [
-                'count' => count($queryBuilder->getQuery()->getScalarResult()),
-            ];
+            $metadata = $this->metadata;
+            $rootEntityAlias = $metadata->getEntityAlias();
+            $select = 'count(' . $rootEntityAlias . '.id)';
+
+            $count = $queryBuilder
+                ->select($select)
+                ->getQuery()
+                ->getSingleScalarResult();
+
+            return [ 'count' => $count ];
         }
 
         $this->lastQuery = $queryBuilder->getQuery()->getSql();
