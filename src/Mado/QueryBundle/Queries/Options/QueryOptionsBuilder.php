@@ -3,6 +3,7 @@
 namespace Mado\QueryBundle\Queries\Options;
 
 use Mado\QueryBundle\Exceptions\InvalidFiltersException;
+use Symfony\Component\HttpFoundation\Request;
 
 class QueryOptionsBuilder
 {
