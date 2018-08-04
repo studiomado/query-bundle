@@ -115,46 +115,7 @@ class BaseRepository extends EntityRepository
 
     public function setQueryOptionsFromRequestWithCustomOrFilter(Request $request = null, $orFilter)
     {
-        $filters = $request->query->get('filtering', []);
-        $orFilters = $request->query->get('filtering_or', []);
-        $sorting = $request->query->get('sorting', []);
-        $printing = $request->query->get('printing', []);
-        $rel = $request->query->get('rel', '');
-        $page = $request->query->get('page', '');
-        $select = $request->query->get('select', $this->metadata->getEntityAlias());
-        $filtering = $request->query->get('filtering', '');
-        $limit = $request->query->get('limit', '');
-
-        $orFilters = array_merge($orFilters, $orFilter);
-
-        $filterOrCorrected = [];
-
-        $count = 0;
-        foreach ($orFilters as $key => $filter) {
-            if (is_array($filter)) {
-                foreach ($filter as $keyInternal => $internal) {
-                    $filterOrCorrected[$keyInternal . '|' . $count] = $internal;
-                    $count += 1;
-                }
-            } else {
-                $filterOrCorrected[$key] = $filter;
-            }
-        }
-
-        $this->queryOptions = QueryBuilderOptions::fromArray([
-            '_route' => $request->attributes->get('_route'),
-            '_route_params' => $request->attributes->get('_route_params', []),
-            'id' => $request->attributes->get('id'),
-            'filtering' => $filtering,
-            'limit' => $limit,
-            'page' => $page,
-            'filters' => $filters,
-            'orFilters' => $filterOrCorrected,
-            'sorting' => $sorting,
-            'rel' => $rel,
-            'printing' => $printing,
-            'select' => $select,
-        ]);
+        $this->queryOptions = $this->qoBuilder->buildForOrFilter($request);
 
         return $this;
     }
