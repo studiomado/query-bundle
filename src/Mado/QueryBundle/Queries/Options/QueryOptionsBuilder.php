@@ -14,6 +14,11 @@ class QueryOptionsBuilder
         $this->entityAlias = $entityAlias;
     }
 
+    public function getEntityAlias()
+    {
+        return $this->entityAlias;
+    }
+
     public function builderFromRequest(Request $request = null)
     {
         $this->ensureEntityAliasIsDefined();
