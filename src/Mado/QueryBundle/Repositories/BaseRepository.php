@@ -10,7 +10,7 @@ use Mado\QueryBundle\Objects\MetaDataAdapter;
 use Mado\QueryBundle\Objects\PagerfantaBuilder;
 use Mado\QueryBundle\Queries\QueryBuilderFactory;
 use Mado\QueryBundle\Queries\QueryBuilderOptions;
-use Mado\QueryBundle\Queries\QueryOptionsBuilder;
+use Mado\QueryBundle\Queries\Options\QueryOptionsBuilder;
 use Mado\QueryBundle\Services\Pager;
 use Pagerfanta\Adapter\DoctrineORMAdapter;
 use Symfony\Component\HttpFoundation\Request;
