@@ -10,6 +10,7 @@ use Mado\QueryBundle\Objects\MetaDataAdapter;
 use Mado\QueryBundle\Objects\PagerfantaBuilder;
 use Mado\QueryBundle\Queries\QueryBuilderFactory;
 use Mado\QueryBundle\Queries\QueryBuilderOptions;
+use Mado\QueryBundle\Queries\QueryOptionsBuilder;
 use Mado\QueryBundle\Services\Pager;
 use Pagerfanta\Adapter\DoctrineORMAdapter;
 use Symfony\Component\HttpFoundation\Request;
@@ -48,6 +49,7 @@ class BaseRepository extends EntityRepository
         $this->metadata->setEntityName($this->getEntityName());
 
         $this->queryBuilderFactory = new QueryBuilderFactory($this->getEntityManager());
+        $this->qoBuilder = new QueryOptionsBuilder();
     }
 
     public function initFromQueryBuilderOptions(QueryBuilderOptions $options)
@@ -97,57 +99,9 @@ class BaseRepository extends EntityRepository
 
     public function setQueryOptionsFromRequest(Request $request = null)
     {
-        $requestAttributes = [];
-        foreach ($request->attributes->all() as $attributeName => $attributeValue) {
-            $requestAttributes[$attributeName] = $request->attributes->get(
-                $attributeName,
-                $attributeValue
-            );
-        }
-
-        $filters     = $request->query->get('filtering', []);
-        $orFilters   = $request->query->get('filtering_or', []);
-        $sorting     = $request->query->get('sorting', []);
-        $printing    = $request->query->get('printing', []);
-        $rel         = $request->query->get('rel', '');
-        $page        = $request->query->get('page', '');
-        $select      = $request->query->get('select', $this->metadata->getEntityAlias());
-        $filtering   = $request->query->get('filtering', '');
-        $limit       = $request->query->get('limit', '');
-
-        $filterOrCorrected = [];
-
-        $count = 0;
-        foreach ($orFilters as $key => $filter) {
-            if (is_array($filter)) {
-                foreach ($filter as $keyInternal => $internal) {
-                    $filterOrCorrected[$keyInternal . '|' . $count] = $internal;
-                    $count += 1;
-                }
-            } else {
-                $filterOrCorrected[$key] = $filter;
-            }
-        }
-
-        $requestProperties = [
-            'filtering'   => $filtering,
-            'orFiltering' => $filterOrCorrected,
-            'limit'       => $limit,
-            'page'        => $page,
-            'filters'     => $filters,
-            'orFilters'   => $filterOrCorrected,
-            'sorting'     => $sorting,
-            'rel'         => $rel,
-            'printing'    => $printing,
-            'select'      => $select,
-        ];
-
-        $options = array_merge(
-            $requestAttributes,
-            $requestProperties
-        );
-
-        $this->queryOptions = QueryBuilderOptions::fromArray($options);
+        $entityAlias = $this->metadata->getEntityAlias();
+        $this->qoBuilder->setEntityAlias($entityAlias);
+        $this->queryOptions = $this->qoBuilder->builderFromRequest($request);
 
         return $this;
     }
