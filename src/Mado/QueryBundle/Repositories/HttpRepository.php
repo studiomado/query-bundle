@@ -12,6 +12,8 @@ class HttpRepository
 
     private $stack;
 
+    private $repo;
+
     public function __construct(
         EntityManagerInterface $manager,
         RequestStack $stack
@@ -20,12 +22,19 @@ class HttpRepository
         $this->stack = $stack;
     }
 
+    public function setRepo(BaseRepository $repo)
+    {
+        $this->repo = $repo;
+    }
+
     public function buildForEntity(string $entityClassName)
     {
-        $this->repo = new BaseRepository(
-            $this->manager,
-            $this->manager->getClassMetadata($entityClassName)
-        );
+        if (!$this->repo) {
+            $this->repo = new BaseRepository(
+                $this->manager,
+                $this->manager->getClassMetadata($entityClassName)
+            );
+        }
 
         $this->repo->setRequest($this->stack->getCurrentRequest());
 
