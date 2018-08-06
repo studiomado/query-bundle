@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Hateoas\Representation\Factory\PagerfantaFactory;
 use Mado\QueryBundle\Exceptions\InvalidFiltersException;
+use Mado\QueryBundle\Filters\Filters;
 use Mado\QueryBundle\Objects\MetaDataAdapter;
 use Mado\QueryBundle\Objects\PagerfantaBuilder;
 use Mado\QueryBundle\Queries\QueryBuilderFactory;
@@ -71,26 +72,38 @@ class BaseRepository extends EntityRepository
         $this->useResultCache = $bool;
     }
 
+    public function setFilters(Filters $filters)
+    {
+        $this->queryOptions = $filters->getQueryBuilderOptions();
+
+        return $this;
+    }
+
+    /** @deprecated */
     public function setRequest(Request $request)
     {
         return $this->setQueryOptionsFromRequest($request);
     }
 
+    /** @deprecated */
     public function setRequestWithFilter(Request $request, $filter)
     {
         return $this->setQueryOptionsFromRequestWithCustomFilter($request, $filter);
     }
 
+    /** @deprecated */
     public function setRequestWithOrFilter(Request $request, $orFilter)
     {
         return $this->setQueryOptionsFromRequestWithCustomOrFilter($request, $orFilter);
     }
 
+    /** @deprecated */
     public function setQueryOptions(QueryBuilderOptions $options)
     {
         $this->queryOptions = $options;
     }
 
+    /** @deprecated */
     public function setQueryOptionsFromRequest(Request $request = null)
     {
         $requestAttributes = [];
@@ -148,6 +161,7 @@ class BaseRepository extends EntityRepository
         return $this;
     }
 
+    /** @deprecated */
     private function ensureFilterIsValid($filters)
     {
         if (!is_array($filters)) {
@@ -161,6 +175,7 @@ class BaseRepository extends EntityRepository
         }
     }
 
+    /** @deprecated */
     public function setQueryOptionsFromRequestWithCustomFilter(Request $request = null, $filter)
     {
         $filters = $request->query->get('filtering', []);
@@ -208,6 +223,7 @@ class BaseRepository extends EntityRepository
         return $this;
     }
 
+    /** @deprecated */
     public function setQueryOptionsFromRequestWithCustomOrFilter(Request $request = null, $orFilter)
     {
         $filters = $request->query->get('filtering', []);
@@ -254,6 +270,7 @@ class BaseRepository extends EntityRepository
         return $this;
     }
 
+    /** @deprecated */
     public function getRequest()
     {
         return $this->request;
