@@ -28,8 +28,7 @@ class QueryOptionsBuilder
         foreach ($request->attributes->all() as $attributeName => $attributeValue) {
             $requestAttributes[$attributeName] = $request->attributes->get(
                 $attributeName,
-                $attributeValue
-            );
+                $attributeValue);
         }
 
         $filters     = $request->query->get('filtering', []);
