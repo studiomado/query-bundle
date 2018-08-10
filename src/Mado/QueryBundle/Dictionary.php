@@ -128,5 +128,14 @@ class Dictionary
             );
         }
     }
+
+    public static function isValidOperator($operator)
+    {
+        if (!isset(self::$operatorMap[$operator])) {
+            throw new \RuntimeException(
+                'Oops! Operator "' . $operator . '" is not yet defined.'
+            );
+        }
+    }
 }
 
