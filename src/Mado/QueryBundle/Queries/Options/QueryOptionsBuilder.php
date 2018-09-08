@@ -147,7 +147,7 @@ class QueryOptionsBuilder
         }
     }
 
-    public function buildForOrFilter(Request $request, $orFilter)
+    public function buildForOrFilter(Request $request, array $orFilter)
     {
         $this->ensureEntityAliasIsDefined();
 
