@@ -49,9 +49,9 @@ class BaseRepository extends EntityRepository
 
         $this->queryBuilderFactory = new QueryBuilderFactory($this->getEntityManager());
 
-        $this->qoBuilder = new QueryOptionsBuilder();
+        $this->queryOptionBuilder = new QueryOptionsBuilder();
         $entityAlias = $this->metadata->getEntityAlias();
-        $this->qoBuilder->setEntityAlias($entityAlias);
+        $this->queryOptionBuilder->setEntityAlias($entityAlias);
     }
 
     public function initFromQueryBuilderOptions(QueryBuilderOptions $options)
@@ -101,21 +101,21 @@ class BaseRepository extends EntityRepository
 
     public function setQueryOptionsFromRequest(Request $request = null)
     {
-        $this->queryOptions = $this->qoBuilder->builderFromRequest($request);
+        $this->queryOptions = $this->queryOptionBuilder->fromRequest($request);
 
         return $this;
     }
 
     public function setQueryOptionsFromRequestWithCustomFilter(Request $request = null, $filter)
     {
-        $this->queryOptions = $this->qoBuilder->buildFromRequestAndCustomFilter($request, $filter);
+        $this->queryOptions = $this->queryOptionBuilder->buildFromRequestAndCustomFilter($request, $filter);
 
         return $this;
     }
 
     public function setQueryOptionsFromRequestWithCustomOrFilter(Request $request = null, $orFilter)
     {
-        $this->queryOptions = $this->qoBuilder->buildForOrFilter($request);
+        $this->queryOptions = $this->queryOptionBuilder->buildForOrFilter($request);
 
         return $this;
     }

@@ -53,7 +53,7 @@ class QueryOptionsBuilderTest extends TestCase
 
         $this->builder = new QueryOptionsBuilder();
         $this->builder->setEntityAlias($alias = 'asdf');
-        $options = $this->builder->builderFromRequest($this->request);
+        $options = $this->builder->fromRequest($this->request);
 
         $this->assertEquals(
             QueryBuilderOptions::fromArray([
@@ -104,7 +104,7 @@ class QueryOptionsBuilderTest extends TestCase
 
         $this->builder = new QueryOptionsBuilder();
         $this->builder->setEntityAlias($alias = 'asdf');
-        $options = $this->builder->builderFromRequest($this->request);
+        $options = $this->builder->fromRequest($this->request);
 
         $this->assertEquals(
             QueryBuilderOptions::fromArray([
@@ -162,7 +162,7 @@ class QueryOptionsBuilderTest extends TestCase
 
         $this->builder = new QueryOptionsBuilder();
         $this->builder->setEntityAlias($alias = 'asdf');
-        $options = $this->builder->builderFromRequest($this->request);
+        $options = $this->builder->fromRequest($this->request);
 
         $this->assertEquals(
             QueryBuilderOptions::fromArray([
