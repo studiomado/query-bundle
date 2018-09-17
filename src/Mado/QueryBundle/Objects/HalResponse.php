@@ -11,6 +11,11 @@ class HalResponse
         $this->json = $json;
     }
 
+    public static function fromJson(string $json)
+    {
+        return self::fromArray(json_decode($json, true));
+    }
+
     public static function fromArray(array $json)
     {
         return new self($json);
