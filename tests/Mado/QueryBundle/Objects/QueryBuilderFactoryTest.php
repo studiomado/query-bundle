@@ -456,9 +456,9 @@ class QueryBuilderFactoryTest extends TestCase
         $queryBuilderFactory->setRel([ 'group' ]);
         $queryBuilderFactory->setOrFilters([
             '_embedded.group.name|contains|1' => 'ad',
-            '_embedded.group.name|contains|2' => 'ns',
-            '_embedded.group.name|contains|3' => 'dm',
-            '_embedded.group.name|contains|4' => 'mi',
+            '_embedded.group.description|contains|1' => 'ns',
+            '_embedded.group.name|contains|2' => 'dm',
+            '_embedded.group.description|contains|2' => 'mi',
         ]);
         $queryBuilderFactory->createQueryBuilder(User::class, 'e');
         $queryBuilderFactory->filter();
@@ -470,10 +470,8 @@ class QueryBuilderFactoryTest extends TestCase
             " u0_.group_id AS group_id_2 " .
             "FROM User u0_ " .
             "LEFT JOIN Group g1_ ON u0_.group_id = g1_.id " .
-            "WHERE g1_.name LIKE ? " .
-            "OR g1_.name LIKE ? " .
-            "OR g1_.name LIKE ? " .
-            "OR g1_.name LIKE ?",
+            "WHERE (g1_.name LIKE ? OR g1_.description LIKE ?) AND " .
+            "(g1_.name LIKE ? OR g1_.description LIKE ?)",
             $queryBuilderFactory->getQueryBuilder()->getQuery()->getSql()
         );
     }
@@ -958,6 +956,8 @@ class Group
     private $id;
     /** @Column(type="string") */
     private $name;
+    /** @Column(type="string") */
+    private $description;
     /** @OneToMany(targetEntity="User", mappedBy="member") */
     private $members;
     /** @ManyToOne(targetEntity="Company", inversedBy="groups") */

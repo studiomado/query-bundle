@@ -28,9 +28,9 @@ class OrFilter
         $this->fields = $fields;
         $this->join = $join;
 
-        $this->conditions = '';
+        $this->conditions = [];
         $this->parameters = [];
-        $this->parser  = new StringParser();
+        $this->parser = new StringParser();
     }
 
     public function createFilter(array $orFilters)
@@ -45,6 +45,12 @@ class OrFilter
 
     private function applyFilter(Objects\FilterObject $filterObject, $value)
     {
+        $position = $filterObject->getPosition();
+
+        if (!array_key_exists($position, $this->conditions)) {
+            $this->conditions[$position] = '';
+        }
+
         $whereCondition = $this->entityAlias . '.' . $filterObject->getFieldName() . ' '
             . $filterObject->getOperatorMeta();
 
@@ -63,10 +69,10 @@ class OrFilter
                 $whereCondition .= ' :field_' . $filterObject->getFieldName() . $salt;
             }
 
-            if ('' != $this->conditions) {
-                $this->conditions .= ' OR ' . $whereCondition;
+            if ('' != $this->conditions[$position]) {
+                $this->conditions[$position] .= ' OR ' . $whereCondition;
             } else {
-                $this->conditions = $whereCondition;
+                $this->conditions[$position] = $whereCondition;
             }
 
             if ($filterObject->haveOperatorSubstitutionPattern()) {
@@ -91,10 +97,10 @@ class OrFilter
             $isNotARelation = 0 !== strpos($filterObject->getFieldName(), 'Embedded.');
             if ($isNotARelation) {
                 $whereCondition .= ' ' . $this->entityAlias . '.' . $value;
-                if ('' != $this->conditions) {
-                    $this->conditions .= ' OR ' . $whereCondition;
+                if ('' != $this->conditions[$position]) {
+                    $this->conditions[$position] .= ' OR ' . $whereCondition;
                 } else {
-                    $this->conditions = $whereCondition;
+                    $this->conditions[$position] = $whereCondition;
                 }
             }
         }
@@ -121,10 +127,10 @@ class OrFilter
                 $whereCondition .= ' :field_' . $embeddableFieldName . $salt;
             }
 
-            if ('' != $this->conditions) {
-                $this->conditions .= ' OR ' . $whereCondition;
+            if ('' != $this->conditions[$position]) {
+                $this->conditions[$position] .= ' OR ' . $whereCondition;
             } else {
-                $this->conditions = $whereCondition;
+                $this->conditions[$position] = $whereCondition;
             }
 
             if ($filterObject->haveOperatorSubstitutionPattern()) {
@@ -148,7 +154,7 @@ class OrFilter
         }
     }
 
-    public function getConditions() :string
+    public function getConditions() :array
     {
         return $this->conditions;
     }
