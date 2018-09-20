@@ -35,8 +35,7 @@
         "symfony/filesystem": "~3.4.3",
         "symfony/http-foundation": "~3.4.3",
         "doctrine/cache": "v1.6.2",
-        "doctrine/collections": "v1.4.0",
-        "doctrine/instantiator": "1.0.5"
+        "doctrine/collections": "v1.4.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^6.3"
