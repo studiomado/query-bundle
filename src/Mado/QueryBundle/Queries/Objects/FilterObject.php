@@ -12,11 +12,15 @@ final class FilterObject
 
     const OPERATOR = 1;
 
+    const POSITION = 2;
+
     private $rawFilter;
 
     private $fieldName;
 
     private $operatorName;
+
+    private $position;
 
     private function __construct(string $rawFilter)
     {
@@ -32,6 +36,13 @@ final class FilterObject
         $this->fieldName = $parser->camelize($fieldName);
 
         $this->operatorName = $explodedRawFilter[self::OPERATOR];
+
+        $position = 0;
+        if (isset($explodedRawFilter[self::POSITION])) {
+            $position = $explodedRawFilter[self::POSITION];
+        }
+
+        $this->position = $position;
     }
 
     public static function fromRawFilter(string $filter) : FilterObject
@@ -102,5 +113,10 @@ final class FilterObject
     public function isListContainsType() : bool
     {
         return $this->getOperatorName() === 'listcontains';
+    }
+
+    public function getPosition()
+    {
+        return $this->position;
     }
 }
