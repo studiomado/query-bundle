@@ -186,17 +186,19 @@ class QueryBuilderFactory extends AbstractQuery
             $parameters = $orFilterFactory->getParameters();
             $leftJoins = $orFilterFactory->getLeftJoin();
 
-            if ($conditions !== '') {
-                $this->qBuilder->andWhere($conditions);
+            foreach ($conditions as $condition) {
+                if ($condition !== '') {
+                    $this->qBuilder->andWhere($condition);
 
-                foreach ($parameters as $parameter) {
-                    $this->qBuilder->setParameter($parameter['field'], $parameter['value']);
-                }
+                    foreach ($parameters as $parameter) {
+                        $this->qBuilder->setParameter($parameter['field'], $parameter['value']);
+                    }
 
-                foreach ($leftJoins as $join) {
-                    if (!$this->joinAlreadyDone($join)) {
-                        $this->storeJoin($join);
-                        $this->qBuilder->leftJoin($join['field'], $join['relation']);
+                    foreach ($leftJoins as $join) {
+                        if (!$this->joinAlreadyDone($join)) {
+                            $this->storeJoin($join);
+                            $this->qBuilder->leftJoin($join['field'], $join['relation']);
+                        }
                     }
                 }
             }
