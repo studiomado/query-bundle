@@ -222,3 +222,37 @@ In Controller:
             ->findAllPaginated();
     }
 ```
+
+# Queries
+
+## Or Conditions
+
+If you want to create an or condition with this library you can create it from the client for example with a simple GET request like this:
+
+```
+/api/foo?filtering_or[name|eq]=bar&filtering_or[surname|eq]=bar
+```
+
+This request will produce a query like this:
+
+```
+SELECT f0_.id AS id_0, f0_.name AS name_1, f0_.surname AS surname_2" .
+FROM foo f0_" .
+WHERE ((f0_.name = "bar" OR f0_.surname = "bar"))
+```
+
+If you want instead to have more OR conditions separated you can do something like this:
+
+ ```
+ /api/foo?filtering_or[name|eq|1]=bar&filtering_or[surname|eq|1]=bar&filtering_or[group|contains|2]=baz&filtering_or[role|contains|2]=baz
+ ```
+ 
+This request will produce a query like this:
+
+```
+SELECT f0_.id AS id_0, f0_.name AS name_1, f0_.surname AS surname_2, f0_.group AS group_3, f0_.role AS role_4" .
+FROM foo f0_" .
+WHERE (f0_.name = "bar" OR f0_.surname = "bar") AND (f0_.group LIKE "%baz%" OR f0_.role LIKE "%baz%")
+```
+
+This can be done by using a counter after the operator separated by ```|``` 
