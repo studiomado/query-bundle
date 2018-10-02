@@ -225,9 +225,9 @@ In Controller:
 
 # Queries
 
-## Or Conditions
+## OR Conditions
 
-If you want to create an or condition with this library you can create it from the client for example with a simple GET request like this:
+If you want to create an OR condition with this library you can create it from the client for example with a simple GET request like this:
 
 ```
 /api/foo?filtering_or[name|eq]=bar&filtering_or[surname|eq]=bar
@@ -241,7 +241,7 @@ FROM foo f0_" .
 WHERE ((f0_.name = "bar" OR f0_.surname = "bar"))
 ```
 
-If you want instead to have more OR conditions separated you can do something like this:
+Instead, if you want to have more OR conditions separated you can do something like this:
 
  ```
  /api/foo?filtering_or[name|eq|1]=bar&filtering_or[surname|eq|1]=bar&filtering_or[group|contains|2]=baz&filtering_or[role|contains|2]=baz
