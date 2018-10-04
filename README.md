@@ -225,6 +225,22 @@ In Controller:
 
 # Queries
 
+## AND Conditions
+
+If you want to create an AND condition with this library you can create it from the client for example with a simple GET request like this:
+
+```
+/api/foo?filtering[name|eq]=bar&filtering[surname|eq]=bar
+```
+
+This request will produce a query like this:
+
+```
+SELECT f0_.id AS id_0, f0_.name AS name_1, f0_.surname AS surname_2" .
+FROM foo f0_" .
+WHERE f0_.name = "bar" AND f0_.surname = "bar"
+```
+
 ## OR Conditions
 
 If you want to create an OR condition with this library you can create it from the client for example with a simple GET request like this:
