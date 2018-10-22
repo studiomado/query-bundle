@@ -272,3 +272,53 @@ WHERE (f0_.name = "bar" OR f0_.surname = "bar") AND (f0_.group LIKE "%baz%" OR f
 ```
 
 This can be done by using a counter after the operator separated by ```|``` 
+
+## Search into relations
+
+If you want to search inside an entity where a condition is inside another entity you can do this:
+
+```
+/api/users?filtering[_embedded.group.name|contains =bar
+```
+
+This request will produce a query like this:
+
+```
+SELECT u0_.id AS id_0 u0_.username AS username_1,  u0_.group_id AS group_id_2 " .
+FROM User u0_
+LEFT JOIN Group g1_ ON u0_.group_id = g1_.id " .
+WHERE g1_.name LIKE "%bar%"
+```
+
+To do this you need to add inside the user entity some Hateoas annotations like this:
+
+```
+ * @Hateoas\Relation(
+ *     "groups",
+ *     embedded = @Hateoas\Embedded(
+ *         "expr(object.getGroups())",
+ *          exclusion = @Hateoas\Exclusion(
+ *              excludeIf = "expr(object.getGroups().isEmpty() === true)",
+ *              groups={"groups"},
+ *              maxDepth = 1
+ *          )
+ *     ),
+ *     exclusion = @Hateoas\Exclusion(
+ *              excludeIf = "expr(object.getGroups().isEmpty() === true)",
+ *              groups={"groups"},
+ *              maxDepth = 1
+ *          )
+ * )
+ 
+ ```
+
+If you add Hateoas annotations correctly, you can search deeper than only "one level". Here an example:
+
+```
+/api/users?filtering[_embedded.profile.location.country.name|contains]=italy
+```
+
+In this example you search all users that have a profile with a country location name: Italy.  
+Profile, location and country are entities and name is the field.
+
+You can use _embedded filter also into filtering_or conditions.
