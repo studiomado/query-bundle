@@ -1,0 +1,6 @@
+#alias
+alias app="cd /var/www/app"
+alias ll="ls -alhF"
+alias memflush="echo \"flush_all\" | nc servicememcached 11211"
+alias xon="sed -i 's/^;zend_extension/zend_extension/g' $XDEBUG_CONF_FILE && kill -USR2 1"
+alias xoff="sed -i 's/^zend_extension/;zend_extension/g' $XDEBUG_CONF_FILE && kill -USR2 1"

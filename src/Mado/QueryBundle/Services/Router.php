@@ -7,24 +7,25 @@ use Mado\QueryBundle\Queries\QueryBuilderOptions;
 
 class Router
 {
-    public function createRouter(QueryBuilderOptions $queryOptions, $routeName) :Route
-    {
+    public function createRouter(QueryBuilderOptions $queryOptions, $routeName): Route {
         $params = [];
-        $routeParams = [];
-
-        if (null != $queryOptions->get('_route_params')) {
-            $routeParams = array_keys($queryOptions->get('_route_params'));
-        }
-
-        $list = array_merge([
+        $list = [
             'filtering',
             'limit',
             'page',
             'sorting',
-        ], $routeParams);
+        ];
 
         foreach ($list as $itemKey => $itemValue) {
             $params[$itemValue] = $queryOptions->get($itemValue);
+        }
+
+        if (null != $queryOptions->get('_route_params')) {
+            foreach (
+                $queryOptions->get('_route_params') as $itemKey => $itemValue
+            ) {
+                $params[$itemKey] = $itemValue;
+            }
         }
 
         if (!isset($routeName)) {

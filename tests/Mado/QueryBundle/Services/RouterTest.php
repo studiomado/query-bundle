@@ -34,5 +34,6 @@ class RouterTest extends TestCase
 
         $this->assertEquals($routeName, $route->getName());
         $this->assertTrue(array_key_exists($routeParamsKey, $routeParams));
+        $this->assertEquals($routeParamsValue, $routeParams[$routeParamsKey]);
     }
 }

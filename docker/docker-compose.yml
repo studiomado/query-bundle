@@ -1,0 +1,29 @@
+version: '3.7'
+
+networks:
+  query_bundle_network:
+    name: query_bundle_network
+    driver: bridge
+
+services:
+  web:
+    build: nginx
+    depends_on:
+      - php_query_bundle
+    volumes:
+      - ./nginx/host.conf:/etc/nginx/conf.d/default.conf
+      - ./logs/nginx/:/var/log/nginx
+      - ../:/var/www/app:delegated
+    networks:
+      - query_bundle_network
+
+  php_query_bundle:
+    build: php
+    hostname: app_hostname
+    volumes:
+      - ./data/shell_history:/home/utente/shell_history
+      - ../:/var/www/app:delegated
+    networks:
+      - query_bundle_network
+    environment:
+      - HISTFILE=/home/utente/shell_history/.x_history

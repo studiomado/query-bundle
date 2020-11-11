@@ -1,3 +1,9 @@
 /vendor/
 /html/
 /bin/
+
+.idea
+docker/docker-compose.override.yml
+docker/php/ssh
+docker/php/git
+docker/data/shell_history/.x_history
